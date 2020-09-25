@@ -1,8 +1,13 @@
 import * as React from "react";
 import logo from './logo.svg';
 import './App.less';
+import {useContext} from "react";
+import {FhirContext} from "./FhirContext";
 
 function App() {
+  const context = useContext(FhirContext);
+  console.log(context.patient)
+
   return (
     <div className="App">
       <header className="App-header">
@@ -18,6 +23,9 @@ function App() {
         >
           Learn React
         </a>
+        <pre style={{color:"black",fontSize:9,textAlign:"left",position:"relative"}}>
+          {JSON.stringify(context.patient,null, 4)}
+        </pre>
       </header>
     </div>
   );
