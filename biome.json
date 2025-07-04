@@ -7,7 +7,16 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["src/**", "package.json", "biome.json"]
+        "includes": [
+            "src/**",
+            "package.json",
+            "biome.json",
+            "vitest.config.mts",
+            "tsup.config.mts",
+            "tsconfig.json",
+            "README.md",
+            ".github/**"
+        ]
     },
     "formatter": {
         "enabled": true,
