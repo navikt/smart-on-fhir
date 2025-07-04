@@ -4,7 +4,7 @@ import { logger } from '../../logger'
 import { removeTrailingSlash } from '../../utils'
 import { OtelTaxonomy, spanAsync } from '../../otel'
 
-import { SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
+import { type SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
 
 export type SmartConfigurationErrors = {
     error: 'WELL_KNOWN_INVALID_BODY' | 'WELL_KNOWN_INVALID_RESPONSE' | 'UNKNOWN_ERROR'

@@ -1,6 +1,6 @@
 import { logger } from '../logger'
 
-import { CompleteSession, CompleteSessionSchema, InitialSession, InitialSessionSchema } from './schema'
+import { type CompleteSession, CompleteSessionSchema, type InitialSession, InitialSessionSchema } from './schema'
 
 export type SmartStorage = {
     set: (sessionId: string, values: InitialSession | CompleteSession) => Promise<void>

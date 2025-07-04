@@ -1,4 +1,4 @@
-import { SmartStorageErrors } from '../storage'
+import type { SmartStorageErrors } from '../storage'
 
 export type CallbackError = {
     error: 'INVALID_STATE'

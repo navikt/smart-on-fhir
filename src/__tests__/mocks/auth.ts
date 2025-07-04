@@ -1,4 +1,4 @@
-import nock, { Scope } from 'nock'
+import nock, { type Scope } from 'nock'
 
 import { createTestIdToken } from '../utils/token'
 

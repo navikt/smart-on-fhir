@@ -1,6 +1,6 @@
-import { Mock, vi } from 'vitest'
+import { type Mock, vi } from 'vitest'
 
-import { SmartStorage } from '../../client'
+import { type SmartStorage } from '../../client'
 
 export function createTestStorage(): SmartStorage {
     const inMem = new Map()

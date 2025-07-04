@@ -1,18 +1,18 @@
 import * as z from 'zod/v4'
 import {
     createFhirBundleSchema,
-    FhirBundle,
-    FhirCondition,
+    type FhirBundle,
+    type FhirCondition,
     FhirConditionSchema,
-    FhirDocumentReferenceBase,
+    type FhirDocumentReferenceBase,
     FhirDocumentReferenceBaseSchema,
-    FhirEncounter,
+    type FhirEncounter,
     FhirEncounterSchema,
-    FhirOrganization,
+    type FhirOrganization,
     FhirOrganizationSchema,
-    FhirPatient,
+    type FhirPatient,
     FhirPatientSchema,
-    FhirPractitioner,
+    type FhirPractitioner,
     FhirPractitionerSchema,
 } from '../../../zod'
 

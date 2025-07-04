@@ -69,6 +69,9 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - run: yarn build
+      - name: Summarize tsup build
+        run: |
+          ./scripts/meta.mjs . >> $GITHUB_STEP_SUMMARY
       - name: Publish package
         if: github.ref == 'refs/heads/main' && needs.should_release.outputs.skip == 'false'
         run: |

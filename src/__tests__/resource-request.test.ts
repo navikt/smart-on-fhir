@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { CompleteSession } from '../client/storage/schema'
+import type { CompleteSession } from '../client/storage/schema'
 
 import { createTestIdToken } from './utils/token'
 import { expectHas } from './utils/expect'

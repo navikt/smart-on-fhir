@@ -1,14 +1,19 @@
 import { teamLogger } from '@navikt/pino-logger/team-log'
 import { decodeJwt } from 'jose'
 
-import { CompleteSession, InitialSession } from '../../storage/schema'
+import type { CompleteSession, InitialSession } from '../../storage/schema'
 import { logger } from '../../logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../../otel'
 import { getResponseError } from '../../utils'
-import { SmartClientConfiguration } from '../config'
+import type { SmartClientConfiguration } from '../config'
 
-import { TokenRefreshResponse, TokenRefreshResponseSchema, TokenResponse, TokenResponseSchema } from './token-schema'
-import { TokenExchangeErrors } from '../client-errors'
+import {
+    type TokenRefreshResponse,
+    TokenRefreshResponseSchema,
+    type TokenResponse,
+    TokenResponseSchema,
+} from './token-schema'
+import { type TokenExchangeErrors } from '../client-errors'
 
 export async function exchangeToken(
     code: string,

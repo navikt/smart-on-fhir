@@ -1,7 +1,7 @@
-import nock, { Scope } from 'nock'
-import { FhirDocumentReference } from '../../zod'
+import nock, { type Scope } from 'nock'
+import { type FhirDocumentReference } from '../../zod'
 
-import { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
+import type { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
 
 export function mockCreateDocumentReference(expectedPayload: PayloadForCreate<'DocumentReference'>): Scope {
     return nock('http://fhir-server')

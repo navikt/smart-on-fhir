@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { calculatePKCECodeChallenge } from 'openid-client'
 
 import { ReadyClient, SmartClient } from '../client'
-import { CompleteSession, InitialSession } from '../client/storage/schema'
+import type { CompleteSession, InitialSession } from '../client/storage/schema'
 
 import { createTestStorage } from './utils/storage'
 import { FHIR_SERVER } from './mocks/common'

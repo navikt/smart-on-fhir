@@ -1,22 +1,22 @@
 import { decodeJwt, jwtVerify } from 'jose'
-import { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
+import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
-import { CompleteSession } from '../storage/schema'
+import type { CompleteSession } from '../storage/schema'
 import { logger } from '../logger'
 import { OtelTaxonomy, spanAsync } from '../otel'
 import { getResponseError } from '../utils'
 
-import { IdToken, IdTokenSchema } from './launch/token-schema'
+import { type IdToken, IdTokenSchema } from './launch/token-schema'
 import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
 import { getFhir, postFhir } from './resources/fetcher'
 import { SmartClient } from './SmartClient'
-import { ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
-import { KnownPaths, resourceToSchema, ResponseFor } from './resources/resource-map'
+import type { ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
+import { resourceToSchema, type KnownPaths, type ResponseFor } from './resources/resource-map'
 import {
     createResourceToSchema,
-    KnownCreatePaths,
-    PayloadForCreate,
-    ResponseForCreate,
+    type KnownCreatePaths,
+    type PayloadForCreate,
+    type ResponseForCreate,
 } from './resources/create-resource-map'
 
 /**

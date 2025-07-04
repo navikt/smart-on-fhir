@@ -1,5 +1,5 @@
 export function assertNotBrowser(): void {
-    if (typeof window !== 'undefined') {
+    if (typeof (globalThis as any).window !== 'undefined') {
         throw new Error(
             'Oops! You seem to have bundled @navikt/smart-on-fhir in your browser. This library is server-side only. Please make sure you are using this library properly.',
         )

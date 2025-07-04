@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import nock from 'nock'
 
-import { CompleteSession } from '../client/storage/schema'
+import type { CompleteSession } from '../client/storage/schema'
 import { ReadyClient } from '../client'
 
 import { expectIs } from './utils/expect'

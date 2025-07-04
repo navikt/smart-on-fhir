@@ -1,5 +1,5 @@
-import { ReadyClient, SmartClient, SmartClientOptions, SmartStorage } from '../../client'
-import { CompleteSession } from '../../client/storage/schema'
+import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../../client'
+import type { CompleteSession } from '../../client/storage/schema'
 
 import { createTestStorage } from './storage'
 import { expectIs } from './expect'

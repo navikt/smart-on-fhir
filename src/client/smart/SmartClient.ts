@@ -1,17 +1,18 @@
 import { randomPKCECodeVerifier, randomState } from 'openid-client'
 import { teamLogger } from '@navikt/pino-logger/team-log'
 
-import { safeSmartStorage, SafeSmartStorage, SmartStorage, SmartStorageErrors } from '../storage'
+import type { SafeSmartStorage, SmartStorage, SmartStorageErrors } from '../storage'
+import type { CompleteSession, InitialSession } from '../storage/schema'
+import { safeSmartStorage } from '../storage'
 import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../utils'
 import { logger } from '../logger'
-import { CompleteSession, InitialSession } from '../storage/schema'
 import { OtelTaxonomy, spanAsync } from '../otel'
 
-import { fetchSmartConfiguration, SmartConfigurationErrors } from './well-known/smart-configuration'
+import type { CallbackError, SessionStorageErrors, SmartClientReadyErrors, TokenExchangeErrors } from './client-errors'
+import type { SmartClientConfiguration, SmartClientOptions } from './config'
+import { fetchSmartConfiguration, type SmartConfigurationErrors } from './well-known/smart-configuration'
 import { tokenExpiresIn, exchangeToken, refreshToken } from './launch/token'
 import { buildAuthUrl } from './launch/authorization'
-import { CallbackError, SessionStorageErrors, SmartClientReadyErrors, TokenExchangeErrors } from './client-errors'
-import { SmartClientConfiguration, SmartClientOptions } from './config'
 import { ReadyClient } from './ReadyClient'
 
 /**

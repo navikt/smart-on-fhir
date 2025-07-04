@@ -1,5 +1,5 @@
-import nock, { Scope } from 'nock'
-import { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
+import nock, { type Scope } from 'nock'
+import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
 export function mockPractitioner(id: string): Scope {
     return nock('http://fhir-server')
