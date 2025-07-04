@@ -210,7 +210,7 @@ export class SmartClient {
      *
      * This will happen automatically buring the `ready`-step if the `autoRefresh` option is set to `true`.
      */
-    async refresh(sessionId: string, session: CompleteSession): Promise<CompleteSession | TokenExchangeErrors> {
+    async refresh(session: CompleteSession): Promise<CompleteSession | TokenExchangeErrors> {
         const refreshResponse = await refreshToken(session, this._config)
         if ('error' in refreshResponse) return refreshResponse
 
@@ -221,7 +221,7 @@ export class SmartClient {
             refreshToken: refreshResponse.refresh_token,
         }
 
-        await this._storage.set(sessionId, refreshedSessionValues)
+        await this._storage.set(this.sessionId, refreshedSessionValues)
 
         return refreshedSessionValues
     }
@@ -273,7 +273,9 @@ export class SmartClient {
 
                 // Pre-emptively refresh the token if it is about to expire within 5 minutes
                 if (tokenExpiresIn(session.accessToken) < 60 * 5) {
-                    const refreshResult = await this.refresh(sessionId, session)
+                    span.setAttribute(OtelTaxonomy.SessionExpired, true)
+
+                    const refreshResult = await this.refresh(session)
                     if ('error' in refreshResult) {
                         span.setAttributes({
                             [OtelTaxonomy.SessionError]: refreshResult.error,
@@ -291,7 +293,10 @@ export class SmartClient {
                     return refreshResult
                 }
 
-                span.setAttribute(OtelTaxonomy.SessionRefreshed, false)
+                span.setAttributes({
+                    [OtelTaxonomy.SessionExpired]: false,
+                    [OtelTaxonomy.SessionRefreshed]: false,
+                })
                 return session
             },
         )

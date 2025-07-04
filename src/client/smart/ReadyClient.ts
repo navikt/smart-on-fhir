@@ -128,7 +128,21 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const response = await postFhir({ session: this._session, path: resource }, { payload: params.payload })
+            let response = await postFhir({ session: this._session, path: resource }, { payload: params.payload })
+            if (response.status === 401 && this._client.options.autoRefresh) {
+                const refresh = await this._client.refresh(this._session)
+                if ('error' in refresh) {
+                    logger.error(`Failed to refresh session: ${refresh.error}`)
+                    span.setAttributes({
+                        [OtelTaxonomy.SessionError]: refresh.error,
+                        [OtelTaxonomy.SessionRefreshed]: false,
+                    })
+                    // Don't return, let the rest of the code handle the 401
+                } else {
+                    // We refreshed! Let's try the resource again
+                    response = await postFhir({ session: this._session, path: resource }, { payload: params.payload })
+                }
+            }
 
             if (!response.ok) {
                 const responseError = await getResponseError(response)
@@ -163,7 +177,21 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const response = await getFhir({ session: this._session, path: resource })
+            let response = await getFhir({ session: this._session, path: resource })
+            if (response.status === 401 && this._client.options.autoRefresh) {
+                const refresh = await this._client.refresh(this._session)
+                if ('error' in refresh) {
+                    logger.error(`Failed to refresh session: ${refresh.error}`)
+                    span.setAttributes({
+                        [OtelTaxonomy.SessionError]: refresh.error,
+                        [OtelTaxonomy.SessionRefreshed]: false,
+                    })
+                    // Don't return, let the rest of the code handle the 401
+                } else {
+                    // We refreshed! Let's try the resource again
+                    response = await getFhir({ session: this._session, path: resource })
+                }
+            }
 
             if (response.status === 404) {
                 logger.warn(`Resource (${resource}) was not found on FHIR server`)

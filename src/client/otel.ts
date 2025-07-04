@@ -38,6 +38,7 @@ export function failSpan(span: Span, error: Error): void {
 export const OtelTaxonomy = {
     FhirServer: 'fhir.server',
     FhirResource: 'fhir.resource',
+    SessionExpired: 'session.expired',
     SessionError: 'session.error',
     SessionRefreshed: 'session.refreshed',
 }

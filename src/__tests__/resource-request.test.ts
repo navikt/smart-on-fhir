@@ -54,14 +54,14 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
     const [ready] = await createLaunchedReadyClient(validSession)
 
     const mock = mockCreateDocumentReference({ resourceType: 'DocumentReference' })
-    const practitioner = await ready.create('DocumentReference', {
+    const documentReference = await ready.create('DocumentReference', {
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },
     })
 
     expect(mock.isDone()).toBe(true)
-    expectHas(practitioner, 'resourceType')
-    expect(practitioner.resourceType).toBe('DocumentReference')
+    expectHas(documentReference, 'resourceType')
+    expect(documentReference.resourceType).toBe('DocumentReference')
 })
 
 test('shorthand for .request Practitioner should fetch and parse Practitioner resource', async () => {

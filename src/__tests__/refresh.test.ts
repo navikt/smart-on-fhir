@@ -4,11 +4,13 @@ import nock from 'nock'
 import type { CompleteSession } from '../client/storage/schema'
 import { ReadyClient } from '../client'
 
-import { expectIs } from './utils/expect'
+import { expectHas, expectIs } from './utils/expect'
 import { createTestAccessToken, createTestIdToken } from './utils/token'
-import { createLaunchableSmartClient } from './utils/client'
+import { createLaunchableSmartClient, createLaunchedReadyClient } from './utils/client'
 import { mockTokenRefresh } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
+import { mockPractitioner } from './mocks/resources'
+import { mockCreateDocumentReference } from './mocks/create-resources'
 
 const validSession: CompleteSession = {
     // Initial
@@ -84,4 +86,59 @@ test('.ready - should refresh token when expiry is long ago', async () => {
     expectIs(ready, ReadyClient)
 
     expect(tokenMock.isDone()).toBe(true)
+})
+
+test('SmartClient.request - Should refresh token when server says 401', async () => {
+    const [ready] = await createLaunchedReadyClient(validSession, { autoRefresh: true })
+
+    // First request should fail with 401 Unauthorized
+    const practitionerUnauthorized = nock('http://fhir-server')
+        .get(`/Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e`)
+        .reply(401)
+
+    // We then expect the token to be refreshed
+    const tokenMock = mockTokenRefresh({
+        client_id: 'test-client',
+        refresh_token: 'valid-refresh-token',
+    })
+
+    // And finally, the request should succeed with the refreshed token
+    const practitionerActual = mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
+
+    const practitioner = await ready.request(ready.user.fhirUser)
+
+    expect(practitionerUnauthorized.isDone()).toBe(true)
+    expect(practitionerActual.isDone()).toBe(true)
+    expect(tokenMock.isDone()).toBe(true)
+
+    expectHas(practitioner, 'resourceType')
+    expect(practitioner.resourceType).toBe('Practitioner')
+})
+
+test('SmartClient.create - Should refresh token when server says 401', async () => {
+    const [ready] = await createLaunchedReadyClient(validSession, { autoRefresh: true })
+
+    // First request should fail with 401 Unauthorized
+    const documentReferenceUnauthorized = nock('http://fhir-server').post(`/DocumentReference`).reply(401)
+
+    // We then expect the token to be refreshed
+    const tokenMock = mockTokenRefresh({
+        client_id: 'test-client',
+        refresh_token: 'valid-refresh-token',
+    })
+
+    // And finally, the request should succeed with the refreshed token
+    const documentReferenceActual = mockCreateDocumentReference({ resourceType: 'DocumentReference' })
+
+    const documentReference = await ready.create('DocumentReference', {
+        // Payload is contrivedly small for test
+        payload: { resourceType: 'DocumentReference' },
+    })
+
+    expect(documentReferenceUnauthorized.isDone()).toBe(true)
+    expect(documentReferenceActual.isDone()).toBe(true)
+    expect(tokenMock.isDone()).toBe(true)
+
+    expectHas(documentReference, 'resourceType')
+    expect(documentReference.resourceType).toBe('DocumentReference')
 })
