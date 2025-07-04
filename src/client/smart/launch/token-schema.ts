@@ -13,6 +13,14 @@ export const TokenResponseSchema = z.object({
     practitioner: z.string().optional(),
 })
 
+export type TokenRefreshResponse = z.infer<typeof TokenRefreshResponseSchema>
+export const TokenRefreshResponseSchema = z.object({
+    // OIDC:
+    access_token: z.string(),
+    id_token: z.string(),
+    refresh_token: z.string(),
+})
+
 export type IdToken = z.infer<typeof IdTokenSchema>
 export const IdTokenSchema = z.object({
     // SMART:

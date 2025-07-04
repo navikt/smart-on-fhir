@@ -7,7 +7,7 @@ import { OtelTaxonomy, spanAsync } from '../../otel'
 import { getResponseError } from '../../utils'
 import { SmartClientConfiguration } from '../config'
 
-import { TokenResponse, TokenResponseSchema } from './token-schema'
+import { TokenRefreshResponse, TokenRefreshResponseSchema, TokenResponse, TokenResponseSchema } from './token-schema'
 import { TokenExchangeErrors } from '../client-errors'
 
 export async function exchangeToken(
@@ -93,7 +93,7 @@ export async function exchangeToken(
 export async function refreshToken(
     session: CompleteSession,
     config: SmartClientConfiguration,
-): Promise<TokenResponse | TokenExchangeErrors> {
+): Promise<TokenRefreshResponse | TokenExchangeErrors> {
     return spanAsync('token-exchange', async (span) => {
         span.setAttribute(OtelTaxonomy.FhirServer, session.server)
 
@@ -132,7 +132,7 @@ export async function refreshToken(
         }
 
         const result: unknown = await response.json()
-        const parsedTokenResponse = TokenResponseSchema.safeParse(result)
+        const parsedTokenResponse = TokenRefreshResponseSchema.safeParse(result)
 
         if (!parsedTokenResponse.success) {
             const exception = new Error(
