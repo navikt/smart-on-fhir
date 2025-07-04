@@ -11,16 +11,33 @@ if (!inputDir) {
 }
 
 const project = path.basename(inputDir)
-const metaPath = path.join(inputDir, 'dist', 'metafile-cjs.json')
+const metaPath = path.join(inputDir, 'dist', 'metafile-esm.json')
 const prefix = inputDir.endsWith('/') ? inputDir : inputDir + '/'
-
 const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'))
 
 console.log(`## TSUP Build Summary: ${project}\n`)
 
-for (const [file, data] of Object.entries(meta.outputs)) {
-    if (!data.entryPoint) continue
+const entries = Object.entries(meta.outputs).filter(([_, data]) => data.entryPoint)
+const sharedChunks = new Set()
+
+for (const [file, data] of entries) {
+    for (const imp of data.imports || []) {
+        if (!imp.external && meta.outputs[imp.path]) {
+            sharedChunks.add(imp.path)
+        }
+    }
+}
+
+for (const [file, data] of entries) {
     const sizeKb = (data.bytes / 1024).toFixed(1)
     const relativeFile = file.replace(prefix, '')
-    console.log(`- \`${relativeFile}\` (from \`${data.entryPoint}\`) — ${sizeKb} KB`)
+    const entryPoint = data.entryPoint.replace(/^.*?src\//, 'src/')
+    console.log(`- \`${relativeFile}\` (from \`${entryPoint}\`) — ${sizeKb} KB`)
+}
+
+for (const file of sharedChunks) {
+    const data = meta.outputs[file]
+    const sizeKb = (data.bytes / 1024).toFixed(1)
+    const relativeFile = file.replace(prefix, '')
+    console.log(`- \`${relativeFile}\` (shared chunk) — ${sizeKb} KB`)
 }

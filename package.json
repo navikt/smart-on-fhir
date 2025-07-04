@@ -5,6 +5,7 @@
     "engines": {
         "node": "22"
     },
+    "type": "module",
     "scripts": {
         "build": "tsup",
         "test": "vitest",
@@ -26,14 +27,12 @@
     ],
     "exports": {
         "./client": {
-            "types": "./dist/client/index.d.ts",
-            "import": "./dist/client/index.js",
-            "require": "./dist/client/index.js"
+            "types": "./dist/client/index.d.mts",
+            "import": "./dist/client/index.mjs"
         },
         "./zod": {
-            "types": "./dist/zod/index.d.ts",
-            "import": "./dist/zod/index.js",
-            "require": "./dist/zod/index.js"
+            "types": "./dist/zod/index.d.mts",
+            "import": "./dist/zod/index.mjs"
         }
     },
     "dependencies": {

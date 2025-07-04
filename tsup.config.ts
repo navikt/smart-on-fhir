@@ -1,10 +1,11 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from "tsup";
 
 export default defineConfig({
-    dts: true,
-    splitting: false,
-    sourcemap: true,
-    clean: true,
-    metafile: true,
-    entry: ['src/zod/index.ts', 'src/client/index.ts'],
-})
+  dts: true,
+  splitting: true,
+  sourcemap: true,
+  clean: true,
+  metafile: true,
+  format: "esm",
+  entry: ["src/zod/index.ts", "src/client/index.ts"],
+});
