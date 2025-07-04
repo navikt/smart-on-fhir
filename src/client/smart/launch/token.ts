@@ -94,7 +94,7 @@ export async function refreshToken(
     session: CompleteSession,
     config: SmartClientConfiguration,
 ): Promise<TokenRefreshResponse | TokenExchangeErrors> {
-    return spanAsync('token-exchange', async (span) => {
+    return spanAsync('token-refresh', async (span) => {
         span.setAttribute(OtelTaxonomy.FhirServer, session.server)
 
         const tokenRequestBody = {
