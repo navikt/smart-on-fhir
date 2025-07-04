@@ -8,7 +8,7 @@ if [ -z "$VERSION" ]; then
 fi
 
 LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
-COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"* %s" | grep -v "set next version")
+COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"* %s" | grep -v "released\! \[skip ci\]" || true)
 
 echo "Got version $VERSION"
 echo "Last tag is $LAST_TAG"
