@@ -2,7 +2,6 @@ export type {
     ResourceCreateErrors,
     ResourceRequestErrors,
     SmartClientReadyErrors,
-    TokenExchangeErrors,
 } from './smart/client-errors'
 export type {
     SmartClientConfiguration,

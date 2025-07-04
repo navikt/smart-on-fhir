@@ -4,11 +4,8 @@ import { logger } from '../../logger'
 import { OtelTaxonomy, spanAsync } from '../../otel'
 import { removeTrailingSlash } from '../../utils'
 
+import type { SmartConfigurationErrors } from './smart-configuration-errors'
 import { type SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
-
-export type SmartConfigurationErrors = {
-    error: 'WELL_KNOWN_INVALID_BODY' | 'WELL_KNOWN_INVALID_RESPONSE' | 'UNKNOWN_ERROR'
-}
 
 export async function fetchSmartConfiguration(
     fhirServer: string,

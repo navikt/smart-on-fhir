@@ -5,9 +5,9 @@ import { logger } from '../../logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../../otel'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import { getResponseError } from '../../utils'
-import type { TokenExchangeErrors } from '../client-errors'
 import type { SmartClientConfiguration } from '../config'
 
+import type { RefreshTokenErrors, TokenExchangeErrors } from './token-errors'
 import {
     type TokenRefreshResponse,
     TokenRefreshResponseSchema,
@@ -95,7 +95,7 @@ export async function exchangeToken(
 export async function refreshToken(
     session: CompleteSession,
     config: SmartClientConfiguration,
-): Promise<TokenRefreshResponse | TokenExchangeErrors> {
+): Promise<TokenRefreshResponse | RefreshTokenErrors> {
     return spanAsync('token-refresh', async (span) => {
         span.setAttribute(OtelTaxonomy.FhirServer, session.server)
 
@@ -128,7 +128,7 @@ export async function refreshToken(
                 ),
             )
 
-            return { error: 'TOKEN_EXCHANGE_FAILED' }
+            return { error: 'REFRESH_TOKEN_FAILED' }
         }
 
         const result: unknown = await response.json()
@@ -145,7 +145,7 @@ export async function refreshToken(
             logger.error(exception)
             span.recordException(exception)
 
-            return { error: 'TOKEN_EXCHANGE_INVALID_BODY' }
+            return { error: 'REFRESH_TOKEN_INVALID_BODY' }
         }
 
         if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {

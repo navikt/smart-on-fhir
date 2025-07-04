@@ -7,7 +7,6 @@ import type { CompleteSession } from '../storage/schema'
 import { getResponseError } from '../utils'
 
 import type { ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
-import { type IdToken, IdTokenSchema } from './launch/token-schema'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
@@ -17,6 +16,7 @@ import {
 import { getFhir, postFhir } from './resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from './resources/resource-map'
 import type { SmartClient } from './SmartClient'
+import { type IdToken, IdTokenSchema } from './token/token-schema'
 import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
 
 /**

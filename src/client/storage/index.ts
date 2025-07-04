@@ -1,17 +1,17 @@
 import { logger } from '../logger'
 
 import { type CompleteSession, CompleteSessionSchema, type InitialSession, InitialSessionSchema } from './schema'
+import type { CompleteSessionErrors, InitialSessionErrors } from './storage-errors'
 
 export type SmartStorage = {
     set: (sessionId: string, values: InitialSession | CompleteSession) => Promise<void>
     get: (sessionId: string) => Promise<unknown>
 }
 
-export type SmartStorageErrors = { error: 'BROKEN_SESSION_STATE' | 'NO_STATE' }
-
 export type SafeSmartStorage = {
     set: (sessionId: string, values: InitialSession | CompleteSession) => Promise<void>
-    get: (sessionId: string) => Promise<InitialSession | CompleteSession | SmartStorageErrors>
+    getPartial: (sessionId: string) => Promise<InitialSession | InitialSessionErrors>
+    getComplete: (sessionId: string) => Promise<CompleteSession | CompleteSessionErrors>
 }
 
 export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStorage>): SafeSmartStorage {
@@ -19,16 +19,13 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
         set: async (...args) => {
             return (await smartStorage).set(...args)
         },
-        get: async (sessionId) => {
+        getPartial: async (sessionId) => {
             const raw = await (await smartStorage).get(sessionId)
 
             if (raw == null) return { error: 'NO_STATE' }
             if (raw && typeof raw === 'object' && Object.keys(raw).length === 0) {
                 return { error: 'NO_STATE' }
             }
-
-            const completeParsed = CompleteSessionSchema.safeParse(raw)
-            if (!completeParsed.error) return completeParsed.data
 
             const initialParsed = InitialSessionSchema.safeParse(raw)
             if (initialParsed.error) {
@@ -41,6 +38,26 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
             }
 
             return initialParsed.data
+        },
+        getComplete: async (sessionId) => {
+            const raw = await (await smartStorage).get(sessionId)
+
+            if (raw == null) return { error: 'NO_STATE' }
+            if (raw && typeof raw === 'object' && Object.keys(raw).length === 0) {
+                return { error: 'NO_STATE' }
+            }
+
+            const completeParsed = CompleteSessionSchema.safeParse(raw)
+            if (completeParsed.error) {
+                logger.error(
+                    new Error(`SmartSession state for session ${sessionId} was expected to be complete, but wasn't`, {
+                        cause: completeParsed.error,
+                    }),
+                )
+                return { error: 'BROKEN_SESSION_STATE' }
+            }
+
+            return completeParsed.data
         },
     }
 }

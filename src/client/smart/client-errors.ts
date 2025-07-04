@@ -1,13 +1,17 @@
-import type { SmartStorageErrors } from '../storage'
+import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
 
-export type CallbackError = {
-    error: 'INVALID_STATE'
-}
+import type { RefreshTokenErrors, TokenExchangeErrors } from './token/token-errors'
 
-export type SessionStorageErrors = SmartStorageErrors | { error: 'INCOMPLETE_SESSION' }
+export type CallbackError =
+    | TokenExchangeErrors
+    | InitialSessionErrors
+    | {
+          error: 'INVALID_STATE'
+      }
 
 export type SmartClientReadyErrors =
-    | SessionStorageErrors
+    | CompleteSessionErrors
+    | RefreshTokenErrors
     | {
           error: 'NO_ACTIVE_SESSION' | 'INVALID_ID_TOKEN' | 'INVALID_TOKEN' | 'REFRESH_FAILED'
       }
@@ -18,8 +22,4 @@ export type ResourceCreateErrors = {
 
 export type ResourceRequestErrors = {
     error: 'REQUEST_FAILED_NON_OK_RESPONSE' | 'REQUEST_FAILED_INVALID_RESPONSE' | 'REQUEST_FAILED_RESOURCE_NOT_FOUND'
-}
-
-export type TokenExchangeErrors = {
-    error: 'TOKEN_EXCHANGE_FAILED' | 'TOKEN_EXCHANGE_INVALID_BODY' | 'UNKNOWN_ERROR'
 }
