@@ -17,6 +17,11 @@
         "access": "public",
         "registry": "https://npm.pkg.github.com/"
     },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
     "exports": {
         "./client": {
             "types": "./dist/client/index.d.ts",
