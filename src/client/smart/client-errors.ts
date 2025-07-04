@@ -17,3 +17,7 @@ export type ResourceCreateErrors = {
 export type ResourceRequestErrors = {
     error: 'REQUEST_FAILED_NON_OK_RESPONSE' | 'REQUEST_FAILED_INVALID_RESPONSE' | 'REQUEST_FAILED_RESOURCE_NOT_FOUND'
 }
+
+export type TokenExchangeErrors = {
+    error: 'TOKEN_EXCHANGE_FAILED' | 'TOKEN_EXCHANGE_INVALID_BODY' | 'UNKNOWN_ERROR'
+}

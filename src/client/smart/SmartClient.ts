@@ -8,9 +8,9 @@ import { CompleteSession, InitialSession } from '../storage/schema'
 import { OtelTaxonomy, spanAsync } from '../otel'
 
 import { fetchSmartConfiguration, SmartConfigurationErrors } from './well-known/smart-configuration'
-import { tokenExpiresIn, exchangeToken, TokenExchangeErrors, refreshToken } from './launch/token'
+import { tokenExpiresIn, exchangeToken, refreshToken } from './launch/token'
 import { buildAuthUrl } from './launch/authorization'
-import { CallbackError, SessionStorageErrors, SmartClientReadyErrors } from './client-errors'
+import { CallbackError, SessionStorageErrors, SmartClientReadyErrors, TokenExchangeErrors } from './client-errors'
 import { SmartClientConfiguration, SmartClientOptions } from './config'
 import { ReadyClient } from './ReadyClient'
 

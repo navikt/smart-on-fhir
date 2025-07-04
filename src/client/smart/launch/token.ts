@@ -7,11 +7,8 @@ import { OtelTaxonomy, spanAsync } from '../../otel'
 import { getResponseError } from '../../utils'
 import { SmartClientConfiguration } from '../config'
 
-import { TokenResponseSchema, TokenResponse } from './token-schema'
-
-export type TokenExchangeErrors = {
-    error: 'TOKEN_EXCHANGE_FAILED' | 'TOKEN_EXCHANGE_INVALID_BODY' | 'UNKNOWN_ERROR'
-}
+import { TokenResponse, TokenResponseSchema } from './token-schema'
+import { TokenExchangeErrors } from '../client-errors'
 
 export async function exchangeToken(
     code: string,
