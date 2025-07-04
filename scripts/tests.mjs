@@ -21,7 +21,7 @@ console.log(`- Tests: ${results.numPassedTests}/${results.numTotalTests} passed`
 console.log(`- Failures: ${results.numFailedTests}\n`)
 
 for (const suite of results.testResults) {
-    const file = path.relative(process.cwd(), suite.name)
+    const file = path.relative(process.cwd(), suite.name).replace("src/__tests__/", "")
     console.log(`### ${file}`)
     for (const t of suite.assertionResults) {
         const status = t.status === 'passed' ? '✅' : '❌'
