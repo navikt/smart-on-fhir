@@ -1,4 +1,5 @@
-import { trace, context, Span } from '@opentelemetry/api'
+import { trace, context, Span, SpanStatusCode } from '@opentelemetry/api'
+import { logger } from './logger'
 
 const LIB_NAME = '@navikt/smart-on-fhir'
 const LIB_VERSION = '0.0.1-alpha.0'
@@ -22,6 +23,16 @@ export function spanSync<Result>(name: string, fn: () => Result): Result {
             span.end()
         }
     })
+}
+
+/**
+ * Marks the span as failed, as well as logs the exception.
+ */
+export function failSpan(span: Span, error: Error): void {
+    logger.error(error)
+
+    span.recordException(error)
+    span.setStatus({ code: SpanStatusCode.ERROR, message: error.message })
 }
 
 export const OtelTaxonomy = {

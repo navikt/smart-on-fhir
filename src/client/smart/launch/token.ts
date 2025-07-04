@@ -3,7 +3,7 @@ import { decodeJwt } from 'jose'
 
 import { CompleteSession, InitialSession } from '../../storage/schema'
 import { logger } from '../../logger'
-import { OtelTaxonomy, spanAsync } from '../../otel'
+import { failSpan, OtelTaxonomy, spanAsync } from '../../otel'
 import { getResponseError } from '../../utils'
 import { SmartClientConfiguration } from '../config'
 
@@ -68,15 +68,12 @@ export async function exchangeToken(
         const parsedTokenResponse = TokenResponseSchema.safeParse(result)
 
         if (!parsedTokenResponse.success) {
-            const exception = new Error(
-                `Issuer/token_endpoint ${session.tokenEndpoint} responded with weird token response`,
-                {
+            failSpan(
+                span,
+                new Error(`Issuer/token_endpoint ${session.tokenEndpoint} responded with weird token response`, {
                     cause: parsedTokenResponse.error,
-                },
+                }),
             )
-
-            logger.error(exception)
-            span.recordException(exception)
 
             return { error: 'TOKEN_EXCHANGE_INVALID_BODY' }
         }
@@ -118,13 +115,11 @@ export async function refreshToken(
 
         if (!response.ok) {
             const responseError = await getResponseError(response)
-            logger.error(
-                `Token refresh failed, token_endpoint responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
-            )
 
-            span.recordException(
+            failSpan(
+                span,
                 new Error(
-                    `Token refresh failed, token_endpoint responded with ${response.status} ${response.statusText}`,
+                    `Token refresh failed, token_endpoint responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
                 ),
             )
 
