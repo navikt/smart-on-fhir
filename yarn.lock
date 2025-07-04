@@ -380,6 +380,7 @@ __metadata:
     nock: "npm:^14.0.5"
     openid-client: "npm:^6.6.2"
     pino: "npm:^9.7.0"
+    pinst: "npm:^3.0.0"
     prettier: "npm:^3.6.2"
     typescript: "npm:^5.8.3"
     vitest: "npm:^3.2.4"
@@ -3473,6 +3474,15 @@ __metadata:
   bin:
     pino: bin.js
   checksum: 10c0/c7f8a83a9a9d728b4eff6d0f4b9367f031c91bcaa5806fbf0eedcc8e77faba593d59baf11a8fba0dd1c778bb17ca7ed01418ac1df4ec129faeedd4f3ecaff66f
+  languageName: node
+  linkType: hard
+
+"pinst@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "pinst@npm:3.0.0"
+  bin:
+    pinst: bin.js
+  checksum: 10c0/abb1ed62ea2acb2207a7a860715bdb26ecbde74ede8fad5f6200194f3e22db25e2b7a49af05e5cc7fc05384709c651e0000323f0077d7239060c4b68c8acd428
   languageName: node
   linkType: hard
 

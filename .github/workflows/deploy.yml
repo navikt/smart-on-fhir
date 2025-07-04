@@ -72,7 +72,9 @@ jobs:
       - name: Publish package
         if: github.ref == 'refs/heads/main' && needs.should_release.outputs.skip == 'false'
         run: |
+          yarn pinst --disable
           yarn npm publish
+          yarn pinst --enable
           ./scripts/create-release.sh
           ./scripts/bump-version.sh
         env:
