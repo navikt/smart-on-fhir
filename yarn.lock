@@ -365,18 +365,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@navikt/smart-on-fhir@workspace:libs/smart-on-fhir":
+"@navikt/smart-on-fhir@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@navikt/smart-on-fhir@workspace:libs/smart-on-fhir"
+  resolution: "@navikt/smart-on-fhir@workspace:."
   dependencies:
+    "@navikt/eslint-config-teamsykmelding": "npm:^7.1.0"
     "@navikt/pino-logger": "npm:^4.1.5"
     "@opentelemetry/api": "npm:^1.9.0"
     "@types/node": "npm:^24.0.10"
     "@vitest/coverage-v8": "npm:3.2.4"
+    husky: "npm:^9.1.7"
     jose: "npm:^6.0.11"
+    lint-staged: "npm:^16.1.2"
     nock: "npm:^14.0.5"
     openid-client: "npm:^6.6.2"
     pino: "npm:^9.7.0"
+    prettier: "npm:^3.6.2"
     typescript: "npm:^5.8.3"
     vitest: "npm:^3.2.4"
     zod: "npm:^3.25.67"
@@ -4024,17 +4028,6 @@ __metadata:
   checksum: 10c0/a16775323e1404dd43fabafe7460be13a471e021637bc7889468eb45ce6a6b207261f454e4e530a19500cc962c4cc5348583520843b363f4193cee5c00e1e539
   languageName: node
   linkType: hard
-
-"smart-on-fhir-root@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "smart-on-fhir-root@workspace:."
-  dependencies:
-    "@navikt/eslint-config-teamsykmelding": "npm:^7.1.0"
-    husky: "npm:^9.1.7"
-    lint-staged: "npm:^16.1.2"
-    prettier: "npm:^3.6.2"
-  languageName: unknown
-  linkType: soft
 
 "socks-proxy-agent@npm:^8.0.3":
   version: 8.0.5
