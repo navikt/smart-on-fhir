@@ -1,5 +1,5 @@
 import nock, { Scope } from 'nock'
-import { FhirEncounter, FhirPatient, FhirPractitioner } from '@navikt/fhir-zod'
+import { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
 export function mockPractitioner(id: string): Scope {
     return nock('http://fhir-server')

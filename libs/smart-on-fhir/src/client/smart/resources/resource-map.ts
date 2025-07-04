@@ -14,7 +14,7 @@ import {
     FhirPatientSchema,
     FhirPractitioner,
     FhirPractitionerSchema,
-} from '@navikt/fhir-zod'
+} from '../../../zod'
 
 /**
  * A map of FHIR paths in a FHIR server and their known corresponding resource types.

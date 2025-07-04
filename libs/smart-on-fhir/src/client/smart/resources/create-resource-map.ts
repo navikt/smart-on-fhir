@@ -1,5 +1,5 @@
 import * as z from 'zod/v4'
-import { FhirDocumentReference, FhirDocumentReferenceBaseSchema } from '@navikt/fhir-zod'
+import { FhirDocumentReference, FhirDocumentReferenceBaseSchema } from '../../../zod'
 
 /**
  * A map of FHIR paths in a FHIR server and their known corresponding resource types.

@@ -1,5 +1,5 @@
 import nock, { Scope } from 'nock'
-import { FhirDocumentReference } from '@navikt/fhir-zod'
+import { FhirDocumentReference } from '../../zod'
 
 import { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
 

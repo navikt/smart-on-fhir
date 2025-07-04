@@ -1,5 +1,5 @@
 import { decodeJwt, jwtVerify } from 'jose'
-import { FhirEncounter, FhirPatient, FhirPractitioner } from '@navikt/fhir-zod'
+import { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
 import { CompleteSession } from '../storage/schema'
 import { logger } from '../logger'
