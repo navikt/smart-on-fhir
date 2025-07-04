@@ -3,23 +3,20 @@
 layout: home
 
 hero:
-  name: "@navikt/smart-on-fhir"
-  text: "Getting started with server-first Smart on FHIR client"
-  tagline: My great project tagline
+  name: "A Modern Smart on FHIR library"
+  tagline: "@navikt/smart-on-fhir node/deno/bun library"
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Getting Started
+      link: /getting-started
     - theme: alt
       text: API Examples
       link: /api-examples
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Server first
+    details: No secrets available in the client, all secrets are stored on the server using your favourite key value storage such as Valkey or Redis.
+  - title: Modern Web API's
+    details: Built using Request/Response API's, so it will work with any Node server framework such as Express, Fastify, or even Next.js
 ---
 
