@@ -1,0 +1,80 @@
+name: Build & Deploy
+on:
+  push:
+    paths-ignore:
+      - docs/**
+
+env:
+  NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+jobs:
+  should_release:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "⏭️ Skipping release because not on main branch." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
+
+          body="$(git log -1 --pretty=%B | tail -n +2)"
+          if echo "$body" | grep -qi 'skip release'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "⏭️ Skipping release due to 'skip release' in commit message." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Proceeding with release." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  test-and-verify:
+    name: Test, lint and verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        id: setup-node
+        with:
+          node-version: 22.x
+          cache: yarn
+      - run: yarn install --immutable
+      - run: yarn tsc
+      - run: yarn test
+
+  build_and_release:
+    permissions:
+      packages: write
+      contents: write
+    runs-on: ubuntu-latest
+    needs: [should_release, test-and-verify]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        id: setup-node
+        with:
+          node-version: 22.x
+          cache: yarn
+      - run: yarn install --immutable
+      - run: yarn build
+      - name: Publish package
+        if: github.ref == 'refs/heads/main' && needs.should_release.outputs.skip == 'false'
+        run: |
+          yarn npm publish
+          ./scripts/create-release.sh
+          ./scripts/bump-version.sh
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

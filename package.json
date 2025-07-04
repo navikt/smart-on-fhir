@@ -1,13 +1,21 @@
 {
     "name": "@navikt/smart-on-fhir",
+    "version": "0.0.1",
     "packageManager": "yarn@4.7.0",
     "engines": {
         "node": "22"
     },
     "scripts": {
+        "build": "echo 'No build step yet, will tsup later'",
         "test": "vitest",
         "tsc": "tsc",
-        "postinstall": "husky"
+        "postinstall": "husky",
+        "next:major": "yarn version -i major",
+        "next:minor": "yarn version -i minor"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://npm.pkg.github.com/"
     },
     "exports": {
         "./client": {
