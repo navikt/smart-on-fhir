@@ -27,12 +27,12 @@
     ],
     "exports": {
         "./client": {
-            "types": "./dist/client/index.d.mts",
-            "import": "./dist/client/index.mjs"
+            "types": "./dist/client/index.d.ts",
+            "import": "./dist/client/index.js"
         },
         "./zod": {
-            "types": "./dist/zod/index.d.mts",
-            "import": "./dist/zod/index.mjs"
+            "types": "./dist/zod/index.d.ts",
+            "import": "./dist/zod/index.js"
         }
     },
     "dependencies": {
