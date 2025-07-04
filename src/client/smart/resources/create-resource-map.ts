@@ -1,4 +1,5 @@
-import * as z from 'zod/v4'
+import type * as z from 'zod/v4'
+
 import { type FhirDocumentReference, FhirDocumentReferenceBaseSchema } from '../../../zod'
 
 /**
@@ -37,7 +38,7 @@ export type PayloadForCreate<T extends string> = {
  * This function is a type-hole, the callee will have to as the resulting parsed schema to the correct type.
  */
 export function createResourceToSchema(resource: KnownCreatePaths): z.ZodObject {
-    if (resource == 'DocumentReference') {
+    if (resource === 'DocumentReference') {
         return FhirDocumentReferenceBaseSchema
     }
 

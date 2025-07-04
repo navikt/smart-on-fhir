@@ -1,7 +1,7 @@
 import nock, { type Scope } from 'nock'
-import { type FhirDocumentReference } from '../../zod'
 
 import type { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
+import type { FhirDocumentReference } from '../../zod'
 
 export function mockCreateDocumentReference(expectedPayload: PayloadForCreate<'DocumentReference'>): Scope {
     return nock('http://fhir-server')
@@ -37,6 +37,8 @@ export function mockCreateDocumentReference(expectedPayload: PayloadForCreate<'D
                     },
                 },
             ],
-            context: { encounter: [{ reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' }] },
+            context: {
+                encounter: [{ reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' }],
+            },
         } satisfies FhirDocumentReference)
 }

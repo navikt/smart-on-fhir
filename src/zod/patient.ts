@@ -1,6 +1,6 @@
 import * as z from 'zod/v4'
 
-import { NameSchema, GeneralIdentifierSchema } from './common'
+import { GeneralIdentifierSchema, NameSchema } from './common'
 
 export type FhirPatient = z.infer<typeof FhirPatientSchema>
 export const FhirPatientSchema = z.object({

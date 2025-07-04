@@ -1,19 +1,19 @@
-import { randomPKCECodeVerifier, randomState } from 'openid-client'
 import { teamLogger } from '@navikt/pino-logger/team-log'
+import { randomPKCECodeVerifier, randomState } from 'openid-client'
 
-import type { SafeSmartStorage, SmartStorage, SmartStorageErrors } from '../storage'
-import type { CompleteSession, InitialSession } from '../storage/schema'
-import { safeSmartStorage } from '../storage'
-import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../utils'
 import { logger } from '../logger'
 import { OtelTaxonomy, spanAsync } from '../otel'
+import type { SafeSmartStorage, SmartStorage, SmartStorageErrors } from '../storage'
+import { safeSmartStorage } from '../storage'
+import type { CompleteSession, InitialSession } from '../storage/schema'
+import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../utils'
 
 import type { CallbackError, SessionStorageErrors, SmartClientReadyErrors, TokenExchangeErrors } from './client-errors'
 import type { SmartClientConfiguration, SmartClientOptions } from './config'
-import { fetchSmartConfiguration, type SmartConfigurationErrors } from './well-known/smart-configuration'
-import { tokenExpiresIn, exchangeToken, refreshToken } from './launch/token'
 import { buildAuthUrl } from './launch/authorization'
+import { exchangeToken, refreshToken, tokenExpiresIn } from './launch/token'
 import { ReadyClient } from './ReadyClient'
+import { fetchSmartConfiguration, type SmartConfigurationErrors } from './well-known/smart-configuration'
 
 /**
  * The smart client is used to handle the launch of the Smart on FHIR application. It requires at the very least:
@@ -180,7 +180,10 @@ export class SmartClient {
      * sessionId that was used in the `launch` and `callback` methods.
      */
     async ready(): Promise<
-        ReadyClient | ((SmartClientReadyErrors | TokenExchangeErrors) & { validate: ReadyClient['validate'] })
+        | ReadyClient
+        | ((SmartClientReadyErrors | TokenExchangeErrors) & {
+              validate: ReadyClient['validate']
+          })
     > {
         return spanAsync('ready', async (span) => {
             const session = this._options.autoRefresh

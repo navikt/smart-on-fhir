@@ -1,23 +1,23 @@
 import { decodeJwt, jwtVerify } from 'jose'
-import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
-import type { CompleteSession } from '../storage/schema'
+import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { logger } from '../logger'
 import { OtelTaxonomy, spanAsync } from '../otel'
+import type { CompleteSession } from '../storage/schema'
 import { getResponseError } from '../utils'
 
-import { type IdToken, IdTokenSchema } from './launch/token-schema'
-import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
-import { getFhir, postFhir } from './resources/fetcher'
-import { SmartClient } from './SmartClient'
 import type { ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
-import { resourceToSchema, type KnownPaths, type ResponseFor } from './resources/resource-map'
+import { type IdToken, IdTokenSchema } from './launch/token-schema'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
     type PayloadForCreate,
     type ResponseForCreate,
 } from './resources/create-resource-map'
+import { getFhir, postFhir } from './resources/fetcher'
+import { type KnownPaths, type ResponseFor, resourceToSchema } from './resources/resource-map'
+import type { SmartClient } from './SmartClient'
+import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
 
 /**
  * **Smart App Launch reference**
@@ -93,12 +93,12 @@ export class ReadyClient {
                 return false
             }
 
-            logger.info(`Fetched well known configuration from session.issuer, jwks_uri: ${smartConfig['jwks_uri']}`)
+            logger.info(`Fetched well known configuration from session.issuer, jwks_uri: ${smartConfig.jwks_uri}`)
             try {
                 return await spanAsync('jwt-verify', async (span) => {
                     span.setAttribute(OtelTaxonomy.FhirServer, this._session.server)
 
-                    await jwtVerify(this._session.accessToken, getJwkSet(smartConfig['jwks_uri']), {
+                    await jwtVerify(this._session.accessToken, getJwkSet(smartConfig.jwks_uri), {
                         issuer: this._session.issuer,
                         algorithms: ['RS256'],
                     })
@@ -160,7 +160,11 @@ export class ReadyClient {
 
             const parsed = createResourceToSchema(resource).safeParse(result)
             if (!parsed.success) {
-                logger.error(new Error('Failed to parse DocumentReference', { cause: parsed.error }))
+                logger.error(
+                    new Error('Failed to parse DocumentReference', {
+                        cause: parsed.error,
+                    }),
+                )
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
 

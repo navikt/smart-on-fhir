@@ -1,4 +1,7 @@
 export default {
-    '*.{md,html,css,json,md,mdx,js,yml,yaml,graphql,graphqls}': 'yarn prettier --write',
+    '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}': [
+        'biome check --write --no-errors-on-unmatched',
+        'biome lint --write --no-errors-on-unmatched',
+    ],
     '*.{ts,tsx}': () => ['yarn tsc'],
 }

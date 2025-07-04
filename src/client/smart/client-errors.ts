@@ -8,7 +8,9 @@ export type SessionStorageErrors = SmartStorageErrors | { error: 'INCOMPLETE_SES
 
 export type SmartClientReadyErrors =
     | SessionStorageErrors
-    | { error: 'NO_ACTIVE_SESSION' | 'INVALID_ID_TOKEN' | 'INVALID_TOKEN' | 'REFRESH_FAILED' }
+    | {
+          error: 'NO_ACTIVE_SESSION' | 'INVALID_ID_TOKEN' | 'INVALID_TOKEN' | 'REFRESH_FAILED'
+      }
 
 export type ResourceCreateErrors = {
     error: 'CREATE_FAILED_NON_OK_RESPONSE' | 'CREATE_FAILED_INVALID_RESPONSE'

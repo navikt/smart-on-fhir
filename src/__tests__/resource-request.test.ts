@@ -2,11 +2,11 @@ import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../client/storage/schema'
 
-import { createTestIdToken } from './utils/token'
-import { expectHas } from './utils/expect'
-import { mockEncounter, mockPatient, mockPractitioner } from './mocks/resources'
 import { mockCreateDocumentReference } from './mocks/create-resources'
+import { mockEncounter, mockPatient, mockPractitioner } from './mocks/resources'
 import { createLaunchedReadyClient } from './utils/client'
+import { expectHas } from './utils/expect'
+import { createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
@@ -18,7 +18,9 @@ const validSession: CompleteSession = {
     state: 'valid-state',
     // Completed
     accessToken: 'valid-access-token',
-    idToken: createTestIdToken({ fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e' }),
+    idToken: createTestIdToken({
+        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
+    }),
     refreshToken: 'valid-refresh-token',
     patient: 'valid-patient-id',
     encounter: 'valid-encounter-id',
@@ -53,7 +55,9 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
 test('SmartClient.create - /DocumentReference should POST and parse DocumentReference resource', async () => {
     const [ready] = await createLaunchedReadyClient(validSession)
 
-    const mock = mockCreateDocumentReference({ resourceType: 'DocumentReference' })
+    const mock = mockCreateDocumentReference({
+        resourceType: 'DocumentReference',
+    })
     const documentReference = await ready.create('DocumentReference', {
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },

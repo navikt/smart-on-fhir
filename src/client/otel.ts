@@ -1,4 +1,5 @@
-import { type Span, trace, context, SpanStatusCode } from '@opentelemetry/api'
+import { context, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
+
 import { logger } from './logger'
 
 const LIB_NAME = '@navikt/smart-on-fhir'

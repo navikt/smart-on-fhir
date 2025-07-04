@@ -1,8 +1,8 @@
 import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../../client'
 import type { CompleteSession } from '../../client/storage/schema'
 
-import { createTestStorage } from './storage'
 import { expectIs } from './expect'
+import { createTestStorage } from './storage'
 
 export const TEST_SESSION_ID = 'test-session'
 

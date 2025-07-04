@@ -1,5 +1,5 @@
-import { beforeEach } from 'vitest'
 import nock from 'nock'
+import { beforeEach } from 'vitest'
 
 beforeEach(() => {
     nock.cleanAll()

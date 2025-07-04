@@ -1,4 +1,5 @@
 export function assertNotBrowser(): void {
+    // biome-ignore lint/suspicious/noExplicitAny: we don't want to configure tsconfig with browser types only for this
     if (typeof (globalThis as any).window !== 'undefined') {
         throw new Error(
             'Oops! You seem to have bundled @navikt/smart-on-fhir in your browser. This library is server-side only. Please make sure you are using this library properly.',

@@ -1,6 +1,6 @@
 import { type Mock, vi } from 'vitest'
 
-import { type SmartStorage } from '../../client'
+import type { SmartStorage } from '../../client'
 
 export function createTestStorage(): SmartStorage {
     const inMem = new Map()
@@ -13,7 +13,10 @@ export function createTestStorage(): SmartStorage {
     }
 }
 
-export function createMockedStorage(): SmartStorage & { getFn: Mock; setFn: Mock } {
+export function createMockedStorage(): SmartStorage & {
+    getFn: Mock
+    setFn: Mock
+} {
     const getFn = vi.fn()
     const setFn = vi.fn()
     return {

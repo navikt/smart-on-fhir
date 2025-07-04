@@ -1,16 +1,16 @@
-import { expect, test } from 'vitest'
 import nock from 'nock'
+import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../client/storage/schema'
 import { ReadyClient } from '../client'
+import type { CompleteSession } from '../client/storage/schema'
 
-import { expectHas, expectIs } from './utils/expect'
-import { createTestAccessToken, createTestIdToken } from './utils/token'
-import { createLaunchableSmartClient, createLaunchedReadyClient } from './utils/client'
 import { mockTokenRefresh } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { mockPractitioner } from './mocks/resources'
 import { mockCreateDocumentReference } from './mocks/create-resources'
+import { mockPractitioner } from './mocks/resources'
+import { createLaunchableSmartClient, createLaunchedReadyClient } from './utils/client'
+import { expectHas, expectIs } from './utils/expect'
+import { createTestAccessToken, createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
@@ -22,7 +22,9 @@ const validSession: CompleteSession = {
     state: 'valid-state',
     // Completed
     accessToken: createTestAccessToken(3600),
-    idToken: createTestIdToken({ fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e' }),
+    idToken: createTestIdToken({
+        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
+    }),
     refreshToken: 'valid-refresh-token',
     patient: 'valid-patient-id',
     encounter: 'valid-encounter-id',
@@ -89,7 +91,9 @@ test('.ready - should refresh token when expiry is long ago', async () => {
 })
 
 test('SmartClient.request - Should refresh token when server says 401', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession, { autoRefresh: true })
+    const [ready] = await createLaunchedReadyClient(validSession, {
+        autoRefresh: true,
+    })
 
     // First request should fail with 401 Unauthorized
     const practitionerUnauthorized = nock('http://fhir-server')
@@ -116,7 +120,9 @@ test('SmartClient.request - Should refresh token when server says 401', async ()
 })
 
 test('SmartClient.create - Should refresh token when server says 401', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession, { autoRefresh: true })
+    const [ready] = await createLaunchedReadyClient(validSession, {
+        autoRefresh: true,
+    })
 
     // First request should fail with 401 Unauthorized
     const documentReferenceUnauthorized = nock('http://fhir-server').post(`/DocumentReference`).reply(401)
@@ -128,7 +134,9 @@ test('SmartClient.create - Should refresh token when server says 401', async () 
     })
 
     // And finally, the request should succeed with the refreshed token
-    const documentReferenceActual = mockCreateDocumentReference({ resourceType: 'DocumentReference' })
+    const documentReferenceActual = mockCreateDocumentReference({
+        resourceType: 'DocumentReference',
+    })
 
     const documentReference = await ready.create('DocumentReference', {
         // Payload is contrivedly small for test

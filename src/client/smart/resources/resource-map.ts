@@ -1,4 +1,5 @@
-import * as z from 'zod/v4'
+import type * as z from 'zod/v4'
+
 import {
     createFhirBundleSchema,
     type FhirBundle,

@@ -2,10 +2,10 @@ import { expect, test } from 'vitest'
 
 import { SmartClient } from '../client'
 
+import { mockTokenExchange } from './mocks/auth'
 import { mockSmartConfiguration } from './mocks/issuer'
 import { expectHas } from './utils/expect'
 import { createMockedStorage } from './utils/storage'
-import { mockTokenExchange } from './mocks/auth'
 
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()

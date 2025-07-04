@@ -1,7 +1,7 @@
 import type { CompleteSession } from '../../storage/schema'
 
-import type { KnownPaths } from './resource-map'
 import type { KnownCreatePaths } from './create-resource-map'
+import type { KnownPaths } from './resource-map'
 
 type FhirSession = {
     session: CompleteSession
