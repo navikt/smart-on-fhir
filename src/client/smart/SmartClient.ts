@@ -235,7 +235,7 @@ export class SmartClient {
 
             if ('error' in session) {
                 span.setAttribute('session.error', session.error)
-                logger.error('SmartClient.getSession failed to retrieve session')
+                logger.error(`SmartClient.getSession failed to retrieve session because session is: ${session.error}`)
 
                 return session
             }
@@ -275,7 +275,7 @@ export class SmartClient {
                         [OtelTaxonomy.SessionError]: refreshResult.error,
                         [OtelTaxonomy.SessionRefreshed]: false,
                     })
-                    logger.error('SmartClient.getSession failed to refresh session')
+                    logger.error(`SmartClient.getSession failed to refresh session because: ${refreshResult.error}`)
 
                     // Return potentially expired session, let the rest of the auth flow handle the expiredness.
                     return session
