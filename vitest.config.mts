@@ -9,4 +9,7 @@ export default defineConfig({
             json: 'vitest-report.json',
         },
     },
+    define: {
+        "LIB_VERSION": JSON.stringify("x.x.x-tests")
+    }
 })

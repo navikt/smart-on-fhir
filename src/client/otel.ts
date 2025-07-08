@@ -3,7 +3,6 @@ import { context, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
 import { logger } from './logger'
 
 const LIB_NAME = '@navikt/smart-on-fhir'
-const LIB_VERSION = '0.0.1-alpha.0'
 const SPAN_PREFIX = 'SmartClient.'
 
 export async function spanAsync<Result>(name: string, fn: (span: Span) => Promise<Result>): Promise<Result> {
