@@ -1,11 +1,11 @@
-import nock, { type Scope } from 'nock'
+import nock, { type RequestBodyMatcher, type Scope } from 'nock'
 
 import type { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
 import type { FhirDocumentReference } from '../../zod'
 
 export function mockCreateDocumentReference(expectedPayload: PayloadForCreate<'DocumentReference'>): Scope {
     return nock('http://fhir-server')
-        .post(`/DocumentReference`, expectedPayload)
+        .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
         .reply(200, {
             resourceType: 'DocumentReference',
             id: 'aa66036d-b63c-4c5a-b3d5-b1d1f80000d',
