@@ -10,6 +10,6 @@ export default defineConfig({
         },
     },
     define: {
-        "LIB_VERSION": JSON.stringify("x.x.x-tests")
-    }
+        LIB_VERSION: JSON.stringify('x.x.x-tests'),
+    },
 })

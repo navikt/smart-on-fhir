@@ -1,4 +1,4 @@
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 export type InitialSession = z.infer<typeof InitialSessionSchema>
 export const InitialSessionSchema = z.object({
