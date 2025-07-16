@@ -4,6 +4,7 @@ export type {
     SmartClientReadyErrors,
 } from './smart/client-errors'
 export type {
+    KnownFhirServer,
     SmartClientConfiguration,
     SmartClientOptions,
 } from './smart/config'
