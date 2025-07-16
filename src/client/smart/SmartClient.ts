@@ -2,7 +2,7 @@ import { teamLogger } from '@navikt/pino-logger/team-log'
 import { randomPKCECodeVerifier, randomState } from 'openid-client'
 
 import { logger } from '../logger'
-import { OtelTaxonomy, spanAsync } from '../otel'
+import { failSpan, OtelTaxonomy, spanAsync } from '../otel'
 import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
@@ -76,6 +76,12 @@ export class SmartClient {
     async launch(params: { iss: string; launch: string }): Promise<Launch | SmartConfigurationErrors> {
         return spanAsync('launch', async (span) => {
             span.setAttribute(OtelTaxonomy.FhirServer, removeTrailingSlash(params.iss))
+
+            const validIssuer = await this.validateIssuer(params.iss)
+            if (!validIssuer) {
+                failSpan(span, new Error('Issuer was not found in known FHIR servers'))
+                return { error: 'UNKNOWN_ISSUER' }
+            }
 
             const smartConfig = await fetchSmartConfiguration(params.iss)
             if ('error' in smartConfig) {
@@ -293,6 +299,20 @@ export class SmartClient {
             })
             return session
         })
+    }
+
+    private async validateIssuer(issuer: string): Promise<boolean> {
+        if ('allowAnyServer' in this._config) {
+            if (!this._config.allowAnyServer)
+                throw new Error('Invariant violation: allowAnyServer is false, should only ever be true')
+
+            return true
+        }
+
+        const [withoutQuery] = issuer.split('?')
+        const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
+
+        return this._config.knownFhirServers.map((it) => it.issuer.replace(/\/$/, '')).includes(withoutTrailingSlash)
     }
 }
 

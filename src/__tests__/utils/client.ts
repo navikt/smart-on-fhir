@@ -17,6 +17,7 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sm
             scope: 'openid fhirUser launch/patient',
             callback_url: 'http://app/callback',
             redirect_url: 'http://app/redirect',
+            allowAnyServer: true,
         },
         options,
     )
