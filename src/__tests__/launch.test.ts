@@ -14,7 +14,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
         scope: 'openid fhirUser launch/patient',
         callback_url: 'http://app/callback',
         redirect_url: 'http://app/redirect',
-        allowAnyServer: true,
+        allowAnyIssuer: true,
     })
 
     const smartConfigNock = mockSmartConfiguration()
@@ -55,7 +55,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
     })
 })
 
-test('.launch - should block launches for unknown issuers if allowAnyServer is not set', async () => {
+test('.launch - should block launches for unknown issuers if allowAnyIssuer is not set', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
         client_id: 'test-client',
@@ -95,7 +95,7 @@ test('.callback should exchange code for token', async () => {
         scope: 'openid fhirUser launch/patient',
         callback_url: 'http://app/callback',
         redirect_url: 'http://app/redirect',
-        allowAnyServer: true,
+        allowAnyIssuer: true,
     })
 
     const tokenResponseNock = mockTokenExchange({

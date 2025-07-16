@@ -302,9 +302,9 @@ export class SmartClient {
     }
 
     private async validateIssuer(issuer: string): Promise<boolean> {
-        if ('allowAnyServer' in this._config) {
-            if (!this._config.allowAnyServer)
-                throw new Error('Invariant violation: allowAnyServer is false, should only ever be true')
+        if ('allowAnyIssuer' in this._config) {
+            if (!this._config.allowAnyIssuer)
+                throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
 
             return true
         }

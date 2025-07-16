@@ -12,7 +12,7 @@ export type SmartClientConfiguration = SmartClientBaseConfiguration &
                * Will allow launches to any FHIR server. You can use this if you want to handle your own
                * access control, or if the application is meant to be open.
                */
-              allowAnyServer: true
+              allowAnyIssuer: true
           }
         | {
               knownFhirServers: KnownFhirServer[]
