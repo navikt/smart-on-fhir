@@ -114,7 +114,7 @@ test('.callback should exchange code for token', async () => {
         allowAnyIssuer: true,
     })
 
-    const tokenResponseNock = mockTokenExchange({
+    const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
         code: 'køde',
         code_verifier: 'test-code-verifier',
@@ -150,7 +150,7 @@ test('.callback should gracefully handle state mismatch', async () => {
         allowAnyIssuer: true,
     })
 
-    mockTokenExchange({
+    await mockTokenExchange({
         client_id: 'test-client',
         code: 'køde',
         code_verifier: 'test-code-verifier',

@@ -107,7 +107,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
         ],
     })
 
-    const tokenResponseNock = mockTokenExchange(
+    const tokenResponseNock = await mockTokenExchange(
         {
             client_id: 'test-client',
             code: 'køde',
@@ -152,7 +152,7 @@ test('confidential-symmentric, token - should set correct authorization property
         ],
     })
 
-    const tokenResponseNock = mockTokenExchange({
+    const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
         code: 'køde',
         code_verifier: 'test-code-verifier',

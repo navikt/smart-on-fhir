@@ -15,7 +15,7 @@ type TokenExchangeValues = {
     client_secret?: string
 }
 
-export function mockTokenExchange(expectedBody: TokenExchangeValues, authHeader?: string): Scope {
+export async function mockTokenExchange(expectedBody: TokenExchangeValues, authHeader?: string): Promise<Scope> {
     const postInterceptor = nock(AUTH_SERVER).post('/token', {
         ...expectedBody,
         grant_type: 'authorization_code',
@@ -34,7 +34,7 @@ export function mockTokenExchange(expectedBody: TokenExchangeValues, authHeader?
 
     return postInterceptor.reply(200, {
         access_token: 'test-access-token',
-        id_token: createTestIdToken({
+        id_token: await createTestIdToken({
             fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
         }),
         refresh_token: 'test-refresh-token',
@@ -48,7 +48,7 @@ type TokenRefreshValues = {
     refresh_token: string
 }
 
-export function mockTokenRefresh(expectedBody: TokenRefreshValues): Scope {
+export async function mockTokenRefresh(expectedBody: TokenRefreshValues): Promise<Scope> {
     return nock(AUTH_SERVER)
         .post('/token', {
             ...expectedBody,
@@ -56,7 +56,7 @@ export function mockTokenRefresh(expectedBody: TokenRefreshValues): Scope {
         })
         .reply(200, {
             access_token: 'test-access-token',
-            id_token: createTestIdToken({
+            id_token: await createTestIdToken({
                 fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
             }),
             refresh_token: 'test-refresh-token',

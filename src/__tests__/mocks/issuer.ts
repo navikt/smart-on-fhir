@@ -1,5 +1,7 @@
 import nock, { type Scope } from 'nock'
 
+import { createKeys } from '../utils/jwt'
+
 import { AUTH_SERVER, FHIR_SERVER } from './common'
 
 export function fhirNock(): Scope {
@@ -15,4 +17,10 @@ export function mockSmartConfiguration(): Scope {
             authorization_endpoint: `${AUTH_SERVER}/authorize`,
             token_endpoint: `${AUTH_SERVER}/token`,
         })
+}
+
+export function mockJwks(): Scope {
+    return nock(AUTH_SERVER)
+        .get('/jwks')
+        .reply(200, () => createKeys())
 }

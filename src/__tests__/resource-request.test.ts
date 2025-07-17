@@ -18,7 +18,7 @@ const validSession: CompleteSession = {
     state: 'valid-state',
     // Completed
     accessToken: 'valid-access-token',
-    idToken: createTestIdToken({
+    idToken: await createTestIdToken({
         fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
     }),
     refreshToken: 'valid-refresh-token',

@@ -43,7 +43,7 @@ test('pkce verification should be correct', async () => {
     /**
      * User is returned, and wants to exchange the code for tokens
      */
-    mockTokenExchange({
+    await mockTokenExchange({
         /**
          * Code verifier generated in the launch step
          */
