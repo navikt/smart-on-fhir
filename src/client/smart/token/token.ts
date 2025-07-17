@@ -24,7 +24,10 @@ export async function exchangeToken(
     authMode: FhirAuthMode,
 ): Promise<TokenResponse | TokenExchangeErrors> {
     return spanAsync('token-exchange', async (span) => {
-        span.setAttribute(OtelTaxonomy.FhirServer, session.server)
+        span.setAttributes({
+            [OtelTaxonomy.FhirServer]: session.server,
+            [OtelTaxonomy.FhirAuthorizationMode]: authMode.type,
+        })
 
         const tokenRequestBody = {
             client_id: config.client_id,
@@ -99,7 +102,10 @@ export async function refreshToken(
     authMode: FhirAuthMode,
 ): Promise<TokenRefreshResponse | RefreshTokenErrors> {
     return spanAsync('token-refresh', async (span) => {
-        span.setAttribute(OtelTaxonomy.FhirServer, session.server)
+        span.setAttributes({
+            [OtelTaxonomy.FhirServer]: session.server,
+            [OtelTaxonomy.FhirAuthorizationMode]: authMode.type,
+        })
 
         const tokenRequestBody = {
             client_id: config.client_id,
