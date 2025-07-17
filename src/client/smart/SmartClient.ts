@@ -10,6 +10,7 @@ import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/sto
 import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../utils'
 
 import { buildAuthUrl } from './authorization'
+import type { FhirAuthMode, KnownFhirServer } from './client-auth/config'
 import type { CallbackError, SmartClientReadyErrors } from './client-errors'
 import type { SmartClientConfiguration, SmartClientOptions } from './config'
 import { ReadyClient } from './ReadyClient'
@@ -155,7 +156,12 @@ export class SmartClient {
 
             logger.info(`Exchanging code for token with issuer ${initialSession.tokenEndpoint}`)
 
-            const tokenResponse = await exchangeToken(params.code, initialSession, this._config)
+            const tokenResponse = await exchangeToken(
+                params.code,
+                initialSession,
+                this._config,
+                this.getAuthMode(initialSession.server),
+            )
             if ('error' in tokenResponse) {
                 return { error: tokenResponse.error }
             }
@@ -220,7 +226,7 @@ export class SmartClient {
      * This will happen automatically buring the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
-        const refreshResponse = await refreshToken(session, this._config)
+        const refreshResponse = await refreshToken(session, this._config, this.getAuthMode(session.server))
         if ('error' in refreshResponse) return refreshResponse
 
         const refreshedSessionValues: CompleteSession = {
@@ -309,10 +315,25 @@ export class SmartClient {
             return true
         }
 
+        return this.getKnownFhirServer(issuer) != null
+    }
+
+    private getAuthMode(server: string): FhirAuthMode {
+        return this.getKnownFhirServer(server) ?? { type: 'public' }
+    }
+
+    private getKnownFhirServer(issuer: string): KnownFhirServer | null {
+        if ('allowAnyIssuer' in this._config) {
+            if (!this._config.allowAnyIssuer)
+                throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
+
+            return null
+        }
+
         const [withoutQuery] = issuer.split('?')
         const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
 
-        return this._config.knownFhirServers.map((it) => it.issuer.replace(/\/$/, '')).includes(withoutTrailingSlash)
+        return this._config.knownFhirServers.find((it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash) ?? null
     }
 }
 

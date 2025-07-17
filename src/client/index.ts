@@ -1,10 +1,10 @@
+export type { ConfidentialSymmetricType, KnownFhirServer } from './smart/client-auth/config'
 export type {
     ResourceCreateErrors,
     ResourceRequestErrors,
     SmartClientReadyErrors,
 } from './smart/client-errors'
 export type {
-    KnownFhirServer,
     SmartClientConfiguration,
     SmartClientOptions,
 } from './smart/config'

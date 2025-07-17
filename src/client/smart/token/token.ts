@@ -5,6 +5,8 @@ import { logger } from '../../logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../../otel'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import { getResponseError } from '../../utils'
+import type { FhirAuthMode } from '../client-auth/config'
+import { postFormEncoded } from '../client-auth/fetch'
 import type { SmartClientConfiguration } from '../config'
 
 import type { RefreshTokenErrors, TokenExchangeErrors } from './token-errors'
@@ -19,6 +21,7 @@ export async function exchangeToken(
     code: string,
     session: InitialSession,
     config: SmartClientConfiguration,
+    authMode: FhirAuthMode,
 ): Promise<TokenResponse | TokenExchangeErrors> {
     return spanAsync('token-exchange', async (span) => {
         span.setAttribute(OtelTaxonomy.FhirServer, session.server)
@@ -40,14 +43,12 @@ export async function exchangeToken(
          * PKCE STEP 5
          * Send code and the code_verifier (created in step 1) to the authorization servers /oauth/token endpoint.
          */
-        const response = await fetch(session.tokenEndpoint, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(tokenRequestBody),
-        })
+        const response = await postFormEncoded(
+            session.tokenEndpoint,
+            new URLSearchParams(tokenRequestBody),
+            config.client_id,
+            authMode,
+        )
 
         /**
          * PKCE STEP 6
@@ -95,6 +96,7 @@ export async function exchangeToken(
 export async function refreshToken(
     session: CompleteSession,
     config: SmartClientConfiguration,
+    authMode: FhirAuthMode,
 ): Promise<TokenRefreshResponse | RefreshTokenErrors> {
     return spanAsync('token-refresh', async (span) => {
         span.setAttribute(OtelTaxonomy.FhirServer, session.server)
@@ -109,14 +111,12 @@ export async function refreshToken(
             teamLogger.info(`Refreshing token for ${session.server}, body: ${JSON.stringify(tokenRequestBody)}`)
         }
 
-        const response = await fetch(session.tokenEndpoint, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(tokenRequestBody),
-        })
+        const response = await postFormEncoded(
+            session.tokenEndpoint,
+            new URLSearchParams(tokenRequestBody),
+            config.client_id,
+            authMode,
+        )
 
         if (!response.ok) {
             const responseError = await getResponseError(response)

@@ -9,6 +9,10 @@ type TokenExchangeValues = {
     code: string
     code_verifier: string
     redirect_uri: string
+    /**
+     * Used for confidential symmetric clients using client_secret_post
+     */
+    client_secret?: string
 }
 
 export function mockTokenExchange(expectedBody: TokenExchangeValues, authHeader?: string): Scope {

@@ -66,6 +66,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
             {
                 issuer: 'http://fhir-server',
                 type: 'confidential-symmetric',
+                auth: 'client_secret_basic',
                 clientSecret: 'test-secret',
             },
         ],
@@ -80,7 +81,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
     expectHas(result, 'redirect_url')
 })
 
-test('confidential-symmentric, token - should set correct authorization headers during launch', async () => {
+test('confidential-symmentric, token - should set correct authorization headers when client_secret_basic', async () => {
     const storage = createMockedStorage()
     storage.getFn.mockImplementationOnce(() => ({
         server: 'http://fhir-server',
@@ -100,6 +101,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
             {
                 issuer: 'http://fhir-server',
                 type: 'confidential-symmetric',
+                auth: 'client_secret_basic',
                 clientSecret: 'test-secret',
             },
         ],
@@ -114,6 +116,49 @@ test('confidential-symmentric, token - should set correct authorization headers 
         },
         `Basic ${Buffer.from('test-client:test-secret').toString('base64')}`,
     )
+    const callback = await client.callback({
+        state: 'some-value',
+        code: 'køde',
+    })
+
+    expect(tokenResponseNock.isDone()).toBe(true)
+    expectHas(callback, 'redirect_url')
+    expect(callback.redirect_url).toBe('http://app/redirect')
+})
+
+test('confidential-symmentric, token - should set correct authorization property when client_secret_post', async () => {
+    const storage = createMockedStorage()
+    storage.getFn.mockImplementationOnce(() => ({
+        server: 'http://fhir-server',
+        issuer: 'http://auth-server',
+        authorizationEndpoint: 'http://auth-server/authorize',
+        tokenEndpoint: 'http://auth-server/token',
+        codeVerifier: 'test-code-verifier',
+        state: 'some-value',
+    }))
+
+    const client = new SmartClient('test-session', storage, {
+        client_id: 'test-client',
+        scope: 'openid fhirUser launch/patient',
+        callback_url: 'http://app/callback',
+        redirect_url: 'http://app/redirect',
+        knownFhirServers: [
+            {
+                issuer: 'http://fhir-server',
+                type: 'confidential-symmetric',
+                auth: 'client_secret_post',
+                clientSecret: 'test-secret',
+            },
+        ],
+    })
+
+    const tokenResponseNock = mockTokenExchange({
+        client_id: 'test-client',
+        code: 'køde',
+        code_verifier: 'test-code-verifier',
+        redirect_uri: 'http://app/callback',
+        client_secret: 'test-secret',
+    })
     const callback = await client.callback({
         state: 'some-value',
         code: 'køde',
