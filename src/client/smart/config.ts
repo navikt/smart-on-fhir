@@ -19,19 +19,16 @@ export type SmartClientConfiguration = SmartClientBaseConfiguration &
           }
     )
 
-type NotImplemented<T extends string> = {
-    __not_implemented__: T
-}
-
 export type KnownFhirServer = {
     issuer: string
 } & (
     | {
           type: 'public'
       }
-    | ({
+    | {
           type: 'confidential-symmetric'
-      } & NotImplemented<'confidential-symmetric KnownFhirServer is not implemented yet'>)
+          clientSecret: string
+      }
 )
 
 export type SmartClientOptions = {

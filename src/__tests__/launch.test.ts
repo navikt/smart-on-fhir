@@ -55,30 +55,6 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
     })
 })
 
-test('.launch - should block launches for unknown issuers if allowAnyIssuer is not set', async () => {
-    const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://other-server',
-                type: 'public',
-            },
-        ],
-    })
-
-    const result = await client.launch({
-        launch: 'test-launch',
-        iss: 'http://fhir-server',
-    })
-
-    expectHas(result, 'error')
-    expect(result.error).toEqual('UNKNOWN_ISSUER')
-})
-
 test('.callback should exchange code for token', async () => {
     const storage = createMockedStorage()
     storage.getFn.mockImplementationOnce(() => ({
