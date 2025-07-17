@@ -33,7 +33,7 @@ export async function postFormEncoded(
         }
 
         case 'client_secret_basic': {
-            const encodedCredentials = btoa(`${clientId}:${authMode.clientSecret}`)
+            const encodedCredentials = Buffer.from(`${clientId}:${authMode.clientSecret}`).toString('base64')
             return await fetch(url, {
                 method: 'POST',
                 headers: {
