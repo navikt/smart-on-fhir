@@ -8,6 +8,9 @@ export default defineConfig({
         outputFile: {
             json: 'vitest-report.json',
         },
+        coverage: {
+            include: ["src/**"],
+        }
     },
     define: {
         LIB_VERSION: JSON.stringify('x.x.x-tests'),
