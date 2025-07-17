@@ -1,10 +1,10 @@
-export type ConfidentialSymmetricType =
+export type ConfidentialSymmetricMethod =
     | {
-          auth: 'client_secret_post'
+          method: 'client_secret_post'
           clientSecret: string
       }
     | {
-          auth: 'client_secret_basic'
+          method: 'client_secret_basic'
           clientSecret: string
       }
 /**
@@ -17,15 +17,15 @@ export type ConfidentialSymmetricType =
  *   }
  */
 
-type SmartConfidentialSymmetric = {
+export type SmartConfidentialSymmetricMode = {
     type: 'confidential-symmetric'
-} & ConfidentialSymmetricType
+} & ConfidentialSymmetricMethod
 
-type SmartPublicMode = {
+export type SmartPublicMode = {
     type: 'public'
 }
 
-export type FhirAuthMode = SmartPublicMode | SmartConfidentialSymmetric
+export type FhirAuthMode = SmartPublicMode | SmartConfidentialSymmetricMode
 
 export type KnownFhirServer = {
     issuer: string

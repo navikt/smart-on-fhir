@@ -66,7 +66,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
             {
                 issuer: 'http://fhir-server',
                 type: 'confidential-symmetric',
-                auth: 'client_secret_basic',
+                method: 'client_secret_basic',
                 clientSecret: 'test-secret',
             },
         ],
@@ -101,7 +101,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
             {
                 issuer: 'http://fhir-server',
                 type: 'confidential-symmetric',
-                auth: 'client_secret_basic',
+                method: 'client_secret_basic',
                 clientSecret: 'test-secret',
             },
         ],
@@ -146,7 +146,7 @@ test('confidential-symmentric, token - should set correct authorization property
             {
                 issuer: 'http://fhir-server',
                 type: 'confidential-symmetric',
-                auth: 'client_secret_post',
+                method: 'client_secret_post',
                 clientSecret: 'test-secret',
             },
         ],

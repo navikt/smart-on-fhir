@@ -17,7 +17,7 @@ export async function postFormEncoded(
         })
     }
 
-    switch (authMode.auth) {
+    switch (authMode.method) {
         case 'client_secret_post': {
             const newBody = new URLSearchParams(body.entries())
             newBody.append('client_secret', authMode.clientSecret)

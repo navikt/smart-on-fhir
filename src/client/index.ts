@@ -1,4 +1,4 @@
-export type { ConfidentialSymmetricType, KnownFhirServer } from './smart/client-auth/config'
+export type { KnownFhirServer } from './smart/client-auth/config'
 export type {
     ResourceCreateErrors,
     ResourceRequestErrors,
