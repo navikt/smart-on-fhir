@@ -8,23 +8,28 @@ export default defineConfig({
     themeConfig: {
         // https://vitepress.dev/reference/default-theme-config
         nav: [
-            { text: 'Home', link: '/' },
-            { text: 'Examples', link: '/markdown-examples' },
+            { text: 'Getting started', link: '/getting-started' },
+            { text: 'Docs', link: '/docs' },
         ],
 
         sidebar: [
             {
-                text: 'Examples',
+                text: 'Getting started',
+                link: '/getting-started',
+            },
+            {
+                text: 'Docs',
+                link: '/docs',
                 items: [
-                    { text: 'Markdown Examples', link: '/markdown-examples' },
-                    { text: 'Runtime API Examples', link: '/api-examples' },
+                    { text: 'SmartClient', link: '/docs/smart-client' },
+                    { text: 'ReadyClient', link: '/docs/ready-client' },
                 ],
             },
         ],
 
         socialLinks: [{ icon: 'github', link: 'https://github.com/navikt/smart-on-fhir' }],
     },
-    transformHead({ assets }) {
+    transformHead() {
         return [
             [
                 'link',

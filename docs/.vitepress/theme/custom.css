@@ -1,4 +1,13 @@
 :root {
-    --vp-c-brand-1: var(--ax-bg-accent-strong);
-    --vp-c-brand-2: #790036;
+    --vp-nav-bg-color: var(--ax-bg-default);
+    --vp-c-gutter: var(--ax-border-neutral-subtleA);
+    --vp-c-bg: var(--ax-bg-default);
+    --vp-sidebar-bg-color: var(--ax-bg-default);
+
+    --vp-c-brand-1: var(--ax-accent-700);
+    --vp-c-brand-2: var(--ax-accent-600);
+    --vp-c-brand-3: var(--ax-accent-500);
+    --vp-c-brand-soft: var(--ax-accent-100A);
+
+    --vp-c-brand: var(--vp-c-brand-1);
 }

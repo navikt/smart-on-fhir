@@ -4,22 +4,21 @@ layout: home
 
 hero:
   name: "@navikt/smart-on-fhir"
-  text: "Getting started with server-first Smart on FHIR client"
-  tagline: My great project tagline
+  tagline: Server-first Smart on FHIR Node library 
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Getting started
+      link: /getting-started
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: Documentation
+      link: /docs
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Server-first
+    details: No tokens or secrets in the browser
+  - title: Bring your own storage
+    details: Use any key value store for your sessions
+  - title: Strongly typed
+    details: FHIR resources are validated and typed with Zod
 ---
 
