@@ -3,6 +3,9 @@ on:
   push:
     paths-ignore:
       - docs/**
+      - README.md
+      - .github/workflows/docs-deploy.yml
+      - biome.json
 
 env:
   NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
