@@ -9,6 +9,9 @@
         "ignoreUnknown": false,
         "includes": [
             "src/**",
+            "docs/**/*.md",
+            "docs/.vitepress/theme/**",
+            "docs/.vitepress/config.ts",
             "package.json",
             "biome.json",
             "vitest.config.mts",
