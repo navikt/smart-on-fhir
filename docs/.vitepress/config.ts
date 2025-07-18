@@ -1,4 +1,6 @@
 import { defineConfig } from 'vitepress'
+import { npmCommandsMarkdownPlugin } from 'vitepress-plugin-npm-commands'
+import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -26,8 +28,13 @@ export default defineConfig({
                 ],
             },
         ],
-
         socialLinks: [{ icon: 'github', link: 'https://github.com/navikt/smart-on-fhir' }],
+    },
+    markdown: {
+        config(md) {
+            md.use(tabsMarkdownPlugin)
+            md.use(npmCommandsMarkdownPlugin)
+        },
     },
     transformHead() {
         return [

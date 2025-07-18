@@ -850,6 +850,8 @@ __metadata:
     tsup: "npm:^8.5.0"
     typescript: "npm:^5.8.3"
     vitepress: "npm:^1.6.3"
+    vitepress-plugin-npm-commands: "npm:^0.8.1"
+    vitepress-plugin-tabs: "npm:^0.7.1"
     vitest: "npm:^3.2.4"
     zod: "npm:^4.0.5"
   languageName: unknown
@@ -2651,6 +2653,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"klona@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "klona@npm:2.0.6"
+  checksum: 10c0/94eed2c6c2ce99f409df9186a96340558897b3e62a85afdc1ee39103954d2ebe1c1c4e9fe2b0952771771fa96d70055ede8b27962a7021406374fdb695fd4d01
+  languageName: node
+  linkType: hard
+
 "lilconfig@npm:^3.1.1, lilconfig@npm:^3.1.3":
   version: 3.1.3
   resolution: "lilconfig@npm:3.1.3"
@@ -3082,6 +3091,13 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 10c0/62e9ea70c7a3eb91d162d2c706b6606c041e4e7b547cbbb48f8b3695af457dd6479904d7ace600856bf923dd8d1ed0696f06195c8c20f02ac87c1da0e1d315ef
+  languageName: node
+  linkType: hard
+
+"npm-to-yarn@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "npm-to-yarn@npm:3.0.1"
+  checksum: 10c0/f0a72bfc0ed2ad50c5995511ff6442520d259aee5a58e1b0914572a33d29c07090a684a1d8ce95d2399dfe9bc51e649e8d029b0118ecf941f40212053693caca
   languageName: node
   linkType: hard
 
@@ -4360,6 +4376,29 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/c97601234dba482cea5290f2a2ea0fcd65e1fab3df06718ea48adc8ceb14bc3129508216c4989329c618f6a0470b42f439677a207aef62b0c76f445091c2d89e
+  languageName: node
+  linkType: hard
+
+"vitepress-plugin-npm-commands@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "vitepress-plugin-npm-commands@npm:0.8.1"
+  dependencies:
+    klona: "npm:^2.0.6"
+    npm-to-yarn: "npm:^3.0.1"
+  peerDependencies:
+    vitepress: ^1.0.0
+    vitepress-plugin-tabs: ^0.7.1
+  checksum: 10c0/bd273b5c73bcdb5dd46d0044f4eef42235ec3097ceb4216e0d789d2b6689868a4c094b7a3aeabab274e3573195ec0379fd0fa4e2fb261a29cf4c899d018df437
+  languageName: node
+  linkType: hard
+
+"vitepress-plugin-tabs@npm:^0.7.1":
+  version: 0.7.1
+  resolution: "vitepress-plugin-tabs@npm:0.7.1"
+  peerDependencies:
+    vitepress: ^1.0.0
+    vue: ^3.5.0
+  checksum: 10c0/964d8d9705d213a9b3fcd2ebf2f77e0e216d01a05e52da9a7e684ed0a282f77e5e739ed78d2adf061cfa3dbe4bc5089e3af3eb979e1178ed4236bf5d688cf553
   languageName: node
   linkType: hard
 
