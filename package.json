@@ -44,7 +44,7 @@
         "jose": "^6.0.12",
         "openid-client": "^6.6.2",
         "pino": "^9.7.0",
-        "zod": "^4.0.10"
+        "zod": "^4.0.14"
     },
     "devDependencies": {
         "@biomejs/biome": "2.1.2",
