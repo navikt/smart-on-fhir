@@ -56,7 +56,7 @@
         "pinst": "^3.0.0",
         "prettier": "^3.6.2",
         "tsup": "^8.5.0",
-        "typescript": "^5.8.3",
+        "typescript": "^5.9.2",
         "vitepress": "^1.6.3",
         "vitepress-plugin-npm-commands": "^0.8.1",
         "vitepress-plugin-tabs": "^0.7.1",
