@@ -5,6 +5,18 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@algolia/abtesting@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@algolia/abtesting@npm:1.1.0"
+  dependencies:
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/0531541f10ab45deffd74188c481f61faf959c2b8293249798d9d47fe76ab53627f8a135c49770bbdde1234057d1a9385a5df5b74b20295ba494002877fed073
+  languageName: node
+  linkType: hard
+
 "@algolia/autocomplete-core@npm:1.17.7":
   version: 1.17.7
   resolution: "@algolia/autocomplete-core@npm:1.17.7"
@@ -48,145 +60,145 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@algolia/client-abtesting@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-abtesting@npm:5.34.1"
+"@algolia/client-abtesting@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-abtesting@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/e143032026e3b93b4f60c4c5bda506f3be5e3480194fefe4968a560139681fecdbf7bb293bdf72ba13c12f94b81bd55e280cbfc849251c92f0dab0baf08cdfed
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/3f06a1c2433602355c4463a14a961ae3bef9e7baeeb72d8deea9d19059c08d4c639e24c0450de508a5a82d3904835a178925058a16675e671512f03e2d0d7625
   languageName: node
   linkType: hard
 
-"@algolia/client-analytics@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-analytics@npm:5.34.1"
+"@algolia/client-analytics@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-analytics@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/4ab55b7a6ca421c48c93c77e56784daff6785fe10ffccba5d92fc2a55961da5faba29463a145c9f30153bedd613b1e69bf6d8ffaf6764c8e2267436f48c90609
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/1e771cdeb5044ff8346e944f4da317a77e939047916dad03790a820540e194f28ccdcb1c790b998388696b3d1ac9e48aa2deb1532f096831891c5c0d5010eb89
   languageName: node
   linkType: hard
 
-"@algolia/client-common@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-common@npm:5.34.1"
-  checksum: 10c0/7818a9ecef092d1eeef31a78b8c49d2cd8c6eee2e29fd66ddf05a0f206587a04d046ff944f240dceb75c4036e56288c7ad5463dd253caa2003f71e66f6b0e532
+"@algolia/client-common@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-common@npm:5.35.0"
+  checksum: 10c0/c2d614260e5961e96f7de428b748af8ea3041c8530064b1926f35063c4c88e3ee0769537c35f130ff94eb701927cc72f3ccfdd8a5a8513a87ed528fec7fdb79c
   languageName: node
   linkType: hard
 
-"@algolia/client-insights@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-insights@npm:5.34.1"
+"@algolia/client-insights@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-insights@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/00e80289f0a3964277b0b5a654448d2ff01fa89010d5da72accef5b22562a9136670d378a226afb124b73bf4ed5122a14520117591f6ecd4a73be6e4bc99bc9d
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/c3b146a433500c73148bba58ab2abef0bca9bce08cf15446e8b6143fdf884dafeba6fe86b9ab77337cce91c70f7ef4cc4ffee87736b96a30bad92a53897bfaa7
   languageName: node
   linkType: hard
 
-"@algolia/client-personalization@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-personalization@npm:5.34.1"
+"@algolia/client-personalization@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-personalization@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/cc3822cde67574f7aeff1ae5c592459d4c0657cdda3e22223154e261bc02e57e9a6a3458c6daa2b330bfaf7fbcadeae2f95d4f40ee7d469f1499f8d9b85402e9
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/0cecdca5bec6bf059c4569c66b6ecec3d556825b6767d54254b46333a6e8a2aeacff49a08aefc9490d3f5cc4fefb54200f3945117964a23f7a7bbfd2c7993fac
   languageName: node
   linkType: hard
 
-"@algolia/client-query-suggestions@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-query-suggestions@npm:5.34.1"
+"@algolia/client-query-suggestions@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-query-suggestions@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/c86a3668f4f80adb1d8f652485020028d8738cff7f2d4b1849a07b3845f3e356c28dab9a83a90d7370dd493442f915ee84d188dbdf63e1e1e3403686fb8fe011
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/dd0f2a1e41f9203cfbdaa301346c6a363d1da3016b625439453435363bb0f7c14fed49480ae0a2e013131a6632a6d8c1749b0223336f1642a1f26b214ce3c0f7
   languageName: node
   linkType: hard
 
-"@algolia/client-search@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/client-search@npm:5.34.1"
+"@algolia/client-search@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/client-search@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/6c127872ab82b9b4f46e6d1104a1b404972d2b864985a4b891afd74c176541918e0fe974a50302631ea8ec7da83818c829e297fbfa5c2df8d0561abba1d06aa6
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/a9e52b4f21822f723fad21647056439737d956eb9bd70f541fcbdf96ad5ef60ac0782ed1801af9d3671444bfef95dd74133f3d8846a600bcb387dc8f1b910da6
   languageName: node
   linkType: hard
 
-"@algolia/ingestion@npm:1.34.1":
-  version: 1.34.1
-  resolution: "@algolia/ingestion@npm:1.34.1"
+"@algolia/ingestion@npm:1.35.0":
+  version: 1.35.0
+  resolution: "@algolia/ingestion@npm:1.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/16c7ccf29f30b3eb6b053e0702febe344143f98c56002c2582d8fc3b861f6f05c9d56a1fc30c1c324379075e3b3826dd395090a35653f97ee50769726f427dbd
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/342b9adea87d01a5f29168c16365e5ae0cade177b0749042cda29a64eaaacb2086957bbf70c40ad49a361436d744ca585937f27ebfd1edf12c62ec091c5111bb
   languageName: node
   linkType: hard
 
-"@algolia/monitoring@npm:1.34.1":
-  version: 1.34.1
-  resolution: "@algolia/monitoring@npm:1.34.1"
+"@algolia/monitoring@npm:1.35.0":
+  version: 1.35.0
+  resolution: "@algolia/monitoring@npm:1.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/4b42ad7a5754837d0feb4dc1552e74441f89f590275b3dfcfeffcda5425628047f609ece5108424cb291716e3926388451361377a829c42845a5ca537fcdc14c
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/2bbad1df73421c7bb77efcaab82c83a2bec919e8d843b638640a6c6294fb8b35ad617ec79cc422636125f8365268bd8071e0dbd15455130fec15c9d920de02db
   languageName: node
   linkType: hard
 
-"@algolia/recommend@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/recommend@npm:5.34.1"
+"@algolia/recommend@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/recommend@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/60f721065873c5332fa13c7d082caba8454867a3dfe4f2e80c712a8936876e1d9afa26b4f09eb9c74f50b386eddf73f0c8e5813619330b710e5ca45b2a17460b
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/fa81ef425b9f2c63cfda584372d073b7ced020d0b13e3ced2ea0d992562bb642f7b2bab91844dc91bc4dacc260de437a595242704690fff74f1eceb211356293
   languageName: node
   linkType: hard
 
-"@algolia/requester-browser-xhr@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/requester-browser-xhr@npm:5.34.1"
+"@algolia/requester-browser-xhr@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/requester-browser-xhr@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-  checksum: 10c0/4b5b31c1c908bed9cbce2ded72a5f3def606a97b3bb368c7b17981c9a37ad61d7796de104c8759de6e51fb56e698e22bb83b5ca2ffea28bb0f41575be0a9ba42
+    "@algolia/client-common": "npm:5.35.0"
+  checksum: 10c0/59061fe14c641714136bedec90d54f5146ccc11c576687bbe800b42c1aff26e7106d76d367b3c58edc2e6a14efd22d1f3c3e2417c6734e35c27042c937476830
   languageName: node
   linkType: hard
 
-"@algolia/requester-fetch@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/requester-fetch@npm:5.34.1"
+"@algolia/requester-fetch@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/requester-fetch@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-  checksum: 10c0/c9f5b58f3163f8f734c5095836154ddf44770222ea23826ce1f9758ebd7bda947f5720559cd85a9166166cc7be32f385d968425dfb9d9326b07cb09038c5d3e5
+    "@algolia/client-common": "npm:5.35.0"
+  checksum: 10c0/45c654f1b5746503b268cf5b1959c81943aea2d0fd78e7a028bfa134bbc2b7e2264ab25fa7429eef1ffa4e347030314577d3b5e92e405326d06ae44813786d4d
   languageName: node
   linkType: hard
 
-"@algolia/requester-node-http@npm:5.34.1":
-  version: 5.34.1
-  resolution: "@algolia/requester-node-http@npm:5.34.1"
+"@algolia/requester-node-http@npm:5.35.0":
+  version: 5.35.0
+  resolution: "@algolia/requester-node-http@npm:5.35.0"
   dependencies:
-    "@algolia/client-common": "npm:5.34.1"
-  checksum: 10c0/865e4cf799fc6c35db99e52df984c92cf3c9ecbf844e1ae73190fc868490b2d5d6f0d2b5788d1bc80ff2c05500f9b940647ecc84000251c2fdd3268c0ce1a49d
+    "@algolia/client-common": "npm:5.35.0"
+  checksum: 10c0/c33fbeb38ea48660f61c028074bb37c226d50b1cb853938dbc9bcf8e1144930438764d9ea009d1c98da511c1bd2663f363ee27a21f8aea83510525a0ae5a8a6b
   languageName: node
   linkType: hard
 
@@ -242,18 +254,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/biome@npm:2.1.2"
+"@biomejs/biome@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/biome@npm:2.1.3"
   dependencies:
-    "@biomejs/cli-darwin-arm64": "npm:2.1.2"
-    "@biomejs/cli-darwin-x64": "npm:2.1.2"
-    "@biomejs/cli-linux-arm64": "npm:2.1.2"
-    "@biomejs/cli-linux-arm64-musl": "npm:2.1.2"
-    "@biomejs/cli-linux-x64": "npm:2.1.2"
-    "@biomejs/cli-linux-x64-musl": "npm:2.1.2"
-    "@biomejs/cli-win32-arm64": "npm:2.1.2"
-    "@biomejs/cli-win32-x64": "npm:2.1.2"
+    "@biomejs/cli-darwin-arm64": "npm:2.1.3"
+    "@biomejs/cli-darwin-x64": "npm:2.1.3"
+    "@biomejs/cli-linux-arm64": "npm:2.1.3"
+    "@biomejs/cli-linux-arm64-musl": "npm:2.1.3"
+    "@biomejs/cli-linux-x64": "npm:2.1.3"
+    "@biomejs/cli-linux-x64-musl": "npm:2.1.3"
+    "@biomejs/cli-win32-arm64": "npm:2.1.3"
+    "@biomejs/cli-win32-x64": "npm:2.1.3"
   dependenciesMeta:
     "@biomejs/cli-darwin-arm64":
       optional: true
@@ -273,62 +285,62 @@ __metadata:
       optional: true
   bin:
     biome: bin/biome
-  checksum: 10c0/4863a5d64ff7e47c1f535aca3c0d59769fd1e59868b178798bf1f10de94f41188f235accddb852778743b16239dd890a520266dd2f93ecbcd147ad339caa8e23
+  checksum: 10c0/0393412e965e41b1d6278208d895db0b030a465a4e6a7913d2165d61280c192ad3c95c1d0597e319b5980cee75a3ddf787a7e83698ddbfcc9b520734c407ef20
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-arm64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-darwin-arm64@npm:2.1.2"
+"@biomejs/cli-darwin-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-darwin-arm64@npm:2.1.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-darwin-x64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-darwin-x64@npm:2.1.2"
+"@biomejs/cli-darwin-x64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-darwin-x64@npm:2.1.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64-musl@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.1.2"
+"@biomejs/cli-linux-arm64-musl@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-linux-arm64-musl@npm:2.1.3"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-arm64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-linux-arm64@npm:2.1.2"
+"@biomejs/cli-linux-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-linux-arm64@npm:2.1.3"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64-musl@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-linux-x64-musl@npm:2.1.2"
+"@biomejs/cli-linux-x64-musl@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-linux-x64-musl@npm:2.1.3"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@biomejs/cli-linux-x64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-linux-x64@npm:2.1.2"
+"@biomejs/cli-linux-x64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-linux-x64@npm:2.1.3"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-arm64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-win32-arm64@npm:2.1.2"
+"@biomejs/cli-win32-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-win32-arm64@npm:2.1.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@biomejs/cli-win32-x64@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@biomejs/cli-win32-x64@npm:2.1.2"
+"@biomejs/cli-win32-x64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@biomejs/cli-win32-x64@npm:2.1.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -789,7 +801,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.23, @jridgewell/trace-mapping@npm:^0.3.24, @jridgewell/trace-mapping@npm:^0.3.25":
+"@jridgewell/trace-mapping@npm:^0.3.23, @jridgewell/trace-mapping@npm:^0.3.24, @jridgewell/trace-mapping@npm:^0.3.29":
   version: 0.3.29
   resolution: "@jridgewell/trace-mapping@npm:0.3.29"
   dependencies:
@@ -799,9 +811,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mswjs/interceptors@npm:^0.39.3":
-  version: 0.39.4
-  resolution: "@mswjs/interceptors@npm:0.39.4"
+"@mswjs/interceptors@npm:^0.39.5":
+  version: 0.39.5
+  resolution: "@mswjs/interceptors@npm:0.39.5"
   dependencies:
     "@open-draft/deferred-promise": "npm:^2.2.0"
     "@open-draft/logger": "npm:^0.3.0"
@@ -809,7 +821,7 @@ __metadata:
     is-node-process: "npm:^1.2.0"
     outvariant: "npm:^1.4.3"
     strict-event-emitter: "npm:^0.5.1"
-  checksum: 10c0/349fd4cbfe231dc5da8047d9122b2ce40e2118585c1bf48c1a5ba677581e9f2ea8b68724d39c4e2998ed1eef6ac3824037fd2877e8502bf476dcd23c16af2cf4
+  checksum: 10c0/e8c4dd0514741c07603fe5d00ce47c6a8befa021b9e0891d8a39875946736bdd3bd59758d976bfc12723291c9a9936591068d365c9c5f760e8dd48da3e0f32e5
   languageName: node
   linkType: hard
 
@@ -834,26 +846,26 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@navikt/smart-on-fhir@workspace:."
   dependencies:
-    "@biomejs/biome": "npm:2.1.2"
+    "@biomejs/biome": "npm:2.1.3"
     "@navikt/pino-logger": "npm:^4.1.5"
     "@opentelemetry/api": "npm:^1.9.0"
-    "@types/node": "npm:22.16.5"
+    "@types/node": "npm:22.17.0"
     "@vitest/coverage-v8": "npm:3.2.4"
     husky: "npm:^9.1.7"
     jose: "npm:^6.0.12"
-    lint-staged: "npm:^16.1.2"
-    nock: "npm:^14.0.7"
+    lint-staged: "npm:^16.1.4"
+    nock: "npm:^14.0.8"
     openid-client: "npm:^6.6.2"
     pino: "npm:^9.7.0"
     pinst: "npm:^3.0.0"
     prettier: "npm:^3.6.2"
     tsup: "npm:^8.5.0"
-    typescript: "npm:^5.8.3"
+    typescript: "npm:^5.9.2"
     vitepress: "npm:^1.6.3"
     vitepress-plugin-npm-commands: "npm:^0.8.1"
     vitepress-plugin-tabs: "npm:^0.7.1"
     vitest: "npm:^3.2.4"
-    zod: "npm:^4.0.10"
+    zod: "npm:^4.0.14"
   languageName: unknown
   linkType: soft
 
@@ -917,142 +929,142 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/rollup-android-arm-eabi@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-android-arm-eabi@npm:4.46.1"
+"@rollup/rollup-android-arm-eabi@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-android-arm-eabi@npm:4.46.2"
   conditions: os=android & cpu=arm
   languageName: node
   linkType: hard
 
-"@rollup/rollup-android-arm64@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-android-arm64@npm:4.46.1"
+"@rollup/rollup-android-arm64@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-android-arm64@npm:4.46.2"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-darwin-arm64@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-darwin-arm64@npm:4.46.1"
+"@rollup/rollup-darwin-arm64@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-darwin-arm64@npm:4.46.2"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-darwin-x64@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-darwin-x64@npm:4.46.1"
+"@rollup/rollup-darwin-x64@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-darwin-x64@npm:4.46.2"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-freebsd-arm64@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-freebsd-arm64@npm:4.46.1"
+"@rollup/rollup-freebsd-arm64@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-freebsd-arm64@npm:4.46.2"
   conditions: os=freebsd & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-freebsd-x64@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-freebsd-x64@npm:4.46.1"
+"@rollup/rollup-freebsd-x64@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-freebsd-x64@npm:4.46.2"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-arm-gnueabihf@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-arm-gnueabihf@npm:4.46.1"
+"@rollup/rollup-linux-arm-gnueabihf@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-arm-gnueabihf@npm:4.46.2"
   conditions: os=linux & cpu=arm & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-arm-musleabihf@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-arm-musleabihf@npm:4.46.1"
+"@rollup/rollup-linux-arm-musleabihf@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-arm-musleabihf@npm:4.46.2"
   conditions: os=linux & cpu=arm & libc=musl
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-arm64-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-arm64-gnu@npm:4.46.1"
+"@rollup/rollup-linux-arm64-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-arm64-gnu@npm:4.46.2"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-arm64-musl@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-arm64-musl@npm:4.46.1"
+"@rollup/rollup-linux-arm64-musl@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-arm64-musl@npm:4.46.2"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-loongarch64-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-loongarch64-gnu@npm:4.46.1"
+"@rollup/rollup-linux-loongarch64-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-loongarch64-gnu@npm:4.46.2"
   conditions: os=linux & cpu=loong64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-ppc64-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-ppc64-gnu@npm:4.46.1"
+"@rollup/rollup-linux-ppc64-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-ppc64-gnu@npm:4.46.2"
   conditions: os=linux & cpu=ppc64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-riscv64-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-riscv64-gnu@npm:4.46.1"
+"@rollup/rollup-linux-riscv64-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-riscv64-gnu@npm:4.46.2"
   conditions: os=linux & cpu=riscv64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-riscv64-musl@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-riscv64-musl@npm:4.46.1"
+"@rollup/rollup-linux-riscv64-musl@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-riscv64-musl@npm:4.46.2"
   conditions: os=linux & cpu=riscv64 & libc=musl
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-s390x-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-s390x-gnu@npm:4.46.1"
+"@rollup/rollup-linux-s390x-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-s390x-gnu@npm:4.46.2"
   conditions: os=linux & cpu=s390x & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-x64-gnu@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-x64-gnu@npm:4.46.1"
+"@rollup/rollup-linux-x64-gnu@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-x64-gnu@npm:4.46.2"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rollup/rollup-linux-x64-musl@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-linux-x64-musl@npm:4.46.1"
+"@rollup/rollup-linux-x64-musl@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-linux-x64-musl@npm:4.46.2"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@rollup/rollup-win32-arm64-msvc@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-win32-arm64-msvc@npm:4.46.1"
+"@rollup/rollup-win32-arm64-msvc@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-win32-arm64-msvc@npm:4.46.2"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rollup/rollup-win32-ia32-msvc@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-win32-ia32-msvc@npm:4.46.1"
+"@rollup/rollup-win32-ia32-msvc@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-win32-ia32-msvc@npm:4.46.2"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@rollup/rollup-win32-x64-msvc@npm:4.46.1":
-  version: 4.46.1
-  resolution: "@rollup/rollup-win32-x64-msvc@npm:4.46.1"
+"@rollup/rollup-win32-x64-msvc@npm:4.46.2":
+  version: 4.46.2
+  resolution: "@rollup/rollup-win32-x64-msvc@npm:4.46.2"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -1202,12 +1214,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.16.5":
-  version: 22.16.5
-  resolution: "@types/node@npm:22.16.5"
+"@types/node@npm:22.17.0":
+  version: 22.17.0
+  resolution: "@types/node@npm:22.17.0"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/93a245e96a01f4a6aa38475000070292a9299e17b95bc1fc8180c652fb3a62f9b3b9ec0b78f9fc6a78b9274d3dfce456e80c7bb68b5357c8f7dbf581df4408c1
+  checksum: 10c0/e1c603b660d3de3243dfc02ded5d40623ff3f36315ffbdd8cdc81bc2c5a8da172035879d437b72e9fa61ca01827f28e9c2b0c32898f411a8e9ba0a5efac0b4ca
   languageName: node
   linkType: hard
 
@@ -1593,23 +1605,24 @@ __metadata:
   linkType: hard
 
 "algoliasearch@npm:^5.14.2":
-  version: 5.34.1
-  resolution: "algoliasearch@npm:5.34.1"
+  version: 5.35.0
+  resolution: "algoliasearch@npm:5.35.0"
   dependencies:
-    "@algolia/client-abtesting": "npm:5.34.1"
-    "@algolia/client-analytics": "npm:5.34.1"
-    "@algolia/client-common": "npm:5.34.1"
-    "@algolia/client-insights": "npm:5.34.1"
-    "@algolia/client-personalization": "npm:5.34.1"
-    "@algolia/client-query-suggestions": "npm:5.34.1"
-    "@algolia/client-search": "npm:5.34.1"
-    "@algolia/ingestion": "npm:1.34.1"
-    "@algolia/monitoring": "npm:1.34.1"
-    "@algolia/recommend": "npm:5.34.1"
-    "@algolia/requester-browser-xhr": "npm:5.34.1"
-    "@algolia/requester-fetch": "npm:5.34.1"
-    "@algolia/requester-node-http": "npm:5.34.1"
-  checksum: 10c0/47f2c4df9aaf4ea4924742e4e16a1cb59d5b7d13bd36433c03773f5f0c5c66e9085b832be7a126072a0f56687a2d1454a2c9c5c68b890f5f123ba6c6a9b7481f
+    "@algolia/abtesting": "npm:1.1.0"
+    "@algolia/client-abtesting": "npm:5.35.0"
+    "@algolia/client-analytics": "npm:5.35.0"
+    "@algolia/client-common": "npm:5.35.0"
+    "@algolia/client-insights": "npm:5.35.0"
+    "@algolia/client-personalization": "npm:5.35.0"
+    "@algolia/client-query-suggestions": "npm:5.35.0"
+    "@algolia/client-search": "npm:5.35.0"
+    "@algolia/ingestion": "npm:1.35.0"
+    "@algolia/monitoring": "npm:1.35.0"
+    "@algolia/recommend": "npm:5.35.0"
+    "@algolia/requester-browser-xhr": "npm:5.35.0"
+    "@algolia/requester-fetch": "npm:5.35.0"
+    "@algolia/requester-node-http": "npm:5.35.0"
+  checksum: 10c0/3b6593dc285e7dadda08dea3998391b9439b4e1144e8da767311e470e69e33067f2396e628cdf24767d52bdc0c08c063991cf76ac787ce5aec36864fcc1e3f9a
   languageName: node
   linkType: hard
 
@@ -1667,13 +1680,13 @@ __metadata:
   linkType: hard
 
 "ast-v8-to-istanbul@npm:^0.3.3":
-  version: 0.3.3
-  resolution: "ast-v8-to-istanbul@npm:0.3.3"
+  version: 0.3.4
+  resolution: "ast-v8-to-istanbul@npm:0.3.4"
   dependencies:
-    "@jridgewell/trace-mapping": "npm:^0.3.25"
+    "@jridgewell/trace-mapping": "npm:^0.3.29"
     estree-walker: "npm:^3.0.3"
     js-tokens: "npm:^9.0.1"
-  checksum: 10c0/ffc39bc3ab4b8c1f7aea945960ce6b1e518bab3da7c800277eab2da07d397eeae4a2cb8a5a5f817225646c8ea495c1e4434fbe082c84bae8042abddef53f50b2
+  checksum: 10c0/01b67bf9b4972a3cb8be35dffd466f1a9da91901b6df47e1157d3c6cf0f104a583443a54bbce7ca033608ac8b556886bc8b94f0f559242bac3244fadf86af9a8
   languageName: node
   linkType: hard
 
@@ -1784,9 +1797,9 @@ __metadata:
   linkType: hard
 
 "chalk@npm:^5.4.1":
-  version: 5.4.1
-  resolution: "chalk@npm:5.4.1"
-  checksum: 10c0/b23e88132c702f4855ca6d25cb5538b1114343e41472d5263ee8a37cccfccd9c4216d111e1097c6a27830407a1dc81fecdf2a56f2c63033d4dbbd88c10b0dcef
+  version: 5.5.0
+  resolution: "chalk@npm:5.5.0"
+  checksum: 10c0/23063b544f7c2fe57d25ff814807de561f8adfff72e4f0051051eaa606f772586470507ccd38d89166300eeaadb0164acde8bb8a0716a0f2d56ccdf3761d5e4f
   languageName: node
   linkType: hard
 
@@ -2674,15 +2687,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^16.1.2":
-  version: 16.1.2
-  resolution: "lint-staged@npm:16.1.2"
+"lint-staged@npm:^16.1.4":
+  version: 16.1.4
+  resolution: "lint-staged@npm:16.1.4"
   dependencies:
     chalk: "npm:^5.4.1"
     commander: "npm:^14.0.0"
     debug: "npm:^4.4.1"
     lilconfig: "npm:^3.1.3"
-    listr2: "npm:^8.3.3"
+    listr2: "npm:^9.0.1"
     micromatch: "npm:^4.0.8"
     nano-spawn: "npm:^1.0.2"
     pidtree: "npm:^0.6.0"
@@ -2690,13 +2703,13 @@ __metadata:
     yaml: "npm:^2.8.0"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10c0/2a299fc0d56e0a64ed0af8caf937e00eac47cb270df2917e2d4b939074eaa63ecd7f16d3b70b7e5e57bff75ffbbbf8aae5768dedf3dfd45e3ca1b9caaf7740cc
+  checksum: 10c0/dd1caa079a37598e1a8e25661f0ab387c584b83f06364e112d73fcfea3896ea920bbadbe89a7150de1bf02130efd16ce0cc8cd217e1db94570fddc93e77878ac
   languageName: node
   linkType: hard
 
-"listr2@npm:^8.3.3":
-  version: 8.3.3
-  resolution: "listr2@npm:8.3.3"
+"listr2@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "listr2@npm:9.0.1"
   dependencies:
     cli-truncate: "npm:^4.0.0"
     colorette: "npm:^2.0.20"
@@ -2704,7 +2717,7 @@ __metadata:
     log-update: "npm:^6.1.0"
     rfdc: "npm:^1.4.1"
     wrap-ansi: "npm:^9.0.0"
-  checksum: 10c0/0792f8a7fd482fa516e21689e012e07081cab3653172ca606090622cfa0024c784a1eba8095a17948a0e9a4aa98a80f7c9c90f78a0dd35173d6802f9cc123a82
+  checksum: 10c0/73462e84a3c4f05de5a3cdea5eaa0209c6ab04a2fdb4046545049806e9ba17b6ee84a097ebf7ffc0e903b0f2a9094c0c480cd2f2bb21d7d21e20969e17a3c32b
   languageName: node
   linkType: hard
 
@@ -3041,20 +3054,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:^14.0.7":
-  version: 14.0.7
-  resolution: "nock@npm:14.0.7"
+"nock@npm:^14.0.8":
+  version: 14.0.8
+  resolution: "nock@npm:14.0.8"
   dependencies:
-    "@mswjs/interceptors": "npm:^0.39.3"
+    "@mswjs/interceptors": "npm:^0.39.5"
     json-stringify-safe: "npm:^5.0.1"
     propagate: "npm:^2.0.0"
-  checksum: 10c0/e8566df7b376a9a2fe2a86edc6e8325ecc3da91304002d5ebf65c18ae2e942999a3d43e77d40b6e6071c2106bf4cd847f2ea653c025c81f844edcd334b895d96
+  checksum: 10c0/9bc2c296d17e4d76dbf9fa277521b192440b2d5ea77ffd41a44c048d2ba9ef4a64b497380ecd3fed602cfa553ca351acee7f3cf68db76940380e47e8ab4371ca
   languageName: node
   linkType: hard
 
 "node-gyp@npm:latest":
-  version: 11.2.0
-  resolution: "node-gyp@npm:11.2.0"
+  version: 11.3.0
+  resolution: "node-gyp@npm:11.3.0"
   dependencies:
     env-paths: "npm:^2.2.0"
     exponential-backoff: "npm:^3.1.1"
@@ -3068,7 +3081,7 @@ __metadata:
     which: "npm:^5.0.0"
   bin:
     node-gyp: bin/node-gyp.js
-  checksum: 10c0/bd8d8c76b06be761239b0c8680f655f6a6e90b48e44d43415b11c16f7e8c15be346fba0cbf71588c7cdfb52c419d928a7d3db353afc1d952d19756237d8f10b9
+  checksum: 10c0/5f4ad5a729386f7b50096efd4934b06c071dbfbc7d7d541a66d6959a7dccd62f53ff3dc95fffb60bf99d8da1270e23769f82246fcaa6c5645a70c967ae9a3398
   languageName: node
   linkType: hard
 
@@ -3102,9 +3115,9 @@ __metadata:
   linkType: hard
 
 "oauth4webapi@npm:^3.5.4":
-  version: 3.6.0
-  resolution: "oauth4webapi@npm:3.6.0"
-  checksum: 10c0/5bfad39628db80faa563b3da4cae342a99827399e7b8730469ece452ecab84e32951b17c09f5904125f0ba6f2f869c01c354421d29470bc90940d8c6c226eef2
+  version: 3.6.1
+  resolution: "oauth4webapi@npm:3.6.1"
+  checksum: 10c0/67cd75811aa03b2aa2cdbf8cfb92a9232fb42b315a7cc0787e6df0ede75f5af5a8c6c25d9e781d1caca307cda92fff386ff34bc43afaa486440e7fc7e88c0d9a
   languageName: node
   linkType: hard
 
@@ -3374,9 +3387,9 @@ __metadata:
   linkType: hard
 
 "preact@npm:^10.0.0":
-  version: 10.26.9
-  resolution: "preact@npm:10.26.9"
-  checksum: 10c0/15f187e3278ae749b70e887f88bb01be63ebcc2eea46ffa86be69180716db40b8b4304e9768767fd68a5910ef5fd1f9ea6389e17cd25e950be76574d568e8fc3
+  version: 10.27.0
+  resolution: "preact@npm:10.27.0"
+  checksum: 10c0/f00d84fdceca2d6236c093afb005ab34bfc9bac7fdeac2bb83c09791034692e0c1eb431659ba1fba1b9914ca0f9918da13b0a212ffb51c3ca2c2f5e5f5f01219
   languageName: node
   linkType: hard
 
@@ -3540,29 +3553,29 @@ __metadata:
   linkType: hard
 
 "rollup@npm:^4.20.0, rollup@npm:^4.34.8, rollup@npm:^4.40.0":
-  version: 4.46.1
-  resolution: "rollup@npm:4.46.1"
+  version: 4.46.2
+  resolution: "rollup@npm:4.46.2"
   dependencies:
-    "@rollup/rollup-android-arm-eabi": "npm:4.46.1"
-    "@rollup/rollup-android-arm64": "npm:4.46.1"
-    "@rollup/rollup-darwin-arm64": "npm:4.46.1"
-    "@rollup/rollup-darwin-x64": "npm:4.46.1"
-    "@rollup/rollup-freebsd-arm64": "npm:4.46.1"
-    "@rollup/rollup-freebsd-x64": "npm:4.46.1"
-    "@rollup/rollup-linux-arm-gnueabihf": "npm:4.46.1"
-    "@rollup/rollup-linux-arm-musleabihf": "npm:4.46.1"
-    "@rollup/rollup-linux-arm64-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-arm64-musl": "npm:4.46.1"
-    "@rollup/rollup-linux-loongarch64-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-ppc64-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-riscv64-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-riscv64-musl": "npm:4.46.1"
-    "@rollup/rollup-linux-s390x-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-x64-gnu": "npm:4.46.1"
-    "@rollup/rollup-linux-x64-musl": "npm:4.46.1"
-    "@rollup/rollup-win32-arm64-msvc": "npm:4.46.1"
-    "@rollup/rollup-win32-ia32-msvc": "npm:4.46.1"
-    "@rollup/rollup-win32-x64-msvc": "npm:4.46.1"
+    "@rollup/rollup-android-arm-eabi": "npm:4.46.2"
+    "@rollup/rollup-android-arm64": "npm:4.46.2"
+    "@rollup/rollup-darwin-arm64": "npm:4.46.2"
+    "@rollup/rollup-darwin-x64": "npm:4.46.2"
+    "@rollup/rollup-freebsd-arm64": "npm:4.46.2"
+    "@rollup/rollup-freebsd-x64": "npm:4.46.2"
+    "@rollup/rollup-linux-arm-gnueabihf": "npm:4.46.2"
+    "@rollup/rollup-linux-arm-musleabihf": "npm:4.46.2"
+    "@rollup/rollup-linux-arm64-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-arm64-musl": "npm:4.46.2"
+    "@rollup/rollup-linux-loongarch64-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-ppc64-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-riscv64-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-riscv64-musl": "npm:4.46.2"
+    "@rollup/rollup-linux-s390x-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-x64-gnu": "npm:4.46.2"
+    "@rollup/rollup-linux-x64-musl": "npm:4.46.2"
+    "@rollup/rollup-win32-arm64-msvc": "npm:4.46.2"
+    "@rollup/rollup-win32-ia32-msvc": "npm:4.46.2"
+    "@rollup/rollup-win32-x64-msvc": "npm:4.46.2"
     "@types/estree": "npm:1.0.8"
     fsevents: "npm:~2.3.2"
   dependenciesMeta:
@@ -3610,7 +3623,7 @@ __metadata:
       optional: true
   bin:
     rollup: dist/bin/rollup
-  checksum: 10c0/84297d63a97bf8fc131039d0f600787ada8baaa38b744820f7d29da601bce9f70a14aa12da80843b2b49eb8660718576f441ee9952954efa16009d7ccebf0000
+  checksum: 10c0/f428497fe119fe7c4e34f1020d45ba13e99b94c9aa36958d88823d932b155c9df3d84f53166f3ee913ff68ea6c7599a9ab34861d88562ad9d8420f64ca5dad4c
   languageName: node
   linkType: hard
 
@@ -4139,23 +4152,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.8.3":
-  version: 5.8.3
-  resolution: "typescript@npm:5.8.3"
+"typescript@npm:^5.9.2":
+  version: 5.9.2
+  resolution: "typescript@npm:5.9.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/5f8bb01196e542e64d44db3d16ee0e4063ce4f3e3966df6005f2588e86d91c03e1fb131c2581baf0fb65ee79669eea6e161cd448178986587e9f6844446dbb48
+  checksum: 10c0/cd635d50f02d6cf98ed42de2f76289701c1ec587a363369255f01ed15aaf22be0813226bff3c53e99d971f9b540e0b3cc7583dbe05faded49b1b0bed2f638a18
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.8.3#optional!builtin<compat/typescript>":
-  version: 5.8.3
-  resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"
+"typescript@patch:typescript@npm%3A^5.9.2#optional!builtin<compat/typescript>":
+  version: 5.9.2
+  resolution: "typescript@patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/39117e346ff8ebd87ae1510b3a77d5d92dae5a89bde588c747d25da5c146603a99c8ee588c7ef80faaf123d89ed46f6dbd918d534d641083177d5fac38b8a1cb
+  checksum: 10c0/34d2a8e23eb8e0d1875072064d5e1d9c102e0bdce56a10a25c0b917b8aa9001a9cf5c225df12497e99da107dc379360bc138163c66b55b95f5b105b50578067e
   languageName: node
   linkType: hard
 
@@ -4627,10 +4640,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^4.0.10":
-  version: 4.0.10
-  resolution: "zod@npm:4.0.10"
-  checksum: 10c0/8d1145e767c22b571a7967c198632f69ef15ce571b5021cdba84cf31d9af2ca40b033ea2fcbe5797cfd2da9c67b3a6ebe435938eabfbb1d1f3ab2f17f00f443b
+"zod@npm:^4.0.14":
+  version: 4.0.14
+  resolution: "zod@npm:4.0.14"
+  checksum: 10c0/ec8681050d393f3be1c2c8f30d7dd4f56bec3746855fb17288be856185a0fe65e68d1b24aec657bbf956f64c05e69332d3751eafd6c103d19385bcc46075612b
   languageName: node
   linkType: hard
 
