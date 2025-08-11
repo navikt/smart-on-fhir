@@ -1,4 +1,5 @@
 import { decodeJwt, jwtVerify } from 'jose'
+import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { logger } from '../logger'
@@ -222,6 +223,19 @@ export class ReadyClient {
 
             return parsed.data as ResponseFor<Path>
         })
+    }
+
+    public getClaim(claim: string): unknown
+    public getClaim<ExpectedClaimSchema extends z.ZodType>(
+        claim: string,
+        schema: ExpectedClaimSchema,
+    ): z.infer<ExpectedClaimSchema>
+    public getClaim<ExpectedClaimSchema extends z.ZodType>(
+        claim: string,
+        schema?: ExpectedClaimSchema,
+    ): z.infer<ExpectedClaimSchema> | unknown {
+        const claimValue = this._idToken[claim]
+        return schema ? schema.parse(claimValue) : claimValue
     }
 }
 

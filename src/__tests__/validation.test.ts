@@ -1,4 +1,5 @@
 import { expect, test } from 'vitest'
+import * as z from 'zod'
 
 import { ReadyClient } from '../client'
 import type { CompleteSession } from '../client/storage/schema'
@@ -7,7 +8,7 @@ import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockJwks, mockSmartConfiguration } from './mocks/issuer'
 import { createLaunchableSmartClient } from './utils/client'
 import { expectIs } from './utils/expect'
-import { createTestAccessToken, createTestIdToken } from './utils/token'
+import { createOtherToken, createTestAccessToken, createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
@@ -73,4 +74,38 @@ test('.validate - should not validate garbage', async () => {
     const validToken = await ready.validate()
 
     expect(validToken).toBe(false)
+})
+
+test('.getClaim - should handle getting arbitrary claims and validating them with zod', async () => {
+    const [client] = await createLaunchableSmartClient({
+        ...validSession,
+        idToken: await createTestIdToken({
+            'https://helseid.nhn.no': {
+                access_token: await createOtherToken('https://helseid.nhn.no'),
+                issuer: 'https://helseid.nhn.no',
+                scope: 'nav:syk-inn',
+            },
+        }),
+    })
+
+    const ready = await client.ready()
+    expectIs(ready, ReadyClient)
+
+    const claim = await ready.getClaim('https://helseid.nhn.no')
+    expect(claim).not.toBeNull()
+
+    const parsedClaim = ready.getClaim(
+        'https://helseid.nhn.no',
+        z.object({
+            access_token: z.string(),
+            issuer: z.string(),
+            scope: z.string(),
+        }),
+    )
+
+    expect(parsedClaim).toEqual({
+        access_token: expect.any(String),
+        issuer: 'https://helseid.nhn.no',
+        scope: 'nav:syk-inn',
+    })
 })

@@ -27,3 +27,14 @@ export async function createTestAccessToken(expiresIn: number): Promise<string> 
 
     return token
 }
+
+export async function createOtherToken(issuer: string): Promise<string> {
+    const token = await new SignJWT()
+        .setProtectedHeader({ alg: 'RS256', kid: 'foo-bar-baz-kid' })
+        .setIssuedAt()
+        .setIssuer(issuer)
+        .setAudience('test-client')
+        .sign(await privateKey())
+
+    return token
+}

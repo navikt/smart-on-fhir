@@ -22,7 +22,9 @@ export const TokenRefreshResponseSchema = z.object({
 })
 
 export type IdToken = z.infer<typeof IdTokenSchema>
-export const IdTokenSchema = z.object({
-    // SMART:
-    fhirUser: z.string().optional(), // TODO: Opitonalness is part of webmed hack
-})
+export const IdTokenSchema = z
+    .object({
+        // SMART:
+        fhirUser: z.string().optional(), // TODO: Opitonalness is part of webmed hack
+    })
+    .catchall(z.unknown())
