@@ -57,7 +57,7 @@ test('.ready - should refresh token when expiry is less than 5 minutes', async (
         { autoRefresh: true },
     )
 
-    const tokenMock = await mockTokenRefresh({
+    await mockTokenRefresh({
         client_id: 'test-client',
         refresh_token: 'valid-refresh-token',
     })
@@ -76,7 +76,7 @@ test('.ready - should refresh token when expiry is long ago', async () => {
         { autoRefresh: true },
     )
 
-    const tokenMock = await mockTokenRefresh({
+    await mockTokenRefresh({
         client_id: 'test-client',
         refresh_token: 'valid-refresh-token',
     })

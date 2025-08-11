@@ -1,4 +1,4 @@
-import { type CryptoKey, exportJWK, importPKCS8, importSPKI, type JSONWebKeySet, type JWK, SignJWT } from 'jose'
+import { type CryptoKey, exportJWK, importPKCS8, importSPKI, type JSONWebKeySet, type JWK } from 'jose'
 
 import { testOnlyPrivateKey, testOnlyPublicKey } from './test-only-keys'
 
