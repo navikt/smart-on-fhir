@@ -7,7 +7,7 @@ import { OtelTaxonomy, spanAsync } from '../otel'
 import type { CompleteSession } from '../storage/schema'
 import { getResponseError } from '../utils'
 
-import type { ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
+import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
@@ -36,7 +36,7 @@ export class ReadyClient {
     constructor(client: SmartClient, session: CompleteSession) {
         this._client = client
         this._session = session
-        this._idToken = IdTokenSchema.parse(decodeJwt(session.idToken))
+        this._idToken = IdTokenSchema.loose().parse(decodeJwt(session.idToken))
     }
 
     public get patient(): ValueAccessor<FhirPatient, 'Patient'> {
@@ -225,17 +225,26 @@ export class ReadyClient {
         })
     }
 
-    public getClaim(claim: string): unknown
+    public getClaim(claim: string): ClaimErrors | unknown
     public getClaim<ExpectedClaimSchema extends z.ZodType>(
         claim: string,
         schema: ExpectedClaimSchema,
-    ): z.infer<ExpectedClaimSchema>
+    ): z.infer<ExpectedClaimSchema> | ClaimErrors
     public getClaim<ExpectedClaimSchema extends z.ZodType>(
         claim: string,
         schema?: ExpectedClaimSchema,
-    ): z.infer<ExpectedClaimSchema> | unknown {
+    ): z.infer<ExpectedClaimSchema> | ClaimErrors | unknown {
         const claimValue = this._idToken[claim]
-        return schema ? schema.parse(claimValue) : claimValue
+        if (claimValue == null) {
+            return { error: 'CLAIM_NOT_FOUND' }
+        }
+
+        try {
+            return schema ? schema.parse(claimValue) : claimValue
+        } catch (e) {
+            logger.error(new Error(`Claim validation failed for claim ${claim}`, { cause: e }))
+            return { error: 'CLAIM_INVALID' }
+        }
     }
 }
 

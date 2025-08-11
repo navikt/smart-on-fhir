@@ -23,3 +23,7 @@ export type ResourceCreateErrors = {
 export type ResourceRequestErrors = {
     error: 'REQUEST_FAILED_NON_OK_RESPONSE' | 'REQUEST_FAILED_INVALID_RESPONSE' | 'REQUEST_FAILED_RESOURCE_NOT_FOUND'
 }
+
+export type ClaimErrors = {
+    error: 'CLAIM_NOT_FOUND' | 'CLAIM_INVALID'
+}
