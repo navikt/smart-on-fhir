@@ -165,3 +165,40 @@ test('.callback should gracefully handle state mismatch', async () => {
     expectHas(callback, 'error')
     expect(callback.error).toBe('INVALID_STATE')
 })
+
+test('.callback should redirect with patient ID when enableMultiLaunch=true', async () => {
+    const storage = createMockedStorage()
+    storage.getFn.mockImplementationOnce(() => ({
+        server: 'http://fhir-server',
+        issuer: 'http://auth-server',
+        authorizationEndpoint: 'http://auth-server/authorize',
+        tokenEndpoint: 'http://auth-server/token',
+        codeVerifier: 'test-code-verifier',
+        state: 'some-value',
+    }))
+
+    const client = new SmartClient('test-session', storage, {
+        clientId: 'test-client',
+        scope: 'openid fhirUser launch/patient',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
+        allowAnyIssuer: true,
+        enableMultiLaunch: true,
+    })
+
+    const tokenResponseNock = await mockTokenExchange({
+        client_id: 'test-client',
+        code: 'køde',
+        code_verifier: 'test-code-verifier',
+        redirect_uri: 'http://app/callback',
+    })
+
+    const callback = await client.callback({
+        state: 'some-value',
+        code: 'køde',
+    })
+
+    expect(tokenResponseNock.isDone()).toBe(true)
+    expectHas(callback, 'redirectUrl')
+    expect(callback.redirectUrl).toBe('http://app/redirect?patient=c4664cf0-9168-4b6f-8798-93799068552b')
+})

@@ -178,9 +178,15 @@ export class SmartClient {
 
             await this._storage.set(this.sessionId, completeSessionValues)
 
-            return {
-                redirectUrl: this._config.redirectUrl,
+            if (!this._config.enableMultiLaunch) {
+                return {
+                    redirectUrl: this._config.redirectUrl,
+                }
             }
+
+            const url = new URL(this._config.redirectUrl)
+            url.searchParams.set('patient', completeSessionValues.patient)
+            return { redirectUrl: url.toString() }
         })
     }
 
