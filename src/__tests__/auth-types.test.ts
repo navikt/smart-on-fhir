@@ -28,7 +28,7 @@ test('public, launch - should allow launches for known issuers', async () => {
         iss: 'http://fhir-server',
     })
 
-    expectHas(result, 'redirect_url')
+    expectHas(result, 'redirectUrl')
 })
 
 test('public, launch - should block launches for unknown issuers if allowAnyIssuer is not set (i.e.) has knownFhirServers', async () => {
@@ -78,7 +78,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
         iss: 'http://fhir-server',
     })
 
-    expectHas(result, 'redirect_url')
+    expectHas(result, 'redirectUrl')
 })
 
 test('confidential-symmentric, token - should set correct authorization headers when client_secret_basic', async () => {
@@ -122,8 +122,8 @@ test('confidential-symmentric, token - should set correct authorization headers 
     })
 
     expect(tokenResponseNock.isDone()).toBe(true)
-    expectHas(callback, 'redirect_url')
-    expect(callback.redirect_url).toBe('http://app/redirect')
+    expectHas(callback, 'redirectUrl')
+    expect(callback.redirectUrl).toBe('http://app/redirect')
 })
 
 test('confidential-symmentric, token - should set correct authorization property when client_secret_post', async () => {
@@ -165,6 +165,6 @@ test('confidential-symmentric, token - should set correct authorization property
     })
 
     expect(tokenResponseNock.isDone()).toBe(true)
-    expectHas(callback, 'redirect_url')
-    expect(callback.redirect_url).toBe('http://app/redirect')
+    expectHas(callback, 'redirectUrl')
+    expect(callback.redirectUrl).toBe('http://app/redirect')
 })

@@ -40,8 +40,8 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
     /**
      * Should create a redirect URL with PKCE and state
      */
-    expectHas(result, 'redirect_url')
-    const params = Object.fromEntries(new URL(result.redirect_url).searchParams.entries())
+    expectHas(result, 'redirectUrl')
+    const params = Object.fromEntries(new URL(result.redirectUrl).searchParams.entries())
     expect(params).toEqual({
         client_id: 'test-client',
         code_challenge_method: 'S256',
@@ -127,8 +127,8 @@ test('.callback should exchange code for token', async () => {
     })
 
     expect(tokenResponseNock.isDone()).toBe(true)
-    expectHas(callback, 'redirect_url')
-    expect(callback.redirect_url).toBe('http://app/redirect')
+    expectHas(callback, 'redirectUrl')
+    expect(callback.redirectUrl).toBe('http://app/redirect')
 })
 
 test('.callback should gracefully handle state mismatch', async () => {

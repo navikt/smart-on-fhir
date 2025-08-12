@@ -33,8 +33,8 @@ test('pkce verification should be correct', async () => {
     /**
      * Verify that the /authorize params are correct
      */
-    expectHas(result, 'redirect_url')
-    const params = searchParamsToObject(result.redirect_url)
+    expectHas(result, 'redirectUrl')
+    const params = searchParamsToObject(result.redirectUrl)
 
     const { codeVerifier } = (await storage.get(sessionId)) as InitialSession
     const expectedCodeChallenge = await calculatePKCECodeChallenge(codeVerifier)
@@ -60,7 +60,7 @@ test('pkce verification should be correct', async () => {
     /**
      * Launch is complete and session is complete
      */
-    expectHas(callback, 'redirect_url')
+    expectHas(callback, 'redirectUrl')
     const session = (await storage.get(sessionId)) as CompleteSession
     expect(session).toHaveProperty('accessToken')
     expect(session).toHaveProperty('idToken')

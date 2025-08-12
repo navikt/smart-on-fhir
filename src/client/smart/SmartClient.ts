@@ -124,7 +124,7 @@ export class SmartClient {
              * Redirect the user to the /authorize endpoint along with the code_challenge
              *
              */
-            return { redirect_url: authUrl }
+            return { redirectUrl: authUrl }
         })
     }
 
@@ -179,7 +179,7 @@ export class SmartClient {
             await this._storage.set(this.sessionId, completeSessionValues)
 
             return {
-                redirect_url: this._config.redirectUrl,
+                redirectUrl: this._config.redirectUrl,
             }
         })
     }
@@ -338,18 +338,18 @@ export class SmartClient {
 }
 
 /**
- * A successful launch will end up in a redirect_url for the user to be redirected to.
+ * A successful launch will end up in a redirectUrl for the user to be redirected to.
  *
  * The responsibilty to redirect the user lies with the application using the SmartClient.
  */
 export type Launch = {
-    redirect_url: string
+    redirectUrl: string
 }
 
 /**
- * A successful callback will end up in a redirect_url for the user to be redirected to, this URL is configured
+ * A successful callback will end up in a redirectUrl for the user to be redirected to, this URL is configured
  * by the application using the SmartClient and is typically part of the app itself.
  */
 export type Callback = {
-    redirect_url: string
+    redirectUrl: string
 }
