@@ -13,10 +13,10 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sm
         TEST_SESSION_ID,
         storage,
         {
-            client_id: 'test-client',
+            clientId: 'test-client',
             scope: 'openid fhirUser launch/patient',
-            callback_url: 'http://app/callback',
-            redirect_url: 'http://app/redirect',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
             allowAnyIssuer: true,
         },
         options,

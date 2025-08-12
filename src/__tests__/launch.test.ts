@@ -10,10 +10,10 @@ import { createMockedStorage } from './utils/storage'
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         allowAnyIssuer: true,
     })
 
@@ -58,10 +58,10 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
 test('.launch - should gracefully handle well-known not responding correctly', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         allowAnyIssuer: true,
     })
 
@@ -78,10 +78,10 @@ test('.launch - should gracefully handle well-known not responding correctly', a
 test('.launch - should gracefully handle well-known responding with invalid payload', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         allowAnyIssuer: true,
     })
 
@@ -107,10 +107,10 @@ test('.callback should exchange code for token', async () => {
     }))
 
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         allowAnyIssuer: true,
     })
 
@@ -143,10 +143,10 @@ test('.callback should gracefully handle state mismatch', async () => {
     }))
 
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         allowAnyIssuer: true,
     })
 

@@ -30,11 +30,11 @@ export async function exchangeToken(
         })
 
         const tokenRequestBody = {
-            client_id: config.client_id,
+            client_id: config.clientId,
             grant_type: 'authorization_code',
             code: code,
             code_verifier: session.codeVerifier,
-            redirect_uri: config.callback_url,
+            redirect_uri: config.callbackUrl,
         }
 
         // TODO: Debug logging
@@ -49,7 +49,7 @@ export async function exchangeToken(
         const response = await postFormEncoded(
             session.tokenEndpoint,
             new URLSearchParams(tokenRequestBody),
-            config.client_id,
+            config.clientId,
             authMode,
         )
 
@@ -108,7 +108,7 @@ export async function refreshToken(
         })
 
         const tokenRequestBody = {
-            client_id: config.client_id,
+            client_id: config.clientId,
             grant_type: 'refresh_token',
             refresh_token: session.refreshToken,
         }
@@ -120,7 +120,7 @@ export async function refreshToken(
         const response = await postFormEncoded(
             session.tokenEndpoint,
             new URLSearchParams(tokenRequestBody),
-            config.client_id,
+            config.clientId,
             authMode,
         )
 

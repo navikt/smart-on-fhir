@@ -1,10 +1,10 @@
 import type { KnownFhirServer } from './client-auth/config'
 
 type SmartClientBaseConfiguration = {
-    client_id: string
+    clientId: string
     scope: string
-    callback_url: string
-    redirect_url: string
+    callbackUrl: string
+    redirectUrl: string
 }
 
 type OpenSmartClientConfiguration = {

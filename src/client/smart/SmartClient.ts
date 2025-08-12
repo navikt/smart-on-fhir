@@ -179,7 +179,7 @@ export class SmartClient {
             await this._storage.set(this.sessionId, completeSessionValues)
 
             return {
-                redirect_url: this._config.redirect_url,
+                redirect_url: this._config.redirectUrl,
             }
         })
     }

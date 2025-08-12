@@ -10,10 +10,10 @@ import { createMockedStorage } from './utils/storage'
 test('public, launch - should allow launches for known issuers', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         knownFhirServers: [
             {
                 issuer: 'http://fhir-server',
@@ -34,10 +34,10 @@ test('public, launch - should allow launches for known issuers', async () => {
 test('public, launch - should block launches for unknown issuers if allowAnyIssuer is not set (i.e.) has knownFhirServers', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         knownFhirServers: [
             {
                 issuer: 'http://other-server',
@@ -58,10 +58,10 @@ test('public, launch - should block launches for unknown issuers if allowAnyIssu
 test('confidential-symmentric, launch - should allow launches for known issuers', async () => {
     const storage = createMockedStorage()
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         knownFhirServers: [
             {
                 issuer: 'http://fhir-server',
@@ -93,10 +93,10 @@ test('confidential-symmentric, token - should set correct authorization headers 
     }))
 
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         knownFhirServers: [
             {
                 issuer: 'http://fhir-server',
@@ -138,10 +138,10 @@ test('confidential-symmentric, token - should set correct authorization property
     }))
 
     const client = new SmartClient('test-session', storage, {
-        client_id: 'test-client',
+        clientId: 'test-client',
         scope: 'openid fhirUser launch/patient',
-        callback_url: 'http://app/callback',
-        redirect_url: 'http://app/redirect',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
         knownFhirServers: [
             {
                 issuer: 'http://fhir-server',

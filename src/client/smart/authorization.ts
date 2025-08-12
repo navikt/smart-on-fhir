@@ -16,9 +16,9 @@ export async function buildAuthUrl(opts: AuthUrlOpts, config: SmartClientConfigu
     const code_challenge = await calculatePKCECodeChallenge(opts.codeVerifier)
     const params = new URLSearchParams({
         response_type: 'code',
-        client_id: config.client_id,
+        client_id: config.clientId,
         scope: config.scope,
-        redirect_uri: config.callback_url,
+        redirect_uri: config.callbackUrl,
         aud: opts.issuer,
         launch: opts.launch,
         state: opts.state,
