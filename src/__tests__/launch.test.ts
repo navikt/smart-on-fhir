@@ -177,14 +177,18 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
         state: 'some-value',
     }))
 
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-        enableMultiLaunch: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        storage,
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { enableMultiLaunch: true },
+    )
 
     const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',

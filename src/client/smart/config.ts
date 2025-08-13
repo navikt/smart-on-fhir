@@ -5,12 +5,6 @@ type SmartClientBaseConfiguration = {
     scope: string
     callbackUrl: string
     redirectUrl: string
-    /**
-     * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
-     * client to store this ID at their own leisure, and using it for subsequent requests, enabling multiple
-     * simultaneous launched sessions with different patients.
-     */
-    enableMultiLaunch?: true
 }
 
 type OpenSmartClientConfiguration = {
@@ -34,4 +28,10 @@ export type SmartClientConfiguration = SmartClientBaseConfiguration &
 
 export type SmartClientOptions = {
     autoRefresh?: boolean
+    /**
+     * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
+     * client to store this ID at their own leisure, and using it for subsequent requests, enabling multiple
+     * simultaneous launched sessions with different patients.
+     */
+    enableMultiLaunch?: true
 }
