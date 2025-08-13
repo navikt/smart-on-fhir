@@ -15,7 +15,11 @@ type TokenExchangeValues = {
     client_secret?: string
 }
 
-export async function mockTokenExchange(expectedBody: TokenExchangeValues, authHeader?: string): Promise<Scope> {
+export async function mockTokenExchange(
+    expectedBody: TokenExchangeValues,
+    values?: Record<string, unknown>,
+    authHeader?: string,
+): Promise<Scope> {
     const postInterceptor = nock(AUTH_SERVER).post('/token', {
         ...expectedBody,
         grant_type: 'authorization_code',
@@ -40,6 +44,7 @@ export async function mockTokenExchange(expectedBody: TokenExchangeValues, authH
         refresh_token: 'test-refresh-token',
         patient: 'c4664cf0-9168-4b6f-8798-93799068552b',
         encounter: '3cdff553-e0ce-4fe0-89ca-8a3b62ca853e',
+        ...values,
     })
 }
 

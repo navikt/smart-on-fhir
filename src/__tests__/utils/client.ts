@@ -1,4 +1,5 @@
-import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../../client'
+import { ReadyClient, SmartClient, type SmartClientOptions } from '../../client'
+import { type SafeSmartStorage, safeSmartStorage } from '../../client/storage'
 import type { CompleteSession } from '../../client/storage/schema'
 
 import { expectIs } from './expect'
@@ -6,7 +7,26 @@ import { createTestStorage } from './storage'
 
 export const TEST_SESSION_ID = 'test-session'
 
-export const createTestClient = (options?: SmartClientOptions): [SmartClient, SmartStorage] => {
+export const createMultiLaunchTestClient = (activePatient: string | null): [SmartClient, SafeSmartStorage] => {
+    const storage = createTestStorage()
+
+    const client = new SmartClient(
+        { sessionId: TEST_SESSION_ID, activePatient },
+        storage,
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { enableMultiLaunch: true },
+    )
+
+    return [client, safeSmartStorage(storage)]
+}
+
+export const createTestClient = (options?: SmartClientOptions): [SmartClient, SafeSmartStorage] => {
     const storage = createTestStorage()
 
     const client = new SmartClient(
@@ -22,13 +42,13 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sm
         options,
     )
 
-    return [client, storage]
+    return [client, safeSmartStorage(storage)]
 }
 
 export async function createLaunchableSmartClient(
     session: CompleteSession,
     options?: SmartClientOptions,
-): Promise<[SmartClient, SmartStorage]> {
+): Promise<[SmartClient, SafeSmartStorage]> {
     const [client, storage] = createTestClient(options)
 
     await storage.set('test-session', session)
@@ -41,7 +61,7 @@ export async function createLaunchableSmartClient(
 export async function createLaunchedReadyClient(
     session: CompleteSession,
     options?: SmartClientOptions,
-): Promise<[ReadyClient, SmartStorage]> {
+): Promise<[ReadyClient, SafeSmartStorage]> {
     const [client, storage] = createTestClient(options)
 
     await storage.set(TEST_SESSION_ID, session)

@@ -114,6 +114,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
             code_verifier: 'test-code-verifier',
             redirect_uri: 'http://app/callback',
         },
+        {},
         `Basic ${Buffer.from('test-client:test-secret').toString('base64')}`,
     )
     const callback = await client.callback({
