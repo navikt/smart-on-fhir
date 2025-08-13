@@ -1,11 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { SmartClient } from '../client'
+import { ReadyClient, SmartClient } from '../client'
+import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
 import { fhirNock, mockSmartConfiguration } from './mocks/issuer'
-import { expectHas } from './utils/expect'
-import { createMockedStorage } from './utils/storage'
+import { TEST_SESSION_ID } from './utils/client'
+import { expectHas, expectIs } from './utils/expect'
+import { createMockedStorage, createTestStorage } from './utils/storage'
 
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()
@@ -205,4 +207,57 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
     expect(tokenResponseNock.isDone()).toBe(true)
     expectHas(callback, 'redirectUrl')
     expect(callback.redirectUrl).toBe('http://app/redirect?patient=c4664cf0-9168-4b6f-8798-93799068552b')
+})
+
+test('full simulated launch flow, .ready() → .callback() → .ready()', async () => {
+    const storage = createTestStorage()
+    const client = new SmartClient('test-session', storage, {
+        clientId: 'test-client',
+        scope: 'openid fhirUser launch/patient',
+        callbackUrl: 'http://app/callback',
+        redirectUrl: 'http://app/redirect',
+        allowAnyIssuer: true,
+    })
+
+    /**
+     * .launch(), create authorization URL and prepare initial session
+     */
+    mockSmartConfiguration()
+    const result = await client.launch({
+        launch: 'test-launch',
+        iss: 'http://fhir-server',
+    })
+    expectHas(result, 'redirectUrl')
+
+    /**
+     * The user would normally be redirected to the authorization URL, and then
+     * the authorization server would redirect back to the app with a code. For testing
+     * purposes we skip this step.
+     */
+    const safeStorage = safeSmartStorage(storage)
+    const state = new URL(result.redirectUrl).searchParams.get('state') as string
+    const firstLaunchPartialSession = await safeStorage.getPartial(TEST_SESSION_ID)
+    expectHas(firstLaunchPartialSession, 'codeVerifier')
+
+    await mockTokenExchange({
+        client_id: 'test-client',
+        code: 'mock-code',
+        code_verifier: firstLaunchPartialSession.codeVerifier,
+        redirect_uri: 'http://app/callback',
+    })
+
+    /**
+     * .callback() should exchange the code for tokens and return a redirect URL to the final URL
+     */
+    const callback = await client.callback({ state, code: 'mock-code' })
+    expectHas(callback, 'redirectUrl')
+
+    /**
+     * .ready() should return a ReadyClient with the active patient
+     */
+    const readyClient = await client.ready()
+
+    expectIs(readyClient, ReadyClient)
+    expect(readyClient.patient.reference).toBe('Patient/c4664cf0-9168-4b6f-8798-93799068552b')
+    expect(readyClient.user.fhirUser).toBe('Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4')
 })
