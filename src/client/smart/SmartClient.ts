@@ -35,6 +35,12 @@ export class SmartClient {
      */
     readonly sessionId: string
 
+    /**
+     * When using the SmartClient in "multi-patient"-mode, i.e. allowing multiple launches, the consumer of the
+     * SmartClient will keep track of the active patient (using for example sessionStorage).
+     */
+    readonly activePatient: string | null
+
     private readonly _storage: SafeSmartStorage
     private readonly _config: SmartClientConfiguration
     private readonly _options: SmartClientOptions
@@ -44,11 +50,39 @@ export class SmartClient {
         storage: SmartStorage | Promise<SmartStorage>,
         config: SmartClientConfiguration,
         options?: SmartClientOptions,
+    )
+    constructor(
+        session: { sessionId: string | null | undefined; activePatient: string | null | undefined },
+        storage: SmartStorage | Promise<SmartStorage>,
+        config: SmartClientConfiguration,
+        options?: SmartClientOptions,
+    )
+    constructor(
+        sessionIdOrSession:
+            | string
+            | null
+            | undefined
+            | { sessionId: string | null | undefined; activePatient: string | null | undefined },
+        storage: SmartStorage | Promise<SmartStorage>,
+        config: SmartClientConfiguration,
+        options?: SmartClientOptions,
     ) {
         assertNotBrowser()
+
+        const sessionId: string | null | undefined =
+            typeof sessionIdOrSession === 'object' && sessionIdOrSession != null
+                ? sessionIdOrSession.sessionId
+                : sessionIdOrSession
+
         assertGoodSessionId(sessionId)
 
+        const activePatient: string | null | undefined =
+            typeof sessionIdOrSession === 'object' && sessionIdOrSession != null
+                ? sessionIdOrSession.activePatient
+                : null
+
         this.sessionId = sessionId
+        this.activePatient = activePatient ?? null
 
         this._storage = safeSmartStorage(storage)
         this._config = config
@@ -91,6 +125,7 @@ export class SmartClient {
 
             /**
              * PKCE STEP 1
+             *
              * Create a cryptographically-random code_verifier
              */
             const codeVerifier = randomPKCECodeVerifier()
