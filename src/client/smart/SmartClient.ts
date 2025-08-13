@@ -243,9 +243,7 @@ export class SmartClient {
           })
     > {
         return spanAsync('ready', async (span) => {
-            const session = this._options.autoRefresh
-                ? await this.getOrRefresh(this.sessionId)
-                : await this.getCompleteSession(this.sessionId)
+            const session = this._options.autoRefresh ? await this.getOrRefresh() : await this.getCompleteSession()
 
             if ('error' in session) return { error: session.error, validate: async () => false }
 
@@ -289,9 +287,20 @@ export class SmartClient {
         return refreshedSessionValues
     }
 
-    private async getCompleteSession(sessionId: string): Promise<CompleteSession | CompleteSessionErrors> {
+    private async getCompleteSession(): Promise<CompleteSession | CompleteSessionErrors> {
         return spanAsync('get-complete', async (span) => {
-            const session = await this._storage.getComplete(sessionId)
+            let session: CompleteSession | CompleteSessionErrors
+            if (this.activePatient != null) {
+                const activePatientSession = await this._storage.getComplete(`${this.sessionId}:${this.activePatient}`)
+
+                if ('error' in activePatientSession) {
+                    session = await this._storage.getComplete(this.sessionId)
+                } else {
+                    session = activePatientSession
+                }
+            } else {
+                session = await this._storage.getComplete(this.sessionId)
+            }
 
             if ('error' in session) {
                 span.setAttribute('session.error', session.error)
@@ -318,11 +327,9 @@ export class SmartClient {
         })
     }
 
-    private async getOrRefresh(
-        sessionId: string,
-    ): Promise<CompleteSession | CompleteSessionErrors | RefreshTokenErrors> {
+    private async getOrRefresh(): Promise<CompleteSession | CompleteSessionErrors | RefreshTokenErrors> {
         return spanAsync('get-or-refresh', async (span) => {
-            const session = await this.getCompleteSession(sessionId)
+            const session = await this.getCompleteSession()
             if ('error' in session) return session
 
             // Pre-emptively refresh the token if it is about to expire within 5 minutes
@@ -341,9 +348,9 @@ export class SmartClient {
                     return session
                 }
 
-                await this._storage.set(sessionId, refreshResult)
+                await this._storage.set(this.sessionId, refreshResult)
                 if (this.activePatient) {
-                    await this._storage.set(`${sessionId}:${this.activePatient}`, refreshResult)
+                    await this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshResult)
                 }
 
                 span.setAttribute(OtelTaxonomy.SessionRefreshed, true)

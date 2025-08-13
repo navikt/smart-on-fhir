@@ -7,25 +7,6 @@ import { createTestStorage } from './storage'
 
 export const TEST_SESSION_ID = 'test-session'
 
-export const createMultiLaunchTestClient = (activePatient: string | null): [SmartClient, SafeSmartStorage] => {
-    const storage = createTestStorage()
-
-    const client = new SmartClient(
-        { sessionId: TEST_SESSION_ID, activePatient },
-        storage,
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { enableMultiLaunch: true },
-    )
-
-    return [client, safeSmartStorage(storage)]
-}
-
 export const createTestClient = (options?: SmartClientOptions): [SmartClient, SafeSmartStorage] => {
     const storage = createTestStorage()
 
