@@ -4,14 +4,14 @@ import { type CompleteSession, CompleteSessionSchema, type InitialSession, Initi
 import type { CompleteSessionErrors, InitialSessionErrors } from './storage-errors'
 
 export type SmartStorage = {
-    set: (sessionId: string, values: InitialSession | CompleteSession) => Promise<void>
-    get: (sessionId: string) => Promise<unknown>
+    set: (key: string, values: InitialSession | CompleteSession) => Promise<void>
+    get: (key: string) => Promise<unknown>
 }
 
 export type SafeSmartStorage = {
-    set: (sessionId: string, values: InitialSession | CompleteSession) => Promise<void>
-    getPartial: (sessionId: string) => Promise<InitialSession | InitialSessionErrors>
-    getComplete: (sessionId: string) => Promise<CompleteSession | CompleteSessionErrors>
+    set: (key: string, values: InitialSession | CompleteSession) => Promise<void>
+    getPartial: (key: string) => Promise<InitialSession | InitialSessionErrors>
+    getComplete: (key: string) => Promise<CompleteSession | CompleteSessionErrors>
 }
 
 export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStorage>): SafeSmartStorage {
@@ -19,8 +19,8 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
         set: async (...args) => {
             return (await smartStorage).set(...args)
         },
-        getPartial: async (sessionId) => {
-            const raw = await (await smartStorage).get(sessionId)
+        getPartial: async (key) => {
+            const raw = await (await smartStorage).get(key)
 
             if (raw == null) return { error: 'NO_STATE' }
             if (raw && typeof raw === 'object' && Object.keys(raw).length === 0) {
@@ -30,7 +30,7 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
             const initialParsed = InitialSessionSchema.safeParse(raw)
             if (initialParsed.error) {
                 logger.error(
-                    new Error(`SmartSession state for session ${sessionId} is broken`, {
+                    new Error(`SmartSession state for session ${key} is broken`, {
                         cause: initialParsed.error,
                     }),
                 )
@@ -39,8 +39,8 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
 
             return initialParsed.data
         },
-        getComplete: async (sessionId) => {
-            const raw = await (await smartStorage).get(sessionId)
+        getComplete: async (key) => {
+            const raw = await (await smartStorage).get(key)
 
             if (raw == null) return { error: 'NO_STATE' }
             if (raw && typeof raw === 'object' && Object.keys(raw).length === 0) {
@@ -50,7 +50,7 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
             const completeParsed = CompleteSessionSchema.safeParse(raw)
             if (completeParsed.error) {
                 logger.error(
-                    new Error(`SmartSession state for session ${sessionId} was expected to be complete, but wasn't`, {
+                    new Error(`SmartSession state for session ${key} was expected to be complete, but wasn't`, {
                         cause: completeParsed.error,
                     }),
                 )
