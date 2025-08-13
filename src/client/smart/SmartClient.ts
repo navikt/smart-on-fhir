@@ -219,6 +219,12 @@ export class SmartClient {
                 }
             }
 
+            /**
+             * When multi-launch is enabled, we also store the session under <sessionId>:<patientId> to allow
+             * for the state to be retrieved in a activePatient-context later.
+             */
+            await this._storage.set(`${this.sessionId}:${tokenResponse.patient}`, completeSessionValues)
+
             const url = new URL(this._config.redirectUrl)
             url.searchParams.set('patient', completeSessionValues.patient)
             return { redirectUrl: url.toString() }
@@ -278,6 +284,9 @@ export class SmartClient {
         }
 
         await this._storage.set(this.sessionId, refreshedSessionValues)
+        if (this.activePatient) {
+            await this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues)
+        }
 
         return refreshedSessionValues
     }
@@ -335,6 +344,9 @@ export class SmartClient {
                 }
 
                 await this._storage.set(sessionId, refreshResult)
+                if (this.activePatient) {
+                    await this._storage.set(`${sessionId}:${this.activePatient}`, refreshResult)
+                }
 
                 span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
                 return refreshResult
