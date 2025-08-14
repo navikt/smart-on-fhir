@@ -41,10 +41,16 @@ export class SmartClient {
      */
     readonly activePatient: string | null
 
+    /**
+     * Configuration for this instance, based on options passed to the constructor + defaults.
+     */
+    readonly options: {
+        autoRefresh: boolean
+        multiLaunch: boolean
+    }
+
     private readonly _storage: SafeSmartStorage
     private readonly _config: SmartClientConfiguration
-    private readonly _options: SmartClientOptions
-    private readonly _isMultiLaunch: boolean
 
     /**
      * Single launch mode. Any subsequent launches using the same sessionId will overwrite the previous
@@ -105,14 +111,10 @@ export class SmartClient {
 
         this._storage = safeSmartStorage(storage)
         this._config = config
-        this._options = options ?? { autoRefresh: false }
-        this._isMultiLaunch = options?.enableMultiLaunch ?? false
-    }
 
-    public get options(): { autoRefresh: boolean } {
-        return {
-            autoRefresh: false,
-            ...this._options,
+        this.options = {
+            autoRefresh: options?.autoRefresh ?? false,
+            multiLaunch: options?.enableMultiLaunch ?? false,
         }
     }
 
@@ -239,7 +241,7 @@ export class SmartClient {
 
             await this._storage.set(this.sessionId, completeSessionValues)
 
-            if (!this._isMultiLaunch) {
+            if (!this.options.multiLaunch) {
                 return { redirectUrl: this._config.redirectUrl }
             }
 
@@ -269,7 +271,7 @@ export class SmartClient {
           })
     > {
         return spanAsync('ready', async (span) => {
-            const session = this._options.autoRefresh ? await this.getOrRefresh() : await this.getCompleteSession()
+            const session = this.options.autoRefresh ? await this.getOrRefresh() : await this.getCompleteSession()
 
             if ('error' in session) return { error: session.error, validate: async () => false }
 
@@ -292,7 +294,7 @@ export class SmartClient {
     /**
      * Explicitly refreshes the session by exchanging the refresh token for a new access token.
      *
-     * This will happen automatically buring the `ready`-step if the `autoRefresh` option is set to `true`.
+     * This will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
         const refreshResponse = await refreshToken(session, this._config, this.getAuthMode(session.server))
@@ -424,7 +426,7 @@ export class SmartClient {
 /**
  * A successful launch will end up in a redirectUrl for the user to be redirected to.
  *
- * The responsibilty to redirect the user lies with the application using the SmartClient.
+ * The responsibility to redirect the user lies with the application using the SmartClient.
  */
 export type Launch = {
     redirectUrl: string
