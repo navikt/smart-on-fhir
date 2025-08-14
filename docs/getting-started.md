@@ -2,8 +2,10 @@
 
 ### Prerequisites
 
-::: info This dependency is available only on Github Package registry (GPR). GPR does not allow anonymous pulls, so you
-need to configure a personal access token (PAT).
+::: info
+
+This dependency is available only on Github Package registry (GPR). GPR does not allow anonymous pulls, so you need to
+configure a personal access token (PAT).
 
 :::
 

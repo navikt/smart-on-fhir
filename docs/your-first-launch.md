@@ -51,7 +51,7 @@ function getSmartStorage(): SmartStorage {
   return {
     set: async (sessionId, values) => {
       await valkey.hset(sessionIdKey(sessionId), values)
-      await valkey.expire(sessionIdKey(sessionId), 60 * 60 * 24 * 30)
+      await valkey.expire(sessionIdKey(sessionId), 3600 * 24 * 30)
     },
     get: async (sessionId) => {
       return valkey.hgetall(sessionIdKey(sessionId))
@@ -87,23 +87,33 @@ https://example.com/fhir/launch?iss=<EHR-FHIR-URL>&launch=12345
 
 Let's implement the `/fhir/launch` route in our web server, using standard Request/Response Web APIs:
 
-```typescript {2,7,24,34}
+```typescript {2,8-11,22-25,34-37,49-52}
 async function launchRoute(req: Request): Promise<Response> {
-  const sessionId = /* retrieve your session ID from a secure cookie */ 'foo'
+  /* retrieve your session ID from a secure cookie */
+  const sessionId = 'foo'
   if (sessionId == null) {
     return new Response('No session ID found', { status: 400 })
   }
 
-  // Extract iss and launch parameters from the request URL, we need these for the launch
+  /**
+   * Extract iss and launch parameters from the request URL,
+   * we need these for the launch
+   */
   const url = new URL(req.url)
   const issuer = url.searchParams.get('iss')
   const launch = url.searchParams.get('launch')
 
   if (issuer == null || launch == null) {
-    return new Response('Missing required parameters: iss and launch', { status: 400 })
+    return new Response('Missing required params: iss or launch', {
+      status: 400,
+    })
   }
 
-  const client = new SmartClient(sessionId, storage, {
+  /**
+   * Instantiate the SmartClient with our current sessionId,
+   * backing Valkey store and the apps configuration.
+   */
+  const client = new SmartClient(sessionId, getSmartStorage(), {
     clientId: 'test-client',
     scope: 'openid fhirUser launch/patient',
     callbackUrl: 'https://example.com/fhir/callback',
@@ -111,17 +121,25 @@ async function launchRoute(req: Request): Promise<Response> {
     allowAnyIssuer: true,
   })
 
-  // Initiate the launch process given the provided EHR FHIR issuer and launch parameter
+  /**
+   * Initiate the launch process given the provided
+   * EHR FHIR issuer and launch parameter
+   */
   const launchResult = await client.launch({
     iss: issuer,
     launch: launch,
   })
 
   if ('error' in launchResult) {
-    return new Response(`Launch error: ${launchResult.error}`, { status: 500 })
+    return new Response(`Launch error: ${launchResult.error}`, {
+      status: 500,
+    })
   }
 
-  // Given a successful launch, we redirect the user to the EHR's authorization server
+  /**
+   * Given a successful launch, we redirect the user to the
+   * EHR's authorization server
+   */
   return Response.redirect(launchResult.redirect_url, 302)
 }
 ```
@@ -140,30 +158,36 @@ and update the storage with these values.
 
 To do this, we'll need to implement our `/fhir/callback` route:
 
-```typescript {2,7-10,19-22,31-34,40}
+```typescript {2,8-12,23-28,37-41,49-52}
 async function callbackHandler(req: Request): Promise<Response> {
-  const sessionId = /* retrieve your session ID from a secure cookie */ 'foo'
+  /* retrieve your session ID from a secure cookie */
+  const sessionId = 'foo'
   if (sessionId == null) {
     return new Response('No session ID found', { status: 400 })
   }
 
   /**
-   * The auth server has provided us with a code and state in the query parameters,
-   * we need both of these to handle the callback.
+   * The auth server has provided us with a code and state in
+   * the query parameters, we need both of these to handle
+   * the callback.
    */
   const url = new URL(req.url)
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
 
   if (code == null || state == null) {
-    return new Response('Missing required parameters: code and state', { status: 400 })
+    return new Response('Missing required params: code or state', {
+      status: 400,
+    })
   }
 
   /**
-   * Instantiate our smart client again, this is the same configuration as during the launch,
-   * and can safely be extracted to a reusable function (but don't share the instance between requests!).
+   * Instantiate our smart client again, this is the same
+   * configuration as during the launch, and can safely be
+   * extracted to a reusable function (but don't share the
+   * instance between requests!).
    */
-  const client = new SmartClient(sessionId, storage, {
+  const client = new SmartClient(sessionId, getSmartStorage(), {
     clientId: 'test-client',
     scope: 'openid fhirUser launch/patient',
     callbackUrl: 'https://example.com/fhir/callback',
@@ -172,15 +196,21 @@ async function callbackHandler(req: Request): Promise<Response> {
   })
 
   /**
-   * Actually complete the callback, this will verify the state, PKCE and exchange the authorization code
-   * for an access token and ID-token for us.
+   * Actually complete the callback, this will verify the state,
+   * PKCE and exchange the authorization code for an access
+   * token and ID-token for us.
    */
   const callbackResult = await client.callback({ code, state })
   if ('error' in callbackResult) {
-    return new Response(`Login failed, cause: ${callbackResult.error}`, { status: 500 })
+    return new Response(`Login failed: ${callbackResult.error}`, {
+      status: 500,
+    })
   }
 
-  // The callback was successful, lets redirect the user to the actual web-app
+  /**
+   * The callback was successful, lets redirect the user to
+   * the actual web-app
+   */
   return Response.redirect(callbackResult.redirect_url, 302)
 }
 ```
@@ -211,18 +241,21 @@ Let's create a simple custom endpoind for our web-app that fetches some FHIR res
 
 This route can for example be configured under the route `/api/fhir-example` as a `GET` resource.
 
-```typescript {20,31-33,36}
+```typescript {8-13,22,25-28,31-34,39}
 async function callbackHandler(req: Request): Promise<Response> {
-  const sessionId = /* retrieve your session ID from a secure cookie */ 'foo'
+  /* retrieve your session ID from a secure cookie */
+  const sessionId = 'foo'
   if (sessionId == null) {
     return new Response('No session ID found', { status: 400 })
   }
 
   /**
-   * Instantiate our smart client again, this is the same configuration as during the launch,
-   * and can safely be extracted to a reusable function (but don't share the instance between requests!).
+   * Instantiate our smart client again, this is the same
+   * configuration as during the launch, and can safely be
+   * extracted to a reusable function (but don't share the
+   * instance between requests!).
    */
-  const client = new SmartClient(sessionId, storage, {
+  const client = new SmartClient(sessionId, getSmartStorage(), {
     clientId: 'test-client',
     scope: 'openid fhirUser launch/patient',
     callbackUrl: 'https://example.com/fhir/callback',
@@ -230,13 +263,19 @@ async function callbackHandler(req: Request): Promise<Response> {
     allowAnyIssuer: true,
   })
 
-  // Create our ReadyClient
+  // Instantiate our ReadyClient given our current session
   const readyClient = client.ready()
 
-  // You can chose to validate the user's session, you should do this once per request
+  /**
+   * You can chose to validate the user's session,
+   * you should do this once per request
+   */
   const validToken = await readyClient.validate()
 
-  // Your error handling could be more sophisticated, but this is a simple example
+  /**
+   * Your error handling could be more sophisticated, but
+   * this is a simple example
+   */
   if ('error' in readyClient || !validToken) {
     return new Response('Invalid session', { status: 401 })
   }
@@ -246,9 +285,6 @@ async function callbackHandler(req: Request): Promise<Response> {
   const practitioner = await readyClient.practitioner.request()
   const encounter = await readyClient.encounter.request()
 
-  // You can also request resources directly
-  const alternativePatient = await readyClient.request(`Patient/${readyClient.patient.id}`)
-
   // Return the resources as JSON after handling any errors
   return new Response.json({ foo: 'baz' }, { status: 200 })
 }
@@ -257,3 +293,6 @@ async function callbackHandler(req: Request): Promise<Response> {
 Each request for a FHIR resource requires some error handling, see the
 [ReadyClient documentation](./docs/ready-client.md) for more information on how to handle errors and responses. But all
 of the requests return a union with a potential `{ error: string }` type.
+
+These examples use the short-hand API for fetching specific resources, in the
+[ReadyClient documentation](./docs/ready-client.md) you'll find more details on how to request arbitrary resources.

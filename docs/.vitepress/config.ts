@@ -45,7 +45,6 @@ export default defineConfig({
             },
             {
                 text: 'Docs',
-                link: '/docs',
                 items: [
                     { text: 'SmartClient', link: '/docs/smart-client' },
                     { text: 'ReadyClient', link: '/docs/ready-client' },
