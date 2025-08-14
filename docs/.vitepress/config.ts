@@ -46,7 +46,16 @@ export default defineConfig({
             {
                 text: 'Docs',
                 items: [
-                    { text: 'SmartClient', link: '/docs/smart-client' },
+                    {
+                        text: 'SmartClient',
+                        link: '/docs/smart-client',
+                        collapsed: true,
+                        items: [
+                            { text: 'SmartStorage', link: '/docs/smart-storage' },
+                            { text: 'SmartClientConfiguration', link: '/docs/smart-client-configuration' },
+                            { text: 'SmartClientOptions', link: '/docs/smart-client-options' },
+                        ],
+                    },
                     { text: 'ReadyClient', link: '/docs/ready-client' },
                     { text: 'SmartStorage', link: '/docs/smart-storage' },
                 ],
