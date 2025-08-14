@@ -99,9 +99,38 @@ test('launching one, no id should still work', async () => {
     expect(ready.patient.id).toBe('patient-zero')
 })
 
-async function fullLaunch(patient: string, storage: SmartStorage): Promise<ReadyClient> {
+test('launching without multi-user should not find previous sessions', async () => {
+    const createClient = () =>
+        new SmartClient(TEST_SESSION_ID, storage, {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        })
+    const storage = createTestStorage()
+
+    const firstLaunch = await fullLaunch('patient-zero', storage, createClient())
+    expect(firstLaunch.patient.id).toBe('patient-zero')
+
+    const secondLaunch = await fullLaunch('patient-one', storage, createClient())
+    expect(secondLaunch.patient.id).toBe('patient-one')
+
+    /**
+     * Try to access the first launch data even though it was launched without enableMultiLaunch,
+     * should fallback to the latest launch
+     */
+    const client = createMultiLaunchTestClient('patient-zero', storage)
+    const ready = await client.ready()
+    expectIs(ready, ReadyClient)
+
+    expect(ready.patient.id).toBe('patient-one')
+})
+
+async function fullLaunch(patient: string, storage: SmartStorage, client?: SmartClient): Promise<ReadyClient> {
     // Launch is inherently activePatient-less
-    const client = createMultiLaunchTestClient(null, storage)
+    client = client ?? createMultiLaunchTestClient(null, storage)
+
     const safeStorage = safeSmartStorage(storage)
 
     mockSmartConfiguration()
