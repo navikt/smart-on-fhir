@@ -1,5 +1,5 @@
 import { teamLogger } from '@navikt/pino-logger/team-log'
-import { randomPKCECodeVerifier, randomState } from 'openid-client'
+import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
 import { logger } from '../logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../otel'
@@ -141,10 +141,16 @@ export class SmartClient {
 
             await this._storage.set(this.sessionId, initialSessionPayload)
 
+            /**
+             * PKCE STEP 2
+             * Generate a code_challenge from the code_verifier in step 1
+             */
+            const codeChallenge = await calculatePKCECodeChallenge(initialSessionPayload.codeVerifier)
             const authUrl = await buildAuthUrl(
                 {
                     ...initialSessionPayload,
                     launch: params.launch,
+                    codeChallenge: codeChallenge,
                 },
                 this._config,
             )
