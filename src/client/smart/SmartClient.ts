@@ -132,7 +132,10 @@ export class SmartClient {
      */
     async launch(params: { iss: string; launch: string }): Promise<Launch | SmartConfigurationErrors> {
         return spanAsync('launch', async (span) => {
-            span.setAttribute(OtelTaxonomy.FhirServer, removeTrailingSlash(params.iss))
+            span.setAttributes({
+                [OtelTaxonomy.FhirServer]: removeTrailingSlash(params.iss),
+                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+            })
 
             const validIssuer = await this.validateIssuer(params.iss)
             if (!validIssuer) {
@@ -205,7 +208,10 @@ export class SmartClient {
             const initialSession = await this.getInitialSession(this.sessionId)
             if ('error' in initialSession) return initialSession
 
-            span.setAttribute(OtelTaxonomy.FhirServer, initialSession.server)
+            span.setAttributes({
+                [OtelTaxonomy.FhirServer]: initialSession.server,
+                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+            })
 
             if (initialSession.state !== params.state) {
                 span.setAttribute(OtelTaxonomy.SessionError, 'STATE_MISMATCH')
@@ -275,7 +281,10 @@ export class SmartClient {
 
             if ('error' in session) return { error: session.error, validate: async () => false }
 
-            span.setAttribute(OtelTaxonomy.FhirServer, session.server)
+            span.setAttributes({
+                [OtelTaxonomy.FhirServer]: session.server,
+                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+            })
 
             try {
                 return new ReadyClient(this, session)

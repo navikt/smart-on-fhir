@@ -42,4 +42,5 @@ export const OtelTaxonomy = {
     SessionExpired: 'session.expired',
     SessionError: 'session.error',
     SessionRefreshed: 'session.refreshed',
+    SessionMulti: 'session.multi-launch',
 }
