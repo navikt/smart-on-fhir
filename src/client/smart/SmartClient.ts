@@ -44,18 +44,37 @@ export class SmartClient {
     private readonly _storage: SafeSmartStorage
     private readonly _config: SmartClientConfiguration
     private readonly _options: SmartClientOptions
+    private readonly _isMultiLaunch: boolean
 
+    /**
+     * Single launch mode. Any subsequent launches using the same sessionId will overwrite the previous
+     * session completely. If the EHR-system supports multiple tabs that use non-isolated browser sessions
+     * this could be an issue.
+     */
     constructor(
         sessionId: string | null | undefined,
         storage: SmartStorage | Promise<SmartStorage>,
         config: SmartClientConfiguration,
         options?: SmartClientOptions,
     )
+    /**
+     * Multi-launch mode. Subsequent launches are stored both by sessionId and the launched patient. This allows
+     * you to use have several launched apps active at the same time in multiple tabs, but requires the application
+     * to keep track of the launched patient's ID and pass it back during ReadyClient-instantiation, using for example
+     * sessionStorage (tab-scoped) in the browser.
+     */
     constructor(
         session: { sessionId: string | null | undefined; activePatient: string | null | undefined },
         storage: SmartStorage | Promise<SmartStorage>,
         config: SmartClientConfiguration,
-        options?: SmartClientOptions,
+        options?: SmartClientOptions & {
+            /**
+             * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
+             * client to store this ID at their own leisure, and using it for subsequent requests, enabling multiple
+             * simultaneous launched sessions with different patients.
+             */
+            enableMultiLaunch?: true
+        },
     )
     constructor(
         sessionIdOrSession:
@@ -65,7 +84,7 @@ export class SmartClient {
             | { sessionId: string | null | undefined; activePatient: string | null | undefined },
         storage: SmartStorage | Promise<SmartStorage>,
         config: SmartClientConfiguration,
-        options?: SmartClientOptions,
+        options?: SmartClientOptions & { enableMultiLaunch?: true },
     ) {
         assertNotBrowser()
 
@@ -87,6 +106,7 @@ export class SmartClient {
         this._storage = safeSmartStorage(storage)
         this._config = config
         this._options = options ?? { autoRefresh: false }
+        this._isMultiLaunch = options?.enableMultiLaunch ?? false
     }
 
     public get options(): { autoRefresh: boolean } {
@@ -219,7 +239,7 @@ export class SmartClient {
 
             await this._storage.set(this.sessionId, completeSessionValues)
 
-            if (!this._options.enableMultiLaunch) {
+            if (!this._isMultiLaunch) {
                 return { redirectUrl: this._config.redirectUrl }
             }
 

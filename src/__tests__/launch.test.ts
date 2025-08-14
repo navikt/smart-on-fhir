@@ -180,7 +180,7 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
     }))
 
     const client = new SmartClient(
-        'test-session',
+        { sessionId: 'test-session', activePatient: null },
         storage,
         {
             clientId: 'test-client',
