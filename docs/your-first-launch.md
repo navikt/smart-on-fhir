@@ -15,8 +15,10 @@ A server side Smart on FHIR launch consists of the following steps:
 
 First we need to configure the SmartClient, we do this by instantiating a `SmartClient` with the provided issuer.
 
-::: tip Caution! Remember to always instantiate the `SmartClient` _**every**_ request. You should never share an
-instance between multiple requests.
+::: tip Caution!
+
+Remember to always instantiate the `SmartClient` _**every**_ request. You should never share an instance between
+multiple requests.
 
 You can use an instance multiple times in a single request, but it's important to remember that a instance is _only_ for
 a specific launch.
@@ -228,9 +230,11 @@ Now that we have a complete session for this user, we can use our `SmartClient` 
 [Patient](https://hl7.org/fhir/R4/patient.html), [Encounter](https://hl7.org/fhir/R4/encounter.html) or any other FHIR
 resources.
 
-:::tip Important! This library, and both _SmartClient_ and _ReadyClient_ are **only** for use in a server environment.
-If you have a isomorphic web-app using frameworks such as Next.js, SvelteKit, Astro or similar, you will have ta be
-aware of where you are executing during data loading.
+:::tip Important!
+
+This library, and both _SmartClient_ and _ReadyClient_ are **only** for use in a server environment. If you have a
+isomorphic web-app using frameworks such as Next.js, SvelteKit, Astro or similar, you will have ta be aware of where you
+are executing during data loading.
 
 The simplest approach is to create HTTP APIs in your web-app that fetches what you need, and the client-side code in
 your web-app can call these APIs.

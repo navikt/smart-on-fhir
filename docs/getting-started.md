@@ -37,7 +37,9 @@ Once you have access to GPR configured, you can install the package using your p
 npm i @navikt/smart-on-fhir // [!=npm auto]
 ```
 
-::: info When you have the library installed, you can move on to the next step:
+::: info
+
+When you have the library installed, you can move on to the next step:
 
 [Your first launch](./your-first-launch.md).
 
