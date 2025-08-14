@@ -4,4 +4,5 @@ export default {
         'biome lint --write --no-errors-on-unmatched',
     ],
     '*.{ts,tsx}': () => ['yarn tsc'],
+    '*.{md,mdx}': () => ["yarn format:markdown"],
 }

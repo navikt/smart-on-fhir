@@ -18,6 +18,30 @@ export default defineConfig({
             {
                 text: 'Getting started',
                 link: '/getting-started',
+                items: [
+                    { text: 'Prerequisites', link: '/getting-started#prerequisites' },
+                    { text: 'Installing', link: '/getting-started#installing' },
+                ],
+            },
+            {
+                text: 'Your first launch',
+                link: '/your-first-launch',
+                items: [
+                    {
+                        text: 'SmartClient configuration',
+                        link: '/your-first-launch#setting-up-the-smartclient',
+                    },
+                    {
+                        text: 'Launching',
+                        link: '/your-first-launch#launching',
+                        collapsed: true,
+                        items: [
+                            { text: '/fhir/launch', link: '/your-first-launch#initial-launch-fhir-launch' },
+                            { text: '/fhir/callback', link: '/your-first-launch#callback-fhir-callback' },
+                            { text: 'Ready!', link: '/your-first-launch#ready' },
+                        ],
+                    },
+                ],
             },
             {
                 text: 'Docs',
@@ -25,6 +49,7 @@ export default defineConfig({
                 items: [
                     { text: 'SmartClient', link: '/docs/smart-client' },
                     { text: 'ReadyClient', link: '/docs/ready-client' },
+                    { text: 'SmartStorage', link: '/docs/smart-storage' },
                 ],
             },
         ],

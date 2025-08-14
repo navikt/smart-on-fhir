@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "@navikt/smart-on-fhir"
-  tagline: Server-first Smart on FHIR Node library 
+  name: '@navikt/smart-on-fhir'
+  tagline: Server-first Smart on FHIR Node library
   actions:
     - theme: brand
       text: Getting started
@@ -21,4 +21,3 @@ features:
   - title: Strongly typed
     details: FHIR resources are validated and typed with Zod
 ---
-
