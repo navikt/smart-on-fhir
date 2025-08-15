@@ -66,14 +66,6 @@ export class ReadyClient {
 
         return {
             get fhirUser(): `Practitioner/${string}` {
-                if (session.webmedPractitioner) {
-                    return `Practitioner/${session.webmedPractitioner}`
-                }
-
-                if (idToken.fhirUser == null) {
-                    throw new Error('WebMed hack: No webmedPractitioner and no idToken.fhirUser, what up?')
-                }
-
                 return idToken.fhirUser as `Practitioner/${string}`
             },
             request: () => this.request(this.user.fhirUser),

@@ -17,6 +17,4 @@ export const CompleteSessionSchema = InitialSessionSchema.extend({
     refreshToken: z.string(),
     patient: z.string(),
     encounter: z.string(),
-    // TODO: Temporary hack
-    webmedPractitioner: z.string().optional(),
 })

@@ -242,7 +242,6 @@ export class SmartClient {
                 refreshToken: tokenResponse.refresh_token,
                 patient: tokenResponse.patient,
                 encounter: tokenResponse.encounter,
-                webmedPractitioner: tokenResponse.practitioner,
             }
 
             await this._storage.set(this.sessionId, completeSessionValues)
