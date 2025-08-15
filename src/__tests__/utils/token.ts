@@ -3,7 +3,10 @@ import { SignJWT } from 'jose'
 import { privateKey } from './jwt'
 
 export async function createTestIdToken(claims: Record<string, unknown>): Promise<string> {
-    const token = await new SignJWT(claims)
+    const token = await new SignJWT({
+        fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
+        ...claims,
+    })
         .setProtectedHeader({ alg: 'RS256', kid: 'foo-bar-baz-kid' })
         .setIssuedAt()
         .setIssuer('http://auth-server')
