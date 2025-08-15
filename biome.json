@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.2.0/schema.json",
     "vcs": {
         "enabled": false,
         "clientKind": "git",
@@ -11,6 +11,7 @@
             "src/**",
             "docs/**/*.md",
             "docs/.vitepress/theme/**",
+            "!docs/.vitepress/theme/aksel",
             "docs/.vitepress/config.ts",
             "package.json",
             "biome.json",

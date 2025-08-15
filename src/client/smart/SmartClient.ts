@@ -1,4 +1,3 @@
-import { teamLogger } from '@navikt/pino-logger/team-log'
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
 import { logger } from '../logger'
@@ -179,11 +178,6 @@ export class SmartClient {
                 },
                 this._config,
             )
-
-            // TODO: Debug logging
-            if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {
-                teamLogger.info(`Authorization URL for launch for ${params.iss}: ${authUrl}`)
-            }
 
             /**
              * PKCE STEP 3

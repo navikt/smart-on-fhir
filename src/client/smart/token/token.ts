@@ -1,4 +1,3 @@
-import { teamLogger } from '@navikt/pino-logger/team-log'
 import { decodeJwt } from 'jose'
 
 import { logger } from '../../logger'
@@ -35,11 +34,6 @@ export async function exchangeToken(
             code: code,
             code_verifier: session.codeVerifier,
             redirect_uri: config.callbackUrl,
-        }
-
-        // TODO: Debug logging
-        if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {
-            teamLogger.info(`Exchanging code for ${session.server}, body: ${JSON.stringify(tokenRequestBody)}`)
         }
 
         /**
@@ -87,11 +81,6 @@ export async function exchangeToken(
             return { error: 'TOKEN_EXCHANGE_INVALID_BODY' }
         }
 
-        // TODO: Debug logging
-        if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {
-            teamLogger.info(`Token exchange successfully, entire token response: ${JSON.stringify(result)}`)
-        }
-
         return parsedTokenResponse.data
     })
 }
@@ -111,10 +100,6 @@ export async function refreshToken(
             client_id: config.clientId,
             grant_type: 'refresh_token',
             refresh_token: session.refreshToken,
-        }
-
-        if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {
-            teamLogger.info(`Refreshing token for ${session.server}, body: ${JSON.stringify(tokenRequestBody)}`)
         }
 
         const response = await postFormEncoded(
@@ -152,10 +137,6 @@ export async function refreshToken(
             span.recordException(exception)
 
             return { error: 'REFRESH_TOKEN_INVALID_BODY' }
-        }
-
-        if (process.env.NEXT_PUBLIC_RUNTIME_ENV === 'dev-gcp') {
-            teamLogger.info(`Token refresh successful, entire token response: ${JSON.stringify(result)}`)
         }
 
         return parsedTokenResponse.data

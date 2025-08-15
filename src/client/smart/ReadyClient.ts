@@ -61,7 +61,6 @@ export class ReadyClient {
         fhirUser: `Practitioner/${string}`
         request: () => Promise<FhirPractitioner | ResourceRequestErrors>
     } {
-        const session = this._session
         const idToken = this._idToken
 
         return {
