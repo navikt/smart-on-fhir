@@ -133,8 +133,7 @@ export async function refreshToken(
                 },
             )
 
-            logger.error(exception)
-            span.recordException(exception)
+            failSpan(span, exception)
 
             return { error: 'REFRESH_TOKEN_INVALID_BODY' }
         }
