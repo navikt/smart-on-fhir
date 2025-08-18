@@ -304,7 +304,6 @@ export class SmartClient {
 
         const refreshedSessionValues: CompleteSession = {
             ...session,
-            idToken: refreshResponse.id_token,
             accessToken: refreshResponse.access_token,
             refreshToken: refreshResponse.refresh_token,
         }
