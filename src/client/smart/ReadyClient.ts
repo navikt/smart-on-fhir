@@ -2,10 +2,10 @@ import { decodeJwt, jwtVerify } from 'jose'
 import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
-import { logger } from '../logger'
-import { OtelTaxonomy, spanAsync } from '../otel'
+import { logger } from '../lib/logger'
+import { OtelTaxonomy, spanAsync } from '../lib/otel'
+import { getResponseError } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
-import { getResponseError } from '../utils'
 
 import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
 import {

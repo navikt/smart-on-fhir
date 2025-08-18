@@ -1,9 +1,9 @@
 import { decodeJwt } from 'jose'
 
-import { logger } from '../../logger'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../otel'
+import { logger } from '../../lib/logger'
+import { failSpan, OtelTaxonomy, spanAsync } from '../../lib/otel'
+import { getResponseError } from '../../lib/utils'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
-import { getResponseError } from '../../utils'
 import type { FhirAuthMode } from '../client-auth/config'
 import { postFormEncoded } from '../client-auth/fetch'
 import type { SmartClientConfiguration } from '../config'

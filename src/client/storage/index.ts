@@ -1,4 +1,4 @@
-import { logger } from '../logger'
+import { logger } from '../lib/logger'
 
 import { type CompleteSession, CompleteSessionSchema, type InitialSession, InitialSessionSchema } from './schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from './storage-errors'

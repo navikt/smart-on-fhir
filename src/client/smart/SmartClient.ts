@@ -1,14 +1,14 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
-import { logger } from '../logger'
-import { failSpan, OtelTaxonomy, spanAsync } from '../otel'
+import { logger } from '../lib/logger'
+import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
+import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../lib/utils'
 import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
-import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../utils'
 
-import { buildAuthUrl } from './authorization'
+import { buildAuthUrl } from './auth-url'
 import type { FhirAuthMode, KnownFhirServer } from './client-auth/config'
 import type { CallbackError, SmartClientReadyErrors } from './client-errors'
 import type { SmartClientConfiguration, SmartClientOptions } from './config'
