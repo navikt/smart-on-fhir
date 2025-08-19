@@ -31,3 +31,7 @@ export async function getResponseError(response: Response): Promise<string> {
         return `Unknown error (content-type was: ${response.headers.get('Content-Type')})`
     }
 }
+
+export function inferResourceType(path: string): string {
+    return path.match(/(\w+)\b/)?.[1] ?? 'Unknown'
+}

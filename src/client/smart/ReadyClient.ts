@@ -3,8 +3,8 @@ import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { logger } from '../lib/logger'
-import { failSpan, OtelTaxonomy, spanAsync, squelchTracing } from '../lib/otel'
-import { getResponseError } from '../lib/utils'
+import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from '../lib/otel'
+import { getResponseError, inferResourceType } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
 
 import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
@@ -107,7 +107,7 @@ export class ReadyClient {
         resource: Path,
         params: { payload: PayloadForCreate<Path> },
     ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
-        const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
+        const resourceType = inferResourceType(resource)
 
         return spanAsync(`create.${resourceType}`, async (span) => {
             span.setAttributes({
@@ -115,23 +115,10 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const doCreate = () => postFhir({ session: this._session, path: resource }, { payload: params.payload })
-
-            let response = await doCreate()
-            if (response.status === 401 && this._client.options.autoRefresh) {
-                const refresh = await this._client.refresh(this._session)
-                if ('error' in refresh) {
-                    logger.error(`Failed to refresh session: ${refresh.error}`)
-                    span.setAttributes({
-                        [OtelTaxonomy.SessionError]: refresh.error,
-                        [OtelTaxonomy.SessionRefreshed]: false,
-                    })
-                    // Don't return, let the rest of the code handle the 401
-                } else {
-                    // We refreshed! Let's try the resource again
-                    response = await doCreate()
-                }
-            }
+            const response = await this.fetchWithRefresh(
+                () => postFhir({ session: this._session, path: resource }, { payload: params.payload }),
+                span,
+            )
 
             if (!response.ok) {
                 const responseError = await getResponseError(response)
@@ -166,7 +153,7 @@ export class ReadyClient {
         resource: Path,
         params: { id: string; payload: PayloadForCreate<Path> },
     ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
-        const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
+        const resourceType = inferResourceType(resource)
 
         return spanAsync(`update.${resourceType}`, async (span) => {
             span.setAttributes({
@@ -174,24 +161,10 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const doUpdate = () =>
-                putFhir({ id: params.id, session: this._session, path: resource }, { payload: params.payload })
-
-            let response = await doUpdate()
-            if (response.status === 401 && this._client.options.autoRefresh) {
-                const refresh = await this._client.refresh(this._session)
-                if ('error' in refresh) {
-                    logger.error(`Failed to refresh session: ${refresh.error}`)
-                    span.setAttributes({
-                        [OtelTaxonomy.SessionError]: refresh.error,
-                        [OtelTaxonomy.SessionRefreshed]: false,
-                    })
-                    // Don't return, let the rest of the code handle the 401
-                } else {
-                    // We refreshed! Let's try the resource again
-                    response = await doUpdate()
-                }
-            }
+            const response = await this.fetchWithRefresh(
+                () => putFhir({ id: params.id, session: this._session, path: resource }, { payload: params.payload }),
+                span,
+            )
 
             if (!response.ok) {
                 const responseError = await getResponseError(response)
@@ -232,7 +205,7 @@ export class ReadyClient {
          */
         otelSpanConfig?: { expectNotFound: true },
     ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
-        const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
+        const resourceType = inferResourceType(resource)
 
         return spanAsync(`request.${resourceType}`, async (span) => {
             span.setAttributes({
@@ -241,26 +214,16 @@ export class ReadyClient {
             })
 
             const doRequest = () => getFhir({ session: this._session, path: resource })
-
-            let response = otelSpanConfig?.expectNotFound ? await squelchTracing(doRequest) : await doRequest()
-            if (response.status === 401 && this._client.options.autoRefresh) {
-                const refresh = await this._client.refresh(this._session)
-                if ('error' in refresh) {
-                    logger.error(`Failed to refresh session: ${refresh.error}`)
-                    span.setAttributes({
-                        [OtelTaxonomy.SessionError]: refresh.error,
-                        [OtelTaxonomy.SessionRefreshed]: false,
-                    })
-                    // Don't return, let the rest of the code handle the 401
-                } else {
-                    // We refreshed! Let's try the resource again
-                    response = otelSpanConfig?.expectNotFound ? await squelchTracing(doRequest) : await doRequest()
-                }
-            }
+            const response = await this.fetchWithRefresh(
+                () => (otelSpanConfig?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
+                span,
+            )
 
             if (response.status === 404) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                logger.warn(`Resource (${resource}) was not found on FHIR server`)
+                if (otelSpanConfig?.expectNotFound) {
+                    logger.warn(`Resource (${resource}) was not found on FHIR server`)
+                }
                 return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND' }
             }
 
@@ -311,6 +274,26 @@ export class ReadyClient {
             logger.error(new Error(`Claim validation failed for claim ${claim}`, { cause: e }))
             return { error: 'CLAIM_INVALID' }
         }
+    }
+
+    private async fetchWithRefresh(fetcher: () => Promise<Response>, span: Span): Promise<Response> {
+        const response = await fetcher()
+        if (!this._client.options.autoRefresh) return response
+        if (response.status !== 401) return response
+
+        const refresh = await this._client.refresh(this._session)
+        if ('error' in refresh) {
+            logger.error(`Failed to refresh session: ${refresh.error}`)
+            span.setAttributes({
+                [OtelTaxonomy.SessionError]: refresh.error,
+                [OtelTaxonomy.SessionRefreshed]: false,
+            })
+            // Couldn't refresh, let the rest of the code handle the 401
+            return response
+        }
+
+        // We refreshed! Let's try the resource again
+        return fetcher()
     }
 }
 

@@ -3,6 +3,8 @@ import { suppressTracing } from '@opentelemetry/core'
 
 import { logger } from './logger'
 
+export type { Span }
+
 const LIB_NAME = '@navikt/smart-on-fhir'
 const SPAN_PREFIX = 'SmartClient.'
 
