@@ -115,7 +115,9 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            let response = await postFhir({ session: this._session, path: resource }, { payload: params.payload })
+            const doCreate = () => postFhir({ session: this._session, path: resource }, { payload: params.payload })
+
+            let response = await doCreate()
             if (response.status === 401 && this._client.options.autoRefresh) {
                 const refresh = await this._client.refresh(this._session)
                 if ('error' in refresh) {
@@ -127,7 +129,7 @@ export class ReadyClient {
                     // Don't return, let the rest of the code handle the 401
                 } else {
                     // We refreshed! Let's try the resource again
-                    response = await postFhir({ session: this._session, path: resource }, { payload: params.payload })
+                    response = await doCreate()
                 }
             }
 
@@ -172,10 +174,10 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            let response = await putFhir(
-                { id: params.id, session: this._session, path: resource },
-                { payload: params.payload },
-            )
+            const doUpdate = () =>
+                putFhir({ id: params.id, session: this._session, path: resource }, { payload: params.payload })
+
+            let response = await doUpdate()
             if (response.status === 401 && this._client.options.autoRefresh) {
                 const refresh = await this._client.refresh(this._session)
                 if ('error' in refresh) {
@@ -187,10 +189,7 @@ export class ReadyClient {
                     // Don't return, let the rest of the code handle the 401
                 } else {
                     // We refreshed! Let's try the resource again
-                    response = await putFhir(
-                        { id: params.id, session: this._session, path: resource },
-                        { payload: params.payload },
-                    )
+                    response = await doUpdate()
                 }
             }
 
@@ -241,9 +240,9 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const doGet = () => getFhir({ session: this._session, path: resource })
+            const doRequest = () => getFhir({ session: this._session, path: resource })
 
-            let response = otelSpanConfig?.expectNotFound ? await squelchTracing(doGet) : await doGet()
+            let response = otelSpanConfig?.expectNotFound ? await squelchTracing(doRequest) : await doRequest()
             if (response.status === 401 && this._client.options.autoRefresh) {
                 const refresh = await this._client.refresh(this._session)
                 if ('error' in refresh) {
@@ -255,7 +254,7 @@ export class ReadyClient {
                     // Don't return, let the rest of the code handle the 401
                 } else {
                     // We refreshed! Let's try the resource again
-                    response = otelSpanConfig?.expectNotFound ? await squelchTracing(doGet) : await doGet()
+                    response = otelSpanConfig?.expectNotFound ? await squelchTracing(doRequest) : await doRequest()
                 }
             }
 
