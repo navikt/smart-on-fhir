@@ -72,12 +72,13 @@ test('SmartClient.update - /DocumentReference should PUT and parse DocumentRefer
     const [ready] = await createLaunchedReadyClient(validSession)
 
     const mock = mockUpdateDocumentReference('my-id', {
-        id: 'my-id',
         resourceType: 'DocumentReference',
     })
+
     const documentReference = await ready.update('DocumentReference', {
+        id: 'my-id',
         // Payload is contrivedly small for test
-        payload: { resourceType: 'DocumentReference', id: 'my-id' },
+        payload: { resourceType: 'DocumentReference' },
     })
 
     expect(mock.isDone()).toBe(true)

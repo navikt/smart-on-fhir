@@ -158,7 +158,7 @@ export class ReadyClient {
 
     public async update<Path extends KnownCreatePaths>(
         resource: Path,
-        params: { payload: PayloadForCreate<Path> & { id: string } },
+        params: { id: string; payload: PayloadForCreate<Path> },
     ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
         const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
 
@@ -169,7 +169,7 @@ export class ReadyClient {
             })
 
             let response = await putFhir(
-                { id: params.payload.id, session: this._session, path: resource },
+                { id: params.id, session: this._session, path: resource },
                 { payload: params.payload },
             )
             if (response.status === 401 && this._client.options.autoRefresh) {
@@ -184,7 +184,7 @@ export class ReadyClient {
                 } else {
                     // We refreshed! Let's try the resource again
                     response = await putFhir(
-                        { id: params.payload.id, session: this._session, path: resource },
+                        { id: params.id, session: this._session, path: resource },
                         { payload: params.payload },
                     )
                 }
