@@ -1,7 +1,7 @@
 import { createRemoteJWKSet } from 'jose'
 
 import { logger } from '../../lib/logger'
-import { OtelTaxonomy, spanAsync } from '../../lib/otel'
+import { failSpan, OtelTaxonomy, spanAsync } from '../../lib/otel'
 import { removeTrailingSlash } from '../../lib/utils'
 
 import type { SmartConfigurationErrors } from './smart-configuration-errors'
@@ -28,13 +28,12 @@ export async function fetchSmartConfiguration(
             const result: unknown = await response.json()
             const validatedWellKnown = SmartConfigurationSchema.safeParse(result)
             if (!validatedWellKnown.success) {
-                logger.error(
+                failSpan(
+                    span,
                     new Error(`FHIR Server ${fhirServer} responded with weird smart-configuration`, {
                         cause: validatedWellKnown.error,
                     }),
                 )
-
-                span.recordException(validatedWellKnown.error)
 
                 return { error: 'WELL_KNOWN_INVALID_BODY' }
             }
@@ -42,9 +41,7 @@ export async function fetchSmartConfiguration(
             logger.info(`FHIR Server ${fhirServer} response validated`)
             return validatedWellKnown.data
         } catch (e) {
-            logger.error(new Error('Fatal error fetching smart configuration', { cause: e }))
-
-            if (e instanceof Error) span.recordException(e)
+            failSpan(span, new Error('Fatal error fetching smart configuration', { cause: e }))
 
             return { error: 'UNKNOWN_ERROR' }
         }

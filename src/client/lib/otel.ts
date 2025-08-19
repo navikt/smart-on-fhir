@@ -32,6 +32,7 @@ export function failSpan(span: Span, error: Error): void {
     logger.error(error)
 
     span.recordException(error)
+    if (error.cause instanceof Error) span.recordException(error.cause)
     span.setStatus({ code: SpanStatusCode.ERROR, message: error.message })
 }
 
