@@ -3,7 +3,7 @@ import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { logger } from '../lib/logger'
-import { OtelTaxonomy, spanAsync } from '../lib/otel'
+import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
 import { getResponseError } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
 
@@ -72,10 +72,6 @@ export class ReadyClient {
     }
 
     public async validate(): Promise<boolean> {
-        logger.info(
-            `Current users issuer: ${this._session.issuer}, looking for well known at /.well-known/smart-configuration`,
-        )
-
         return spanAsync('validate', async (span) => {
             span.setAttribute(OtelTaxonomy.FhirServer, this._session.server)
 
@@ -85,7 +81,6 @@ export class ReadyClient {
                 return false
             }
 
-            logger.info(`Fetched well known configuration from session.issuer, jwks_uri: ${smartConfig.jwks_uri}`)
             try {
                 return await spanAsync('jwt-verify', async (span) => {
                     span.setAttribute(OtelTaxonomy.FhirServer, this._session.server)
@@ -95,14 +90,10 @@ export class ReadyClient {
                         algorithms: ['RS256'],
                     })
 
-                    logger.info('Token verified!')
                     return true
                 })
             } catch (e) {
-                logger.error(new Error(`Token validation failed, ${(e as { code: string })?.code ?? 'UNKNOWN'}`))
-
-                if (e instanceof Error) span.recordException(e)
-
+                failSpan(span, new Error(`Token validation failed, ${(e as { code: string })?.code ?? 'UNKNOWN'}`))
                 return false
             }
         })
@@ -139,7 +130,9 @@ export class ReadyClient {
             if (!response.ok) {
                 const responseError = await getResponseError(response)
 
-                logger.error(
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
+                failSpan(
+                    span,
                     new Error(
                         `Request to create ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
                     ),
@@ -149,16 +142,15 @@ export class ReadyClient {
             }
 
             const result = await response.json()
-
             const parsed = createResourceToSchema(resource).safeParse(result)
             if (!parsed.success) {
-                logger.error(
-                    new Error('Failed to parse DocumentReference', {
-                        cause: parsed.error,
-                    }),
-                )
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
+                failSpan(span, new Error('Failed to parse DocumentReference', { cause: parsed.error }))
+
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
+
+            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
 
             return parsed.data as ResponseForCreate<Path>
         })
@@ -190,13 +182,17 @@ export class ReadyClient {
             }
 
             if (response.status === 404) {
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
                 logger.warn(`Resource (${resource}) was not found on FHIR server`)
                 return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND' }
             }
 
             if (!response.ok) {
                 const responseError = await getResponseError(response)
-                logger.error(
+
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
+                failSpan(
+                    span,
                     new Error(
                         `Request to get ${resource} failed, ${response.url} responded with ${response.status} ${response.statusText}, server said: ${responseError}`,
                     ),
@@ -211,6 +207,8 @@ export class ReadyClient {
                 logger.error(new Error(`Failed to parse ${resource}`, { cause: parsed.error }))
                 return { error: 'REQUEST_FAILED_INVALID_RESPONSE' }
             }
+
+            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
 
             return parsed.data as ResponseFor<Path>
         })
