@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../client/storage/schema'
 
-import { mockCreateDocumentReference } from './mocks/create-resources'
+import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockEncounter, mockPatient, mockPractitioner } from './mocks/resources'
 import { createLaunchedReadyClient } from './utils/client'
 import { expectHas } from './utils/expect'
@@ -61,6 +61,23 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
     const documentReference = await ready.create('DocumentReference', {
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },
+    })
+
+    expect(mock.isDone()).toBe(true)
+    expectHas(documentReference, 'resourceType')
+    expect(documentReference.resourceType).toBe('DocumentReference')
+})
+
+test('SmartClient.update - /DocumentReference should PUT and parse DocumentReference resource', async () => {
+    const [ready] = await createLaunchedReadyClient(validSession)
+
+    const mock = mockUpdateDocumentReference('my-id', {
+        id: 'my-id',
+        resourceType: 'DocumentReference',
+    })
+    const documentReference = await ready.update('DocumentReference', {
+        // Payload is contrivedly small for test
+        payload: { resourceType: 'DocumentReference', id: 'my-id' },
     })
 
     expect(mock.isDone()).toBe(true)

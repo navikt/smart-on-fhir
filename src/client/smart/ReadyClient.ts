@@ -14,7 +14,7 @@ import {
     type PayloadForCreate,
     type ResponseForCreate,
 } from './resources/create-resource-map'
-import { getFhir, postFhir } from './resources/fetcher'
+import { getFhir, postFhir, putFhir } from './resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from './resources/resource-map'
 import type { SmartClient } from './SmartClient'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
@@ -151,6 +151,72 @@ export class ReadyClient {
             }
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
+
+            return parsed.data as ResponseForCreate<Path>
+        })
+    }
+
+    public async update<Path extends KnownCreatePaths>(
+        resource: Path,
+        params: { payload: PayloadForCreate<Path> & { id: string } },
+    ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
+        const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
+
+        return spanAsync(`update.${resourceType}`, async (span) => {
+            span.setAttributes({
+                [OtelTaxonomy.FhirResource]: resourceType,
+                [OtelTaxonomy.FhirServer]: this._session.server,
+            })
+
+            let response = await putFhir(
+                { id: params.payload.id, session: this._session, path: resource },
+                { payload: params.payload },
+            )
+            if (response.status === 401 && this._client.options.autoRefresh) {
+                const refresh = await this._client.refresh(this._session)
+                if ('error' in refresh) {
+                    logger.error(`Failed to refresh session: ${refresh.error}`)
+                    span.setAttributes({
+                        [OtelTaxonomy.SessionError]: refresh.error,
+                        [OtelTaxonomy.SessionRefreshed]: false,
+                    })
+                    // Don't return, let the rest of the code handle the 401
+                } else {
+                    // We refreshed! Let's try the resource again
+                    response = await putFhir(
+                        { id: params.payload.id, session: this._session, path: resource },
+                        { payload: params.payload },
+                    )
+                }
+            }
+
+            if (!response.ok) {
+                const responseError = await getResponseError(response)
+
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
+                failSpan(
+                    span,
+                    new Error(
+                        `Request to update (PUT) ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
+                    ),
+                )
+
+                return { error: 'CREATE_FAILED_NON_OK_RESPONSE' }
+            }
+
+            const result = await response.json()
+            const parsed = createResourceToSchema(resource).safeParse(result)
+            if (!parsed.success) {
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
+                failSpan(
+                    span,
+                    new Error('Failed to parse DocumentReference (from PUT/update)', { cause: parsed.error }),
+                )
+
+                return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
+            }
+
+            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-succeeded')
 
             return parsed.data as ResponseForCreate<Path>
         })

@@ -33,6 +33,30 @@ export async function postFhir(
     })
 }
 
+export async function putFhir(
+    {
+        session,
+        path,
+        id,
+    }: FhirSession & {
+        path: KnownCreatePaths
+        id: string
+    },
+    { payload }: PostFhir,
+): Promise<Response> {
+    const resourcePath = `${session.server}/${path}/${id}`
+
+    return await fetch(resourcePath, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+        headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
 export async function getFhir({
     session,
     path,
