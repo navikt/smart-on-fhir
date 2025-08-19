@@ -1,6 +1,5 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
-import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
 import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../lib/utils'
 import type { SafeSmartStorage, SmartStorage } from '../storage'
@@ -210,14 +209,15 @@ export class SmartClient {
             if (initialSession.state !== params.state) {
                 span.setAttribute(OtelTaxonomy.SessionError, 'STATE_MISMATCH')
 
-                logger.warn(
-                    `State mismatch, expected len: ${initialSession.state.length} but got len: ${params.state.length}`,
+                failSpan(
+                    span,
+                    new Error(
+                        `State mismatch, expected len: ${initialSession.state.length} but got len: ${params.state.length}`,
+                    ),
                 )
 
                 return { error: 'INVALID_STATE' }
             }
-
-            logger.info(`Exchanging code for token with issuer ${initialSession.tokenEndpoint}`)
 
             const tokenResponse = await exchangeToken(
                 params.code,
@@ -282,12 +282,14 @@ export class SmartClient {
             try {
                 return new ReadyClient(this, session)
             } catch (error) {
-                logger.error(
+                failSpan(
+                    span,
                     new Error(
                         `Tried to .ready SmartClient, ReadyClient failed to instantiate for id "${this.sessionId}"`,
                         { cause: error },
                     ),
                 )
+
                 return { error: 'INVALID_ID_TOKEN', validate: async () => false }
             }
         })
@@ -333,7 +335,10 @@ export class SmartClient {
 
             if ('error' in session) {
                 span.setAttribute('session.error', session.error)
-                logger.error(`SmartClient.getSession failed to retrieve session because session is: ${session.error}`)
+                failSpan(
+                    span,
+                    new Error(`SmartClient.getSession failed to retrieve session because session is: ${session.error}`),
+                )
 
                 return session
             }
@@ -347,8 +352,7 @@ export class SmartClient {
             const existingSession = await this._storage.getPartial(sessionId)
             if ('error' in existingSession) {
                 span.setAttribute(OtelTaxonomy.SessionError, existingSession.error)
-
-                logger.error(new Error(`Session not found for sessionId ${sessionId}, was ${existingSession.error}`))
+                failSpan(span, new Error(`Session not found for sessionId ${sessionId}, was ${existingSession.error}`))
 
                 return { error: existingSession.error }
             }
@@ -371,7 +375,11 @@ export class SmartClient {
                         [OtelTaxonomy.SessionError]: refreshResult.error,
                         [OtelTaxonomy.SessionRefreshed]: false,
                     })
-                    logger.error(`SmartClient.getSession failed to refresh session because: ${refreshResult.error}`)
+
+                    failSpan(
+                        span,
+                        new Error(`SmartClient.getSession failed to refresh session because: ${refreshResult.error}`),
+                    )
 
                     // Return potentially expired session, let the rest of the auth flow handle the expiredness.
                     return session
