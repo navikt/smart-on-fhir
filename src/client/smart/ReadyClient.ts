@@ -221,7 +221,7 @@ export class ReadyClient {
 
             if (response.status === 404) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                if (otelSpanConfig?.expectNotFound) {
+                if (!otelSpanConfig?.expectNotFound) {
                     logger.warn(`Resource (${resource}) was not found on FHIR server`)
                 }
                 return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND' }
