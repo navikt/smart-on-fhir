@@ -58,12 +58,16 @@ export class ReadyClient {
     }
 
     public get user(): {
+        type: 'Practitioner'
+        id: string
         fhirUser: `Practitioner/${string}`
         request: () => Promise<FhirPractitioner | ResourceRequestErrors>
     } {
         const idToken = this._idToken
 
         return {
+            type: 'Practitioner',
+            id: idToken.fhirUser.split('/')[1],
             get fhirUser(): `Practitioner/${string}` {
                 return idToken.fhirUser as `Practitioner/${string}`
             },
