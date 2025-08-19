@@ -231,7 +231,7 @@ export class ReadyClient {
         /**
          * If set to true, will not mark the OTEL span as failed if the resource is not found.
          */
-        expectNotFound?: true,
+        otelSpanConfig?: { expectNotFound: true },
     ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
         const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
 
@@ -243,7 +243,7 @@ export class ReadyClient {
 
             const doGet = () => getFhir({ session: this._session, path: resource })
 
-            let response = expectNotFound ? await squelchTracing(doGet) : await doGet()
+            let response = otelSpanConfig?.expectNotFound ? await squelchTracing(doGet) : await doGet()
             if (response.status === 401 && this._client.options.autoRefresh) {
                 const refresh = await this._client.refresh(this._session)
                 if ('error' in refresh) {
@@ -255,7 +255,7 @@ export class ReadyClient {
                     // Don't return, let the rest of the code handle the 401
                 } else {
                     // We refreshed! Let's try the resource again
-                    response = expectNotFound ? await squelchTracing(doGet) : await doGet()
+                    response = otelSpanConfig?.expectNotFound ? await squelchTracing(doGet) : await doGet()
                 }
             }
 
