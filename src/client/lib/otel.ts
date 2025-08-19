@@ -1,4 +1,5 @@
 import { context, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
+import { suppressTracing } from '@opentelemetry/core'
 
 import { logger } from './logger'
 
@@ -23,6 +24,10 @@ export function spanSync<Result>(name: string, fn: () => Result): Result {
             span.end()
         }
     })
+}
+
+export async function squelchTracing<Result>(fn: () => Promise<Result>): Promise<Result> {
+    return context.with(suppressTracing(context.active()), () => fn())
 }
 
 /**

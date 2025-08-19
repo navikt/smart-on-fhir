@@ -3,7 +3,7 @@ import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { logger } from '../lib/logger'
-import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
+import { failSpan, OtelTaxonomy, spanAsync, squelchTracing } from '../lib/otel'
 import { getResponseError } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
 
@@ -226,7 +226,13 @@ export class ReadyClient {
         })
     }
 
-    public async request<Path extends KnownPaths>(resource: Path): Promise<ResponseFor<Path> | ResourceRequestErrors> {
+    public async request<Path extends KnownPaths>(
+        resource: Path,
+        /**
+         * If set to true, will not mark the OTEL span as failed if the resource is not found.
+         */
+        expectNotFound?: true,
+    ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
         const resourceType = resource.match(/(\w+)\b/)?.[1] ?? 'Unknown'
 
         return spanAsync(`request.${resourceType}`, async (span) => {
@@ -235,7 +241,9 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            let response = await getFhir({ session: this._session, path: resource })
+            const doGet = () => getFhir({ session: this._session, path: resource })
+
+            let response = expectNotFound ? await squelchTracing(doGet) : await doGet()
             if (response.status === 401 && this._client.options.autoRefresh) {
                 const refresh = await this._client.refresh(this._session)
                 if ('error' in refresh) {
@@ -247,7 +255,7 @@ export class ReadyClient {
                     // Don't return, let the rest of the code handle the 401
                 } else {
                     // We refreshed! Let's try the resource again
-                    response = await getFhir({ session: this._session, path: resource })
+                    response = expectNotFound ? await squelchTracing(doGet) : await doGet()
                 }
             }
 
