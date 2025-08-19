@@ -6,7 +6,7 @@ import type { CompleteSession } from '../client/storage/schema'
 
 import { mockTokenRefresh } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { mockCreateDocumentReference } from './mocks/create-resources'
+import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockPractitioner } from './mocks/resources'
 import { createLaunchableSmartClient, createLaunchedReadyClient } from './utils/client'
 import { expectHas, expectIs } from './utils/expect'
@@ -135,6 +135,39 @@ test('SmartClient.create - Should refresh token when server says 401', async () 
     })
 
     const documentReference = await ready.create('DocumentReference', {
+        // Payload is contrivedly small for test
+        payload: { resourceType: 'DocumentReference' },
+    })
+
+    expect(documentReferenceUnauthorized.isDone()).toBe(true)
+    expect(documentReferenceActual.isDone()).toBe(true)
+    expect(tokenMock.isDone()).toBe(true)
+
+    expectHas(documentReference, 'resourceType')
+    expect(documentReference.resourceType).toBe('DocumentReference')
+})
+
+test('SmartClient.update - Should refresh token when server says 401', async () => {
+    const [ready] = await createLaunchedReadyClient(validSession, {
+        autoRefresh: true,
+    })
+
+    // First request should fail with 401 Unauthorized
+    const documentReferenceUnauthorized = nock('http://fhir-server').put(`/DocumentReference/my-id`).reply(401)
+
+    // We then expect the token to be refreshed
+    const tokenMock = await mockTokenRefresh({
+        client_id: 'test-client',
+        refresh_token: 'valid-refresh-token',
+    })
+
+    // And finally, the request should succeed with the refreshed token
+    const documentReferenceActual = mockUpdateDocumentReference('my-id', {
+        resourceType: 'DocumentReference',
+    })
+
+    const documentReference = await ready.update('DocumentReference', {
+        id: 'my-id',
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },
     })
