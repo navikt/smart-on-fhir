@@ -1,7 +1,5 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
-import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
-import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from '../lib/utils'
 import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
@@ -9,6 +7,8 @@ import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/sto
 
 import { buildAuthorizationUrl } from './auth/authorization-url'
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
+import { failSpan, OtelTaxonomy, spanAsync } from './lib/otel'
+import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from './lib/utils'
 import { ReadyClient } from './ReadyClient'
 import { exchangeToken, refreshToken, tokenExpiresIn } from './token/token'
 import type { RefreshTokenErrors } from './token/token-errors'

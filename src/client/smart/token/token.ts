@@ -1,11 +1,11 @@
 import { decodeJwt } from 'jose'
 
-import { logger } from '../../lib/logger'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../lib/otel'
-import { getResponseError } from '../../lib/utils'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { FhirAuthMode } from '../client-auth-method/config'
 import { postFormEncoded } from '../client-auth-method/fetch'
+import { logger } from '../lib/logger'
+import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
+import { getResponseError } from '../lib/utils'
 import type { SmartClientConfiguration } from '../types/config'
 
 import type { RefreshTokenErrors, TokenExchangeErrors } from './token-errors'

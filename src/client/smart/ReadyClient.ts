@@ -2,11 +2,11 @@ import { decodeJwt, jwtVerify } from 'jose'
 import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
-import { logger } from '../lib/logger'
-import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from '../lib/otel'
-import { getResponseError, inferResourceType } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
 
+import { logger } from './lib/logger'
+import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
+import { getResponseError, inferResourceType } from './lib/utils'
 import {
     createResourceToSchema,
     type KnownCreatePaths,

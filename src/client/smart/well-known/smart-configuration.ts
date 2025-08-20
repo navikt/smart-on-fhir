@@ -1,8 +1,8 @@
 import { createRemoteJWKSet } from 'jose'
 
-import { logger } from '../../lib/logger'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../lib/otel'
-import { removeTrailingSlash } from '../../lib/utils'
+import { logger } from '../lib/logger'
+import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
+import { removeTrailingSlash } from '../lib/utils'
 
 import type { SmartConfigurationErrors } from './smart-configuration-errors'
 import { type SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
