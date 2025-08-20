@@ -1,13 +1,12 @@
-import type { InitialSession } from '../storage/schema'
-
-import type { SmartClientConfiguration } from './config'
+import type { InitialSession } from '../../storage/schema'
+import type { SmartClientConfiguration } from '../types/config'
 
 type AuthUrlOpts = Pick<InitialSession, 'issuer' | 'state' | 'authorizationEndpoint'> & {
     launch: string
     codeChallenge: string
 }
 
-export async function buildAuthUrl(opts: AuthUrlOpts, config: SmartClientConfiguration): Promise<string> {
+export async function buildAuthorizationUrl(opts: AuthUrlOpts, config: SmartClientConfiguration): Promise<string> {
     const params = new URLSearchParams({
         response_type: 'code',
         client_id: config.clientId,

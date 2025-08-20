@@ -7,7 +7,6 @@ import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from '..
 import { getResponseError, inferResourceType } from '../lib/utils'
 import type { CompleteSession } from '../storage/schema'
 
-import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './client-errors'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
@@ -18,6 +17,7 @@ import { getFhir, postFhir, putFhir } from './resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from './resources/resource-map'
 import type { SmartClient } from './SmartClient'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
+import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './types/client-errors'
 import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
 
 /**

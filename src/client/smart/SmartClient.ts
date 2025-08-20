@@ -7,13 +7,13 @@ import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
 
-import { buildAuthUrl } from './auth-url'
-import type { FhirAuthMode, KnownFhirServer } from './client-auth/config'
-import type { CallbackError, SmartClientReadyErrors } from './client-errors'
-import type { SmartClientConfiguration, SmartClientOptions } from './config'
+import { buildAuthorizationUrl } from './auth/authorization-url'
+import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
 import { ReadyClient } from './ReadyClient'
 import { exchangeToken, refreshToken, tokenExpiresIn } from './token/token'
 import type { RefreshTokenErrors } from './token/token-errors'
+import type { CallbackError, SmartClientReadyErrors } from './types/client-errors'
+import type { SmartClientConfiguration, SmartClientOptions } from './types/config'
 import { fetchSmartConfiguration } from './well-known/smart-configuration'
 import type { SmartConfigurationErrors } from './well-known/smart-configuration-errors'
 
@@ -169,7 +169,7 @@ export class SmartClient {
              * Generate a code_challenge from the code_verifier in step 1
              */
             const codeChallenge = await calculatePKCECodeChallenge(initialSessionPayload.codeVerifier)
-            const authUrl = await buildAuthUrl(
+            const authUrl = await buildAuthorizationUrl(
                 {
                     ...initialSessionPayload,
                     launch: params.launch,

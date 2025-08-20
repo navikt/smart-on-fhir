@@ -1,6 +1,5 @@
-import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
-
-import type { RefreshTokenErrors, TokenExchangeErrors } from './token/token-errors'
+import type { CompleteSessionErrors, InitialSessionErrors } from '../../storage/storage-errors'
+import type { RefreshTokenErrors, TokenExchangeErrors } from '../token/token-errors'
 
 export type CallbackError =
     | TokenExchangeErrors

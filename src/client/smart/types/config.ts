@@ -1,4 +1,4 @@
-import type { KnownFhirServer } from './client-auth/config'
+import type { KnownFhirServer } from '../client-auth-method/config'
 
 type SmartClientBaseConfiguration = {
     clientId: string
