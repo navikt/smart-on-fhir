@@ -1,4 +1,4 @@
-export type ConfidentialSymmetricMethod =
+type ConfidentialSymmetricMethod =
     | {
           method: 'client_secret_post'
           clientSecret: string
@@ -17,11 +17,11 @@ export type ConfidentialSymmetricMethod =
  *   }
  */
 
-export type SmartConfidentialSymmetricMode = {
+type SmartConfidentialSymmetricMode = {
     type: 'confidential-symmetric'
 } & ConfidentialSymmetricMethod
 
-export type SmartPublicMode = {
+type SmartPublicMode = {
     type: 'public'
 }
 

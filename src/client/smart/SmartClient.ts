@@ -5,7 +5,6 @@ import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
 
-import { buildAuthorizationUrl } from './auth/authorization-url'
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
 import { failSpan, OtelTaxonomy, spanAsync } from './lib/otel'
 import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from './lib/utils'
@@ -169,14 +168,11 @@ export class SmartClient {
              * Generate a code_challenge from the code_verifier in step 1
              */
             const codeChallenge = await calculatePKCECodeChallenge(initialSessionPayload.codeVerifier)
-            const authUrl = await buildAuthorizationUrl(
-                {
-                    ...initialSessionPayload,
-                    launch: params.launch,
-                    codeChallenge: codeChallenge,
-                },
-                this._config,
-            )
+            const authUrl = this.buildAuthorizationUrl({
+                ...initialSessionPayload,
+                launch: params.launch,
+                codeChallenge: codeChallenge,
+            })
 
             /**
              * PKCE STEP 3
@@ -429,6 +425,26 @@ export class SmartClient {
         const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
 
         return this._config.knownFhirServers.find((it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash) ?? null
+    }
+
+    private buildAuthorizationUrl(
+        opts: Pick<InitialSession, 'issuer' | 'state' | 'authorizationEndpoint'> & {
+            launch: string
+            codeChallenge: string
+        },
+    ): string {
+        const params = new URLSearchParams({
+            response_type: 'code',
+            client_id: this._config.clientId,
+            scope: this._config.scope,
+            redirect_uri: this._config.callbackUrl,
+            aud: opts.issuer,
+            launch: opts.launch,
+            state: opts.state,
+            code_challenge: opts.codeChallenge,
+            code_challenge_method: 'S256',
+        })
+        return `${opts.authorizationEndpoint}?${params.toString()}`
     }
 }
 
