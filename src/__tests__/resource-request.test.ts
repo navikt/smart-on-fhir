@@ -47,6 +47,11 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
 
     const practitioner = await ready.request(ready.user.fhirUser)
 
+    if ('error' in practitioner) {
+        // Verify union types, this should be string, not unknown
+        expect(practitioner.error.toString()).not.toBeNull()
+    }
+
     expect(mock.isDone()).toBe(true)
     expectHas(practitioner, 'resourceType')
     expect(practitioner.resourceType).toBe('Practitioner')
@@ -62,6 +67,11 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },
     })
+
+    if ('error' in documentReference) {
+        // Verify union types, this should be string, not unknown
+        expect(documentReference.error.toString()).not.toBeNull()
+    }
 
     expect(mock.isDone()).toBe(true)
     expectHas(documentReference, 'resourceType')
@@ -80,6 +90,11 @@ test('SmartClient.update - /DocumentReference should PUT and parse DocumentRefer
         // Payload is contrivedly small for test
         payload: { resourceType: 'DocumentReference' },
     })
+
+    if ('error' in documentReference) {
+        // Verify union types, this should be string, not unknown
+        expect(documentReference.error.toString()).not.toBeNull()
+    }
 
     expect(mock.isDone()).toBe(true)
     expectHas(documentReference, 'resourceType')

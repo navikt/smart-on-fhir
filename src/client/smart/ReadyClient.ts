@@ -135,7 +135,7 @@ export class ReadyClient {
             }
 
             const result = await response.json()
-            const parsed = createResourceToSchema(resource).safeParse(result)
+            const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
                 failSpan(span, new Error('Failed to parse DocumentReference', { cause: parsed.error }))
@@ -181,7 +181,7 @@ export class ReadyClient {
             }
 
             const result = await response.json()
-            const parsed = createResourceToSchema(resource).safeParse(result)
+            const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
                 failSpan(
@@ -242,7 +242,7 @@ export class ReadyClient {
             }
 
             const result = await response.json()
-            const parsed = resourceToSchema(resource).safeParse(result)
+            const parsed = resourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 logger.error(new Error(`Failed to parse ${resource}`, { cause: parsed.error }))
                 return { error: 'REQUEST_FAILED_INVALID_RESPONSE' }
