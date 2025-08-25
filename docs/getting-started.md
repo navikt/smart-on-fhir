@@ -1,5 +1,11 @@
 # Getting started
 
+::: danger 🚧 Under active development! 🚧
+
+This library is under active development is not ready for production. But feel free to try it out and give feedback!
+
+:::
+
 ### Prerequisites
 
 ::: info

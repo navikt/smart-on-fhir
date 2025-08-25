@@ -1,5 +1,11 @@
 # Your first launch
 
+::: danger 🚧 Under active development! 🚧
+
+This library is under active development is not ready for production. But feel free to try it out and give feedback!
+
+:::
+
 This will take you through a secure
 [EHR Launch](https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#launch-app-ehr-launch) using this library.
 

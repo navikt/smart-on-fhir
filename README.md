@@ -5,6 +5,10 @@ server.
 
 This is built on modern Request/Response Web APIs, and is intended to be used in a server environment.
 
+> ⚠️ **Warning**
+>
+> This library is under active development and is **not production ready**. Use at your own risk.
+
 ## Points of interest
 
 - [Documentation](https://navikt.github.io/smart-on-fhir/)
