@@ -12,7 +12,6 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sa
 
     const client = new SmartClient(
         TEST_SESSION_ID,
-        storage,
         {
             clientId: 'test-client',
             scope: 'openid fhirUser launch/patient',
@@ -20,7 +19,7 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sa
             redirectUrl: 'http://app/redirect',
             allowAnyIssuer: true,
         },
-        options,
+        { storage, options },
     )
 
     return [client, safeSmartStorage(storage)]

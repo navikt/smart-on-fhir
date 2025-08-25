@@ -11,13 +11,17 @@ import { createMockedStorage, createTestStorage } from './utils/storage'
 
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     const smartConfigNock = mockSmartConfiguration()
     const result = await client.launch({
@@ -59,13 +63,17 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
 
 test('.launch - should gracefully handle well-known not responding correctly', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     fhirNock().get('/.well-known/smart-configuration').reply(500, { hey_crashy: true })
     const result = await client.launch({
@@ -79,13 +87,17 @@ test('.launch - should gracefully handle well-known not responding correctly', a
 
 test('.launch - should gracefully handle well-known responding with invalid payload', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     fhirNock().get('/.well-known/smart-configuration').reply(200, { this_is_garbage: 'foo-bar-baz' })
     const result = await client.launch({
@@ -108,13 +120,17 @@ test('.callback should exchange code for token', async () => {
         state: 'some-value',
     }))
 
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
@@ -144,13 +160,17 @@ test('.callback should gracefully handle state mismatch', async () => {
         state: 'this-expected-value',
     }))
 
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     await mockTokenExchange({
         client_id: 'test-client',
@@ -181,7 +201,6 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
 
     const client = new SmartClient(
         { sessionId: 'test-session', activePatient: null },
-        storage,
         {
             clientId: 'test-client',
             scope: 'openid fhirUser launch/patient',
@@ -189,7 +208,7 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
             redirectUrl: 'http://app/redirect',
             allowAnyIssuer: true,
         },
-        { enableMultiLaunch: true },
+        { storage: storage, options: { enableMultiLaunch: true } },
     )
 
     const tokenResponseNock = await mockTokenExchange({
@@ -211,13 +230,17 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
 
 test('full simulated launch flow, .ready() → .callback() → .ready()', async () => {
     const storage = createTestStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     /**
      * .launch(), create authorization URL and prepare initial session

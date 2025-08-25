@@ -101,13 +101,17 @@ test('launching one, no id should still work', async () => {
 
 test('launching without multi-user should not find previous sessions', async () => {
     const createClient = () =>
-        new SmartClient(TEST_SESSION_ID, storage, {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        })
+        new SmartClient(
+            TEST_SESSION_ID,
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                allowAnyIssuer: true,
+            },
+            { storage },
+        )
     const storage = createTestStorage()
 
     const firstLaunch = await fullLaunch('patient-zero', storage, createClient())
@@ -166,7 +170,6 @@ async function fullLaunch(patient: string, storage: SmartStorage, client?: Smart
 function createMultiLaunchTestClient(activePatient: string | null, storage: SmartStorage): SmartClient {
     return new SmartClient(
         { sessionId: TEST_SESSION_ID, activePatient },
-        storage,
         {
             clientId: 'test-client',
             scope: 'openid fhirUser launch/patient',
@@ -174,6 +177,9 @@ function createMultiLaunchTestClient(activePatient: string | null, storage: Smar
             redirectUrl: 'http://app/redirect',
             allowAnyIssuer: true,
         },
-        { enableMultiLaunch: true },
+        {
+            storage,
+            options: { enableMultiLaunch: true },
+        },
     )
 }

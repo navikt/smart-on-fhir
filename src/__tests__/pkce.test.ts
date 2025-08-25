@@ -13,13 +13,17 @@ import { createTestStorage } from './utils/storage'
 test('pkce verification should be correct', async () => {
     const sessionId = '689fe0f1-2304-45e9-bb45-bb1b8dac2379'
     const storage = createTestStorage()
-    const client = new SmartClient(sessionId, storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        allowAnyIssuer: true,
-    })
+    const client = new SmartClient(
+        sessionId,
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage },
+    )
 
     /**
      * User launches app, generates auth URL

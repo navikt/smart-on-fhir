@@ -47,7 +47,7 @@ export class SmartClient {
     }
 
     private readonly _storage: SafeSmartStorage
-    private readonly _config: SmartClientConfiguration
+    private readonly _clientConfig: SmartClientConfiguration
 
     /**
      * Single launch mode. Any subsequent launches using the same sessionId will overwrite the previous
@@ -56,9 +56,8 @@ export class SmartClient {
      */
     constructor(
         sessionId: string | null | undefined,
-        storage: SmartStorage | Promise<SmartStorage>,
-        config: SmartClientConfiguration,
-        options?: SmartClientOptions,
+        clientConfiguration: SmartClientConfiguration,
+        configuration: { storage: SmartStorage | Promise<SmartStorage>; options?: SmartClientOptions },
     )
     /**
      * Multi-launch mode. Subsequent launches are stored both by sessionId and the launched patient. This allows
@@ -68,15 +67,17 @@ export class SmartClient {
      */
     constructor(
         session: { sessionId: string | null | undefined; activePatient: string | null | undefined },
-        storage: SmartStorage | Promise<SmartStorage>,
-        config: SmartClientConfiguration,
-        options?: SmartClientOptions & {
-            /**
-             * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
-             * client to store this ID at their own leisure, and using it for subsequent requests, enabling multiple
-             * simultaneous launched sessions with different patients.
-             */
-            enableMultiLaunch?: true
+        clientConfiguration: SmartClientConfiguration,
+        configuration: {
+            storage: SmartStorage | Promise<SmartStorage>
+            options?: SmartClientOptions & {
+                /**
+                 * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
+                 * client to store this ID at their own leisure, and using it for subsequent requests, enabling multiple
+                 * simultaneous launched sessions with different patients.
+                 */
+                enableMultiLaunch?: true
+            }
         },
     )
     constructor(
@@ -85,9 +86,11 @@ export class SmartClient {
             | null
             | undefined
             | { sessionId: string | null | undefined; activePatient: string | null | undefined },
-        storage: SmartStorage | Promise<SmartStorage>,
-        config: SmartClientConfiguration,
-        options?: SmartClientOptions & { enableMultiLaunch?: true },
+        clientConfiguration: SmartClientConfiguration,
+        configuration: {
+            storage: SmartStorage | Promise<SmartStorage>
+            options?: SmartClientOptions & { enableMultiLaunch?: true }
+        },
     ) {
         assertNotBrowser()
 
@@ -106,12 +109,12 @@ export class SmartClient {
         this.sessionId = sessionId
         this.activePatient = activePatient ?? null
 
-        this._storage = safeSmartStorage(storage)
-        this._config = config
+        this._storage = safeSmartStorage(configuration.storage)
+        this._clientConfig = clientConfiguration
 
         this.options = {
-            autoRefresh: options?.autoRefresh ?? false,
-            multiLaunch: options?.enableMultiLaunch ?? false,
+            autoRefresh: configuration.options?.autoRefresh ?? false,
+            multiLaunch: configuration.options?.enableMultiLaunch ?? false,
         }
     }
 
@@ -218,7 +221,7 @@ export class SmartClient {
             const tokenResponse = await exchangeToken(
                 params.code,
                 initialSession,
-                this._config,
+                this._clientConfig,
                 this.getAuthMode(initialSession.server),
             )
             if ('error' in tokenResponse) {
@@ -237,7 +240,7 @@ export class SmartClient {
             await this._storage.set(this.sessionId, completeSessionValues)
 
             if (!this.options.multiLaunch) {
-                return { redirectUrl: this._config.redirectUrl }
+                return { redirectUrl: this._clientConfig.redirectUrl }
             }
 
             /**
@@ -246,7 +249,7 @@ export class SmartClient {
              */
             await this._storage.set(`${this.sessionId}:${tokenResponse.patient}`, completeSessionValues)
 
-            const url = new URL(this._config.redirectUrl)
+            const url = new URL(this._clientConfig.redirectUrl)
             url.searchParams.set('patient', completeSessionValues.patient)
             return { redirectUrl: url.toString() }
         })
@@ -297,7 +300,7 @@ export class SmartClient {
      * This will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
-        const refreshResponse = await refreshToken(session, this._config, this.getAuthMode(session.server))
+        const refreshResponse = await refreshToken(session, this._clientConfig, this.getAuthMode(session.server))
         if ('error' in refreshResponse) return refreshResponse
 
         const refreshedSessionValues: CompleteSession = {
@@ -399,8 +402,8 @@ export class SmartClient {
     }
 
     private async validateIssuer(issuer: string): Promise<boolean> {
-        if ('allowAnyIssuer' in this._config) {
-            if (!this._config.allowAnyIssuer)
+        if ('allowAnyIssuer' in this._clientConfig) {
+            if (!this._clientConfig.allowAnyIssuer)
                 throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
 
             return true
@@ -414,8 +417,8 @@ export class SmartClient {
     }
 
     private getKnownFhirServer(issuer: string): KnownFhirServer | null {
-        if ('allowAnyIssuer' in this._config) {
-            if (!this._config.allowAnyIssuer)
+        if ('allowAnyIssuer' in this._clientConfig) {
+            if (!this._clientConfig.allowAnyIssuer)
                 throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
 
             return null
@@ -424,7 +427,10 @@ export class SmartClient {
         const [withoutQuery] = issuer.split('?')
         const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
 
-        return this._config.knownFhirServers.find((it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash) ?? null
+        return (
+            this._clientConfig.knownFhirServers.find((it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash) ??
+            null
+        )
     }
 
     private buildAuthorizationUrl(
@@ -435,9 +441,9 @@ export class SmartClient {
     ): string {
         const params = new URLSearchParams({
             response_type: 'code',
-            client_id: this._config.clientId,
-            scope: this._config.scope,
-            redirect_uri: this._config.callbackUrl,
+            client_id: this._clientConfig.clientId,
+            scope: this._clientConfig.scope,
+            redirect_uri: this._clientConfig.callbackUrl,
             aud: opts.issuer,
             launch: opts.launch,
             state: opts.state,

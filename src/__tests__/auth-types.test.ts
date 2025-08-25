@@ -9,18 +9,22 @@ import { createMockedStorage } from './utils/storage'
 
 test('public, launch - should allow launches for known issuers', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://fhir-server',
-                type: 'public',
-            },
-        ],
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            knownFhirServers: [
+                {
+                    issuer: 'http://fhir-server',
+                    type: 'public',
+                },
+            ],
+        },
+        { storage },
+    )
 
     mockSmartConfiguration()
     const result = await client.launch({
@@ -33,18 +37,22 @@ test('public, launch - should allow launches for known issuers', async () => {
 
 test('public, launch - should block launches for unknown issuers if allowAnyIssuer is not set (i.e.) has knownFhirServers', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://other-server',
-                type: 'public',
-            },
-        ],
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            knownFhirServers: [
+                {
+                    issuer: 'http://other-server',
+                    type: 'public',
+                },
+            ],
+        },
+        { storage },
+    )
 
     const result = await client.launch({
         launch: 'test-launch',
@@ -57,20 +65,24 @@ test('public, launch - should block launches for unknown issuers if allowAnyIssu
 
 test('confidential-symmentric, launch - should allow launches for known issuers', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://fhir-server',
-                type: 'confidential-symmetric',
-                method: 'client_secret_basic',
-                clientSecret: 'test-secret',
-            },
-        ],
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            knownFhirServers: [
+                {
+                    issuer: 'http://fhir-server',
+                    type: 'confidential-symmetric',
+                    method: 'client_secret_basic',
+                    clientSecret: 'test-secret',
+                },
+            ],
+        },
+        { storage },
+    )
 
     mockSmartConfiguration()
     const result = await client.launch({
@@ -92,20 +104,24 @@ test('confidential-symmentric, token - should set correct authorization headers 
         state: 'some-value',
     }))
 
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://fhir-server',
-                type: 'confidential-symmetric',
-                method: 'client_secret_basic',
-                clientSecret: 'test-secret',
-            },
-        ],
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            knownFhirServers: [
+                {
+                    issuer: 'http://fhir-server',
+                    type: 'confidential-symmetric',
+                    method: 'client_secret_basic',
+                    clientSecret: 'test-secret',
+                },
+            ],
+        },
+        { storage },
+    )
 
     const tokenResponseNock = await mockTokenExchange(
         {
@@ -138,20 +154,24 @@ test('confidential-symmentric, token - should set correct authorization property
         state: 'some-value',
     }))
 
-    const client = new SmartClient('test-session', storage, {
-        clientId: 'test-client',
-        scope: 'openid fhirUser launch/patient',
-        callbackUrl: 'http://app/callback',
-        redirectUrl: 'http://app/redirect',
-        knownFhirServers: [
-            {
-                issuer: 'http://fhir-server',
-                type: 'confidential-symmetric',
-                method: 'client_secret_post',
-                clientSecret: 'test-secret',
-            },
-        ],
-    })
+    const client = new SmartClient(
+        'test-session',
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            knownFhirServers: [
+                {
+                    issuer: 'http://fhir-server',
+                    type: 'confidential-symmetric',
+                    method: 'client_secret_post',
+                    clientSecret: 'test-secret',
+                },
+            ],
+        },
+        { storage },
+    )
 
     const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
