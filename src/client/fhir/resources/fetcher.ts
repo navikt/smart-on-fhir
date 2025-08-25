@@ -1,10 +1,9 @@
-import type { CompleteSession } from '../../storage/schema'
-
 import type { KnownCreatePaths } from './create-resource-map'
 import type { KnownPaths } from './resource-map'
 
-type FhirSession = {
-    session: CompleteSession
+type AuthenticatedServer = {
+    server: string
+    accessToken: string
 }
 
 type PostFhir = {
@@ -12,63 +11,53 @@ type PostFhir = {
 }
 
 export async function postFhir(
-    {
-        session,
-        path,
-    }: FhirSession & {
-        path: KnownCreatePaths
-    },
+    server: AuthenticatedServer,
+    path: KnownCreatePaths,
     { payload }: PostFhir,
 ): Promise<Response> {
-    const resourcePath = `${session.server}/${path}`
+    const resourcePath = `${server.server}/${path}`
 
     return await fetch(resourcePath, {
         method: 'POST',
         body: JSON.stringify(payload),
         headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${server.accessToken}`,
             Accept: 'application/json',
             'Content-Type': 'application/json',
         },
     })
 }
 
+type PutFhir = {
+    path: KnownCreatePaths
+    id: string
+}
+
 export async function putFhir(
-    {
-        session,
-        path,
-        id,
-    }: FhirSession & {
-        path: KnownCreatePaths
-        id: string
-    },
+    server: AuthenticatedServer,
+    { path, id }: PutFhir,
     { payload }: PostFhir,
 ): Promise<Response> {
-    const resourcePath = `${session.server}/${path}/${id}`
+    const resourcePath = `${server.server}/${path}/${id}`
 
     return await fetch(resourcePath, {
         method: 'PUT',
         body: JSON.stringify(payload),
         headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${server.accessToken}`,
             Accept: 'application/json',
             'Content-Type': 'application/json',
         },
     })
 }
 
-export async function getFhir({
-    session,
-    path,
-}: FhirSession & {
-    path: KnownPaths
-}): Promise<Response> {
-    const resourcePath = `${session.server}/${path}`
+export async function getFhir(server: AuthenticatedServer, path: KnownPaths): Promise<Response> {
+    const resourcePath = `${server.server}/${path}`
 
     return await fetch(resourcePath, {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${session.accessToken}`,
+            Authorization: `Bearer ${server.accessToken}`,
             Accept: 'application/fhir+json,application/json',
         },
     })

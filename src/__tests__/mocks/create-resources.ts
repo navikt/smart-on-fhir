@@ -1,6 +1,6 @@
 import nock, { type RequestBodyMatcher, type Scope } from 'nock'
 
-import type { PayloadForCreate } from '../../client/smart/resources/create-resource-map'
+import type { PayloadForCreate } from '../../client/fhir/resources/create-resource-map'
 import type { FhirDocumentReference } from '../../zod'
 
 const createdDocumentReference: FhirDocumentReference = {

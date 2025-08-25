@@ -2,19 +2,19 @@ import { decodeJwt, jwtVerify } from 'jose'
 import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
-import type { CompleteSession } from '../storage/schema'
-
-import { logger } from './lib/logger'
-import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
-import { getResponseError, inferResourceType } from './lib/utils'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
     type PayloadForCreate,
     type ResponseForCreate,
-} from './resources/create-resource-map'
-import { getFhir, postFhir, putFhir } from './resources/fetcher'
-import { type KnownPaths, type ResponseFor, resourceToSchema } from './resources/resource-map'
+} from '../fhir/resources/create-resource-map'
+import { getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
+import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
+import type { CompleteSession } from '../storage/schema'
+
+import { logger } from './lib/logger'
+import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
+import { getResponseError, inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
 import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './types/client-errors'
@@ -116,7 +116,7 @@ export class ReadyClient {
             })
 
             const response = await this.fetchWithRefresh(
-                () => postFhir({ session: this._session, path: resource }, { payload: params.payload }),
+                () => postFhir(this._session, resource, { payload: params.payload }),
                 span,
             )
 
@@ -162,7 +162,7 @@ export class ReadyClient {
             })
 
             const response = await this.fetchWithRefresh(
-                () => putFhir({ id: params.id, session: this._session, path: resource }, { payload: params.payload }),
+                () => putFhir(this._session, { id: params.id, path: resource }, { payload: params.payload }),
                 span,
             )
 
@@ -213,7 +213,7 @@ export class ReadyClient {
                 [OtelTaxonomy.FhirServer]: this._session.server,
             })
 
-            const doRequest = () => getFhir({ session: this._session, path: resource })
+            const doRequest = () => getFhir(this._session, resource)
             const response = await this.fetchWithRefresh(
                 () => (otelSpanConfig?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
                 span,
