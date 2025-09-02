@@ -30,9 +30,8 @@ export async function fetchSmartConfiguration(
             if (!validatedWellKnown.success) {
                 failSpan(
                     span,
-                    new Error(`FHIR Server ${fhirServer} responded with weird smart-configuration`, {
-                        cause: validatedWellKnown.error,
-                    }),
+                    `FHIR Server ${fhirServer} responded with weird smart-configuration`,
+                    validatedWellKnown.error,
                 )
 
                 return { error: 'WELL_KNOWN_INVALID_BODY' }
@@ -41,7 +40,7 @@ export async function fetchSmartConfiguration(
             logger.info(`FHIR Server ${fhirServer} response validated`)
             return validatedWellKnown.data
         } catch (e) {
-            failSpan(span, new Error('Fatal error fetching smart configuration', { cause: e }))
+            failSpan(span, 'Fatal error fetching smart configuration', e)
 
             return { error: 'UNKNOWN_ERROR' }
         }

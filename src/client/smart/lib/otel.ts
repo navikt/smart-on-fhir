@@ -35,12 +35,20 @@ export async function squelchTracing<Result>(fn: () => Promise<Result>): Promise
 /**
  * Marks the span as failed, as well as logs the exception.
  */
-export function failSpan(span: Span, error: Error): void {
+export function failSpan(span: Span, what: string): void
+export function failSpan(span: Span, what: string, error: Error | unknown): void
+export function failSpan(span: Span, what: string, error?: Error | unknown): void {
     logger.error(error)
 
-    span.recordException(error)
-    if (error.cause instanceof Error) span.recordException(error.cause)
-    span.setStatus({ code: SpanStatusCode.ERROR, message: error.message })
+    if (error && error instanceof Error) {
+        span.recordException(error)
+        // OTEL does not support `cause`, but multiple recordException will create multiple events on the span
+        if (error.cause != null) {
+            span.recordException(error.cause instanceof Error ? error.cause : new Error(error.cause as string))
+        }
+    }
+
+    span.setStatus({ code: SpanStatusCode.ERROR, message: what })
 }
 
 export const OtelTaxonomy = {

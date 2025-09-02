@@ -73,7 +73,8 @@ export async function exchangeToken(
         if (!parsedTokenResponse.success) {
             failSpan(
                 span,
-                new Error(`Issuer/token_endpoint ${session.tokenEndpoint} responded with weird token response`, {
+                'Invalid Issuer/token_endpoint response',
+                new Error(`${session.tokenEndpoint} responded with weird token response`, {
                     cause: parsedTokenResponse.error,
                 }),
             )
@@ -114,8 +115,9 @@ export async function refreshToken(
 
             failSpan(
                 span,
+                'Token refresh failed',
                 new Error(
-                    `Token refresh failed, token_endpoint responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
+                    `Token_endpoint responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
                 ),
             )
 
@@ -126,14 +128,11 @@ export async function refreshToken(
         const parsedTokenResponse = TokenRefreshResponseSchema.safeParse(result)
 
         if (!parsedTokenResponse.success) {
-            const exception = new Error(
+            failSpan(
+                span,
                 `Issuer/token_endpoint ${session.tokenEndpoint} responded with weird token response`,
-                {
-                    cause: parsedTokenResponse.error,
-                },
+                parsedTokenResponse.error,
             )
-
-            failSpan(span, exception)
 
             return { error: 'REFRESH_TOKEN_INVALID_BODY' }
         }

@@ -139,7 +139,7 @@ export class SmartClient {
 
             const validIssuer = await this.validateIssuer(params.iss)
             if (!validIssuer) {
-                failSpan(span, new Error('Issuer was not found in known FHIR servers'))
+                failSpan(span, 'Issuer was not found in known FHIR servers')
                 return { error: 'UNKNOWN_ISSUER' }
             }
 
@@ -210,9 +210,7 @@ export class SmartClient {
 
                 failSpan(
                     span,
-                    new Error(
-                        `State mismatch, expected len: ${initialSession.state.length} but got len: ${params.state.length}`,
-                    ),
+                    `State mismatch, expected len: ${initialSession.state.length} but got len: ${params.state.length}`,
                 )
 
                 return { error: 'INVALID_STATE' }
@@ -283,10 +281,8 @@ export class SmartClient {
             } catch (error) {
                 failSpan(
                     span,
-                    new Error(
-                        `Tried to .ready SmartClient, ReadyClient failed to instantiate for id "${this.sessionId}"`,
-                        { cause: error },
-                    ),
+                    `Tried to .ready SmartClient, ReadyClient failed to instantiate for id "${this.sessionId}"`,
+                    error,
                 )
 
                 return { error: 'INVALID_ID_TOKEN', validate: async () => false }
@@ -334,10 +330,7 @@ export class SmartClient {
 
             if ('error' in session) {
                 span.setAttribute('session.error', session.error)
-                failSpan(
-                    span,
-                    new Error(`SmartClient.getSession failed to retrieve session because session is: ${session.error}`),
-                )
+                failSpan(span, `SmartClient.getSession failed to retrieve session because session is ${session.error}`)
 
                 return session
             }
@@ -351,7 +344,7 @@ export class SmartClient {
             const existingSession = await this._storage.getPartial(sessionId)
             if ('error' in existingSession) {
                 span.setAttribute(OtelTaxonomy.SessionError, existingSession.error)
-                failSpan(span, new Error(`Session not found for sessionId ${sessionId}, was ${existingSession.error}`))
+                failSpan(span, `Session not found for sessionId ${sessionId}, was ${existingSession.error}`)
 
                 return { error: existingSession.error }
             }
@@ -375,10 +368,7 @@ export class SmartClient {
                         [OtelTaxonomy.SessionRefreshed]: false,
                     })
 
-                    failSpan(
-                        span,
-                        new Error(`SmartClient.getSession failed to refresh session because: ${refreshResult.error}`),
-                    )
+                    failSpan(span, 'SmartClient.getSession failed to refresh session', refreshResult.error)
 
                     // Return potentially expired session, let the rest of the auth flow handle the expiredness.
                     return session

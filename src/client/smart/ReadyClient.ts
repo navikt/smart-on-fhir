@@ -96,8 +96,8 @@ export class ReadyClient {
 
                     return true
                 })
-            } catch (e) {
-                failSpan(span, new Error(`Token validation failed, ${(e as { code: string })?.code ?? 'UNKNOWN'}`))
+            } catch (error) {
+                failSpan(span, 'Token validation failed', error)
                 return false
             }
         })
@@ -126,6 +126,7 @@ export class ReadyClient {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
                 failSpan(
                     span,
+                    `Request to create ${resourceType} failed`,
                     new Error(
                         `Request to create ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
                     ),
@@ -138,7 +139,7 @@ export class ReadyClient {
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(span, new Error('Failed to parse DocumentReference', { cause: parsed.error }))
+                failSpan(span, 'Failed to parse DocumentReference', parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
@@ -172,6 +173,7 @@ export class ReadyClient {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
                 failSpan(
                     span,
+                    `Request to update (PUT) ${resourceType} failed`,
                     new Error(
                         `Request to update (PUT) ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
                     ),
@@ -184,10 +186,7 @@ export class ReadyClient {
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(
-                    span,
-                    new Error('Failed to parse DocumentReference (from PUT/update)', { cause: parsed.error }),
-                )
+                failSpan(span, 'Failed to parse DocumentReference (from PUT/update)', parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
@@ -233,6 +232,7 @@ export class ReadyClient {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
                 failSpan(
                     span,
+                    `Request to get ${resource} failed`,
                     new Error(
                         `Request to get ${resource} failed, ${response.url} responded with ${response.status} ${response.statusText}, server said: ${responseError}`,
                     ),
