@@ -38,7 +38,7 @@ export async function squelchTracing<Result>(fn: () => Promise<Result>): Promise
 export function failSpan(span: Span, what: string): void
 export function failSpan(span: Span, what: string, error: Error | unknown): void
 export function failSpan(span: Span, what: string, error?: Error | unknown): void {
-    logger.error(error)
+    logger.error(new Error(what, { cause: error }))
 
     if (error && error instanceof Error) {
         span.recordException(error)
