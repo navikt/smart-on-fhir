@@ -870,6 +870,7 @@ __metadata:
     pino: "npm:^9.9.0"
     pinst: "npm:^3.0.0"
     prettier: "npm:^3.6.2"
+    quick-lru: "npm:^7.1.0"
     tsup: "npm:^8.5.0"
     typescript: "npm:^5.9.2"
     vitepress: "npm:^1.6.4"
@@ -3487,6 +3488,13 @@ __metadata:
   version: 4.0.4
   resolution: "quick-format-unescaped@npm:4.0.4"
   checksum: 10c0/fe5acc6f775b172ca5b4373df26f7e4fd347975578199e7d74b2ae4077f0af05baa27d231de1e80e8f72d88275ccc6028568a7a8c9ee5e7368ace0e18eff93a4
+  languageName: node
+  linkType: hard
+
+"quick-lru@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "quick-lru@npm:7.1.0"
+  checksum: 10c0/ef2df33368a66e3d3b32a42c523fcd0939c03f6192ec7f29db36179e22f015d2c75790aa9ab530c719a0dd3fb510f972bc66acca4e92bc9f01f92f0e6c2084f2
   languageName: node
   linkType: hard
 

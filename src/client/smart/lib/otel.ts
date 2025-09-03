@@ -56,6 +56,7 @@ export const OtelTaxonomy = {
     FhirResource: 'fhir.resource',
     FhirResourceStatus: 'fhir.resource.status',
     FhirAuthorizationType: 'fhir.auth-type',
+    SmartConfigurationCacheHit: 'fhir.smart-configuration.cache-hit',
     SessionExpired: 'session.expired',
     SessionError: 'session.error',
     SessionRefreshed: 'session.refreshed',
