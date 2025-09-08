@@ -866,7 +866,7 @@ __metadata:
     jose: "npm:^6.1.0"
     lint-staged: "npm:^16.1.5"
     nock: "npm:^14.0.10"
-    openid-client: "npm:^6.7.0"
+    openid-client: "npm:^6.7.1"
     pino: "npm:^9.9.0"
     pinst: "npm:^3.0.0"
     prettier: "npm:^3.6.2"
@@ -3184,13 +3184,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:^6.7.0":
-  version: 6.7.0
-  resolution: "openid-client@npm:6.7.0"
+"openid-client@npm:^6.7.1":
+  version: 6.7.1
+  resolution: "openid-client@npm:6.7.1"
   dependencies:
     jose: "npm:^6.1.0"
     oauth4webapi: "npm:^3.8.0"
-  checksum: 10c0/daf01fe43126319ebafaf7602b47ae52a30163c126f9d620f871b839ed2b04ecb2373688cffe245b763537e783e764302ca33499c920128886eb135afd3f9926
+  checksum: 10c0/a4a38e1fa8912c697b2e0b353c47a5d4b48c70f6961ed1ee030335cd84d4b05d923aa9bd8a135b5e83c025dad61e3648ea780617d091302d901cbd7babe0e9f0
   languageName: node
   linkType: hard
 

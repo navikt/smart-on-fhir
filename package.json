@@ -44,7 +44,7 @@
         "@opentelemetry/api": "^1.9.0",
         "@opentelemetry/core": "^2.0.1",
         "jose": "^6.1.0",
-        "openid-client": "^6.7.0",
+        "openid-client": "^6.7.1",
         "pino": "^9.9.0",
         "quick-lru": "^7.1.0",
         "zod": "^4.1.4"
