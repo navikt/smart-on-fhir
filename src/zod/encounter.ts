@@ -21,5 +21,7 @@ export const FhirEncounterSchema = z.object({
             }),
         )
         .optional(),
+    subject: ReferenceSchema.optional(),
+    participant: z.array(z.object({ individual: ReferenceSchema })).optional(),
     serviceProvider: ReferenceSchema,
 })
