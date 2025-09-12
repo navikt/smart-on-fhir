@@ -19,6 +19,7 @@ const FhirPractitionerQualificationSchema = z.object({
 export type FhirPractitioner = z.infer<typeof FhirPractitionerSchema>
 export const FhirPractitionerSchema = z.object({
     resourceType: z.literal('Practitioner'),
+    meta: z.object({ profile: z.array(z.string()) }).optional(),
     name: NameSchema,
     identifier: z.array(z.object({ system: z.string(), value: z.string() })),
     qualification: z.array(FhirPractitionerQualificationSchema).optional(),
