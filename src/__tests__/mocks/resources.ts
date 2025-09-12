@@ -7,6 +7,7 @@ export function mockPractitioner(id: string): Scope {
         .get(`/Practitioner/${id}`)
         .reply(200, {
             resourceType: 'Practitioner',
+            id: '40426ee8-6293-456c-9b79-2016821673ca',
             name: [{ family: 'Doe', given: ['John'] }],
             identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.4', value: '9144889' }],
         } satisfies FhirPractitioner)
@@ -49,6 +50,7 @@ export function mockPatient(id: string): Scope {
         .get(`/Patient/${id}`)
         .reply(200, {
             resourceType: 'Patient',
+            id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
             name: [{ family: 'Doe', given: ['Jane'] }],
             identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.1', value: '12345678901' }],
         } satisfies FhirPatient)
