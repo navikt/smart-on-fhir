@@ -1,5 +1,6 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
+import type { CacheOptions } from '../cache'
 import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
@@ -44,6 +45,7 @@ export class SmartClient {
     readonly options: {
         autoRefresh: boolean
         multiLaunch: boolean
+        cache: CacheOptions
     }
 
     private readonly _storage: SafeSmartStorage
@@ -57,7 +59,11 @@ export class SmartClient {
     constructor(
         sessionId: string | null | undefined,
         clientConfiguration: SmartClientConfiguration,
-        configuration: { storage: SmartStorage | Promise<SmartStorage>; options?: SmartClientOptions },
+        configuration: {
+            cache?: CacheOptions
+            storage: SmartStorage | Promise<SmartStorage>
+            options?: SmartClientOptions
+        },
     )
     /**
      * Multi-launch mode. Subsequent launches are stored both by sessionId and the launched patient. This allows
@@ -69,6 +75,7 @@ export class SmartClient {
         session: { sessionId: string | null | undefined; activePatient: string | null | undefined },
         clientConfiguration: SmartClientConfiguration,
         configuration: {
+            cache?: CacheOptions
             storage: SmartStorage | Promise<SmartStorage>
             options?: SmartClientOptions & {
                 /**
@@ -88,6 +95,7 @@ export class SmartClient {
             | { sessionId: string | null | undefined; activePatient: string | null | undefined },
         clientConfiguration: SmartClientConfiguration,
         configuration: {
+            cache?: CacheOptions
             storage: SmartStorage | Promise<SmartStorage>
             options?: SmartClientOptions & { enableMultiLaunch?: true }
         },
@@ -115,6 +123,7 @@ export class SmartClient {
         this.options = {
             autoRefresh: configuration.options?.autoRefresh ?? false,
             multiLaunch: configuration.options?.enableMultiLaunch ?? false,
+            cache: configuration.cache ?? 'disabled',
         }
     }
 
