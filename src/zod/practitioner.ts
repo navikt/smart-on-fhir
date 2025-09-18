@@ -20,7 +20,7 @@ export type FhirPractitioner = z.infer<typeof FhirPractitionerSchema>
 export const FhirPractitionerSchema = z.object({
     resourceType: z.literal('Practitioner'),
     id: z.string(),
-    meta: z.object({ profile: z.array(z.string()) }).optional(),
+    meta: z.object({ profile: z.array(z.string()).optional() }).optional(),
     name: NameSchema,
     identifier: z.array(z.object({ system: z.string(), value: z.string() })),
     qualification: z.array(FhirPractitionerQualificationSchema).optional(),
