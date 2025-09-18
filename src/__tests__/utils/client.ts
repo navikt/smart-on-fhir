@@ -1,4 +1,5 @@
 import { ReadyClient, SmartClient, type SmartClientOptions } from '../../client'
+import type { CacheOptions } from '../../client/cache'
 import { type SafeSmartStorage, safeSmartStorage } from '../../client/storage'
 import type { CompleteSession } from '../../client/storage/schema'
 
@@ -7,7 +8,10 @@ import { createTestStorage } from './storage'
 
 export const TEST_SESSION_ID = 'test-session'
 
-export const createTestClient = (options?: SmartClientOptions): [SmartClient, SafeSmartStorage] => {
+export const createTestClient = (
+    options?: SmartClientOptions,
+    cache?: CacheOptions,
+): [SmartClient, SafeSmartStorage] => {
     const storage = createTestStorage()
 
     const client = new SmartClient(
@@ -19,7 +23,7 @@ export const createTestClient = (options?: SmartClientOptions): [SmartClient, Sa
             redirectUrl: 'http://app/redirect',
             allowAnyIssuer: true,
         },
-        { storage, options },
+        { storage, options, cache },
     )
 
     return [client, safeSmartStorage(storage)]
@@ -41,8 +45,9 @@ export async function createLaunchableSmartClient(
 export async function createLaunchedReadyClient(
     session: CompleteSession,
     options?: SmartClientOptions,
+    cache?: CacheOptions,
 ): Promise<[ReadyClient, SafeSmartStorage]> {
-    const [client, storage] = createTestClient(options)
+    const [client, storage] = createTestClient(options, cache)
 
     await storage.set(TEST_SESSION_ID, session)
     const ready = await client.ready()
