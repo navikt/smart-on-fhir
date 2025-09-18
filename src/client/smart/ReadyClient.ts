@@ -245,7 +245,7 @@ export class ReadyClient {
             const result = await response.json()
             const parsed = resourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
-                logger.error(new Error(`Failed to parse ${resource}`, { cause: parsed.error }))
+                failSpan(span, `${resourceType} parse error`, parsed.error)
                 return { error: 'REQUEST_FAILED_INVALID_RESPONSE' }
             }
 
