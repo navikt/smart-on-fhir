@@ -281,7 +281,7 @@ export class SmartClient {
             } catch (error) {
                 failSpan(
                     span,
-                    `Tried to .ready SmartClient, ReadyClient failed to instantiate for id "${this.sessionId}"`,
+                    `ReadyClient instantiation failed (INVALID_ID_TOKEN) failed to instantiate for id "${this.sessionId}"`,
                     error,
                 )
 
