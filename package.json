@@ -1,7 +1,7 @@
 {
     "name": "@navikt/smart-on-fhir",
     "version": "1.4.27",
-    "packageManager": "yarn@4.10.0",
+    "packageManager": "yarn@4.10.1",
     "engines": {
         "node": "22"
     },
