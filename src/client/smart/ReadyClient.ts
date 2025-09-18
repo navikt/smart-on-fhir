@@ -2,6 +2,7 @@ import { decodeJwt, jwtVerify } from 'jose'
 import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
+import { type CacheOptions, getCachedResource, setCachedResource } from '../cache'
 import {
     createResourceToSchema,
     type KnownCreatePaths,
@@ -32,11 +33,13 @@ export class ReadyClient {
     private readonly _client: SmartClient
     private readonly _session: CompleteSession
     private readonly _idToken: IdToken
+    private readonly _cache: CacheOptions
 
     constructor(client: SmartClient, session: CompleteSession) {
         this._client = client
         this._session = session
         this._idToken = IdTokenSchema.loose().parse(decodeJwt(session.idToken))
+        this._cache = client.options.cache
     }
 
     public get patient(): ValueAccessor<FhirPatient, 'Patient'> {
@@ -203,7 +206,7 @@ export class ReadyClient {
         /**
          * If set to true, will not mark the OTEL span as failed if the resource is not found.
          */
-        otelSpanConfig?: { expectNotFound: true },
+        config?: { cache?: { ttl: number }; expectNotFound?: true },
     ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
         const resourceType = inferResourceType(resource)
 
@@ -211,17 +214,26 @@ export class ReadyClient {
             span.setAttributes({
                 [OtelTaxonomy.FhirResource]: resourceType,
                 [OtelTaxonomy.FhirServer]: this._session.server,
+                [OtelTaxonomy.ResourceCacheEnabled]: config?.cache != null,
             })
+
+            if (config?.cache != null) {
+                const cached = await getCachedResource<Path>(this._cache, { session: this._session, resource })
+                if (cached) {
+                    span.setAttributes({ [OtelTaxonomy.ResourceCacheHit]: true })
+                    return cached
+                }
+            }
 
             const doRequest = () => getFhir(this._session, resource)
             const response = await this.fetchWithRefresh(
-                () => (otelSpanConfig?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
+                () => (config?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
                 span,
             )
 
             if (response.status === 404) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                if (!otelSpanConfig?.expectNotFound) {
+                if (!config?.expectNotFound) {
                     logger.warn(`Resource (${resource}) was not found on FHIR server`)
                 }
                 return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND' }
@@ -250,6 +262,15 @@ export class ReadyClient {
             }
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
+
+            if (config?.cache != null) {
+                span.setAttribute(OtelTaxonomy.ResourceCacheUpdated, true)
+                await setCachedResource(
+                    this._cache,
+                    { session: this._session, resource, values: parsed.data as ResponseFor<Path> },
+                    config.cache,
+                )
+            }
 
             return parsed.data as ResponseFor<Path>
         })
