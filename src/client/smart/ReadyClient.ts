@@ -81,7 +81,8 @@ export class ReadyClient {
 
             const smartConfig = await fetchSmartConfiguration(this._session.server)
             if ('error' in smartConfig) {
-                logger.error(`Failed to fetch smart configuration: ${smartConfig.error}`)
+                failSpan(span, `Failed to fetch smart configuration`, smartConfig.error)
+
                 return false
             }
 
