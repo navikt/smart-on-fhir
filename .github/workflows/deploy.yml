@@ -45,7 +45,7 @@ jobs:
       - uses: actions/setup-node@v4
         id: setup-node
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: yarn
       - run: yarn install --immutable
         env:
@@ -68,7 +68,7 @@ jobs:
       - uses: actions/setup-node@v4
         id: setup-node
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: yarn
       - run: yarn install --immutable
         env:
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/setup-node@v4
         id: setup-node
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: yarn
       - run: yarn install --immutable
       - run: yarn build
