@@ -28,5 +28,12 @@ type SmartPublicMode = {
 export type FhirAuthMode = SmartPublicMode | SmartConfidentialSymmetricMode
 
 export type KnownFhirServer = {
+    /**
+     * A human readable name for the FHIR server
+     */
+    name: string
+    /**
+     * Expected issuer URL the app will be launched against
+     */
     issuer: string
 } & FhirAuthMode

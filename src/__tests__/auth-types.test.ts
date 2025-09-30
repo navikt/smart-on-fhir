@@ -18,6 +18,7 @@ test('public, launch - should allow launches for known issuers', async () => {
             redirectUrl: 'http://app/redirect',
             knownFhirServers: [
                 {
+                    name: 'TestMed',
                     issuer: 'http://fhir-server',
                     type: 'public',
                 },
@@ -46,6 +47,7 @@ test('public, launch - should block launches for unknown issuers if allowAnyIssu
             redirectUrl: 'http://app/redirect',
             knownFhirServers: [
                 {
+                    name: 'TestMed',
                     issuer: 'http://other-server',
                     type: 'public',
                 },
@@ -74,6 +76,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
             redirectUrl: 'http://app/redirect',
             knownFhirServers: [
                 {
+                    name: 'TestMed',
                     issuer: 'http://fhir-server',
                     type: 'confidential-symmetric',
                     method: 'client_secret_basic',
@@ -113,6 +116,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
             redirectUrl: 'http://app/redirect',
             knownFhirServers: [
                 {
+                    name: 'TestMed',
                     issuer: 'http://fhir-server',
                     type: 'confidential-symmetric',
                     method: 'client_secret_basic',
@@ -163,6 +167,7 @@ test('confidential-symmentric, token - should set correct authorization property
             redirectUrl: 'http://app/redirect',
             knownFhirServers: [
                 {
+                    name: 'TestMed',
                     issuer: 'http://fhir-server',
                     type: 'confidential-symmetric',
                     method: 'client_secret_post',
