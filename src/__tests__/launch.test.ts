@@ -5,7 +5,7 @@ import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
 import { fhirNock, mockSmartConfiguration } from './mocks/issuer'
-import { TEST_SESSION_ID } from './utils/client'
+import { createLaunchedReadyClient, TEST_SESSION_ID } from './utils/client'
 import { expectHas, expectIs } from './utils/expect'
 import { createMockedStorage, createTestStorage } from './utils/storage'
 
@@ -237,7 +237,13 @@ test('full simulated launch flow, .ready() → .callback() → .ready()', async 
             scope: 'openid fhirUser launch/patient',
             callbackUrl: 'http://app/callback',
             redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
+            knownFhirServers: [
+                {
+                    name: 'TestMed',
+                    issuer: 'http://fhir-server',
+                    type: 'public',
+                },
+            ],
         },
         { storage },
     )
@@ -281,6 +287,7 @@ test('full simulated launch flow, .ready() → .callback() → .ready()', async 
     const readyClient = await client.ready()
 
     expectIs(readyClient, ReadyClient)
-    expect(readyClient.patient.reference).toBe('Patient/c4664cf0-9168-4b6f-8798-93799068552b')
-    expect(readyClient.user.fhirUser).toBe('Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4')
+    expect(readyClient.patient.reference).toEqual('Patient/c4664cf0-9168-4b6f-8798-93799068552b')
+    expect(readyClient.user.fhirUser).toEqual('Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4')
+    expect(readyClient.issuerName).toEqual('TestMed')
 })

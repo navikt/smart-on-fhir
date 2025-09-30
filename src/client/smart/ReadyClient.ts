@@ -35,7 +35,11 @@ export class ReadyClient {
     private readonly _idToken: IdToken
     private readonly _cache: CacheOptions
 
-    constructor(client: SmartClient, session: CompleteSession) {
+    public readonly issuerName: string
+
+    constructor(client: SmartClient, session: CompleteSession, issuerName: string) {
+        this.issuerName = issuerName
+
         this._client = client
         this._session = session
         this._idToken = IdTokenSchema.loose().parse(decodeJwt(session.idToken))

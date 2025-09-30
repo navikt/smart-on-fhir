@@ -229,7 +229,15 @@ export class SmartClient {
                 params.code,
                 initialSession,
                 this._clientConfig,
-                this.getAuthMode(initialSession.server),
+                this.getAuthMode(
+                    /*
+                        TODO: Is it correct using session.server here? Aren't the knownFhirServer configurations
+                        based on issuer?
+
+                        We'll see once we go live with multiple FHIR servers.
+                     */
+                    initialSession.server,
+                ),
             )
             if ('error' in tokenResponse) {
                 return { error: tokenResponse.error }
@@ -285,8 +293,10 @@ export class SmartClient {
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
+            const currentIssuer = this.getKnownFhirServer(session.issuer)
+
             try {
-                return new ReadyClient(this, session)
+                return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer')
             } catch (error) {
                 failSpan(
                     span,
@@ -417,19 +427,20 @@ export class SmartClient {
 
     private getKnownFhirServer(issuer: string): KnownFhirServer | null {
         if ('allowAnyIssuer' in this._clientConfig) {
-            if (!this._clientConfig.allowAnyIssuer)
-                throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
+            if (!this._clientConfig.allowAnyIssuer) {
+                throw Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
+            }
 
             return null
         }
 
         const [withoutQuery] = issuer.split('?')
         const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
-
-        return (
-            this._clientConfig.knownFhirServers.find((it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash) ??
-            null
+        const knownFhirServer = this._clientConfig.knownFhirServers.find(
+            (it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash,
         )
+
+        return knownFhirServer ?? null
     }
 
     private buildAuthorizationUrl(
