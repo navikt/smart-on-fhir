@@ -4,7 +4,7 @@ import type { CompleteSession } from '../client/storage/schema'
 
 import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockEncounter, mockPatient, mockPractitioner } from './mocks/resources'
-import { createLaunchedReadyClient } from './utils/client'
+import { createLaunchedOpenReadyClient } from './utils/client-open'
 import { expectHas } from './utils/expect'
 import { createTestIdToken } from './utils/token'
 
@@ -27,7 +27,7 @@ const validSession: CompleteSession = {
 }
 
 test('SmartClient should be properly initiated with Patient, Encounter and User', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     expect(ready.patient.type).toEqual('Patient')
     expect(ready.patient.reference).toEqual('Patient/valid-patient-id')
@@ -41,7 +41,7 @@ test('SmartClient should be properly initiated with Patient, Encounter and User'
 })
 
 test('SmartClient.request - /Practitioner should fetch and parse Practitioner resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const mock = mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
 
@@ -58,7 +58,7 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
 })
 
 test('SmartClient.create - /DocumentReference should POST and parse DocumentReference resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const mock = mockCreateDocumentReference({
         resourceType: 'DocumentReference',
@@ -79,7 +79,7 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
 })
 
 test('SmartClient.update - /DocumentReference should PUT and parse DocumentReference resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const mock = mockUpdateDocumentReference('my-id', {
         resourceType: 'DocumentReference',
@@ -102,7 +102,7 @@ test('SmartClient.update - /DocumentReference should PUT and parse DocumentRefer
 })
 
 test('shorthand for .request Practitioner should fetch and parse Practitioner resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
     const practitioner = await ready.user.request()
@@ -112,7 +112,7 @@ test('shorthand for .request Practitioner should fetch and parse Practitioner re
 })
 
 test('shorthand for .request Encounter should fetch and parse Encounter resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     mockEncounter('valid-encounter-id')
     const encounter = await ready.encounter.request()
@@ -122,7 +122,7 @@ test('shorthand for .request Encounter should fetch and parse Encounter resource
 })
 
 test('shorthand for .request Patient should fetch and parse Patient resource', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     mockPatient('valid-patient-id')
     const encounter = await ready.patient.request()

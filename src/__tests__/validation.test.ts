@@ -6,7 +6,7 @@ import type { CompleteSession } from '../client/storage/schema'
 
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockJwks, mockSmartConfiguration } from './mocks/issuer'
-import { createLaunchableSmartClient } from './utils/client'
+import { createLaunchableOpenSmartClient } from './utils/client-open'
 import { expectIs } from './utils/expect'
 import { createOtherToken, createTestAccessToken, createTestIdToken } from './utils/token'
 
@@ -29,7 +29,7 @@ const validSession: CompleteSession = {
 }
 
 test('.validate - should properly validate token', async () => {
-    const [client] = await createLaunchableSmartClient({
+    const [client] = await createLaunchableOpenSmartClient({
         ...validSession,
         accessToken: await createTestAccessToken(60 * 10), // 10 minutes
     })
@@ -45,7 +45,7 @@ test('.validate - should properly validate token', async () => {
 })
 
 test('.validate - should not validate expired token', async () => {
-    const [client] = await createLaunchableSmartClient({
+    const [client] = await createLaunchableOpenSmartClient({
         ...validSession,
         accessToken: await createTestAccessToken(-60), // 1 minute expired
     })
@@ -61,7 +61,7 @@ test('.validate - should not validate expired token', async () => {
 })
 
 test('.validate - should not validate garbage', async () => {
-    const [client] = await createLaunchableSmartClient({
+    const [client] = await createLaunchableOpenSmartClient({
         ...validSession,
         accessToken: 'straight.up.garbage',
     })
@@ -77,7 +77,7 @@ test('.validate - should not validate garbage', async () => {
 })
 
 test('.getClaim - should handle getting arbitrary claims and validating them with zod', async () => {
-    const [client] = await createLaunchableSmartClient({
+    const [client] = await createLaunchableOpenSmartClient({
         ...validSession,
         idToken: await createTestIdToken({
             'https://helseid.nhn.no': {

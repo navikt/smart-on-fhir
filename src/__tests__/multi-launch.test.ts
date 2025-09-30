@@ -5,7 +5,7 @@ import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
 import { mockSmartConfiguration } from './mocks/issuer'
-import { TEST_SESSION_ID } from './utils/client'
+import { TEST_SESSION_ID } from './utils/client-open'
 import { expectHas, expectIs } from './utils/expect'
 import { createTestStorage } from './utils/storage'
 

@@ -1,27 +1,17 @@
 import { expect, test } from 'vitest'
 
-import { ReadyClient, SmartClient } from '../client'
+import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../client'
 import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
 import { fhirNock, mockSmartConfiguration } from './mocks/issuer'
-import { createLaunchedReadyClient, TEST_SESSION_ID } from './utils/client'
+import { TEST_SESSION_ID } from './utils/client-open'
 import { expectHas, expectIs } from './utils/expect'
 import { createMockedStorage, createTestStorage } from './utils/storage'
 
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage },
-    )
+    const client = createSmartClient(storage)
 
     const smartConfigNock = mockSmartConfiguration()
     const result = await client.launch({
@@ -34,7 +24,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
     /**
      * Should store partial session in the storage
      */
-    expect(storage.setFn).toHaveBeenCalledWith('test-session', {
+    expect(storage.setFn).toHaveBeenCalledWith(TEST_SESSION_ID, {
         issuer: 'http://fhir-server',
         authorizationEndpoint: 'http://auth-server/authorize',
         tokenEndpoint: 'http://auth-server/token',
@@ -63,17 +53,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
 
 test('.launch - should gracefully handle well-known not responding correctly', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage },
-    )
+    const client = createSmartClient(storage)
 
     fhirNock().get('/.well-known/smart-configuration').reply(500, { hey_crashy: true })
     const result = await client.launch({
@@ -87,17 +67,7 @@ test('.launch - should gracefully handle well-known not responding correctly', a
 
 test('.launch - should gracefully handle well-known responding with invalid payload', async () => {
     const storage = createMockedStorage()
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage },
-    )
+    const client = createSmartClient(storage)
 
     fhirNock().get('/.well-known/smart-configuration').reply(200, { this_is_garbage: 'foo-bar-baz' })
     const result = await client.launch({
@@ -119,18 +89,7 @@ test('.callback should exchange code for token', async () => {
         codeVerifier: 'test-code-verifier',
         state: 'some-value',
     }))
-
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage },
-    )
+    const client = createSmartClient(storage)
 
     const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
@@ -159,18 +118,7 @@ test('.callback should gracefully handle state mismatch', async () => {
         codeVerifier: 'test-code-verifier',
         state: 'this-expected-value',
     }))
-
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage },
-    )
+    const client = createSmartClient(storage)
 
     await mockTokenExchange({
         client_id: 'test-client',
@@ -198,18 +146,7 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
         codeVerifier: 'test-code-verifier',
         state: 'some-value',
     }))
-
-    const client = new SmartClient(
-        { sessionId: 'test-session', activePatient: null },
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            allowAnyIssuer: true,
-        },
-        { storage: storage, options: { enableMultiLaunch: true } },
-    )
+    const client = createSmartClient(storage, { enableMultiLaunch: true })
 
     const tokenResponseNock = await mockTokenExchange({
         client_id: 'test-client',
@@ -231,7 +168,7 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
 test('full simulated launch flow, .ready() → .callback() → .ready()', async () => {
     const storage = createTestStorage()
     const client = new SmartClient(
-        'test-session',
+        TEST_SESSION_ID,
         {
             clientId: 'test-client',
             scope: 'openid fhirUser launch/patient',
@@ -291,3 +228,17 @@ test('full simulated launch flow, .ready() → .callback() → .ready()', async 
     expect(readyClient.user.fhirUser).toEqual('Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4')
     expect(readyClient.issuerName).toEqual('TestMed')
 })
+
+function createSmartClient(storage: SmartStorage, options?: SmartClientOptions & { enableMultiLaunch?: true }) {
+    return new SmartClient(
+        TEST_SESSION_ID,
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage, options },
+    )
+}

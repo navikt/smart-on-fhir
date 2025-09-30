@@ -8,10 +8,7 @@ import { createTestStorage } from './storage'
 
 export const TEST_SESSION_ID = 'test-session'
 
-export const createTestClient = (
-    options?: SmartClientOptions,
-    cache?: CacheOptions,
-): [SmartClient, SafeSmartStorage] => {
+function createOpenTestClient(options?: SmartClientOptions, cache?: CacheOptions): [SmartClient, SafeSmartStorage] {
     const storage = createTestStorage()
 
     const client = new SmartClient(
@@ -29,11 +26,11 @@ export const createTestClient = (
     return [client, safeSmartStorage(storage)]
 }
 
-export async function createLaunchableSmartClient(
+export async function createLaunchableOpenSmartClient(
     session: CompleteSession,
     options?: SmartClientOptions,
 ): Promise<[SmartClient, SafeSmartStorage]> {
-    const [client, storage] = createTestClient(options)
+    const [client, storage] = createOpenTestClient(options)
 
     await storage.set('test-session', session)
 
@@ -42,12 +39,12 @@ export async function createLaunchableSmartClient(
     return [client, storage]
 }
 
-export async function createLaunchedReadyClient(
+export async function createLaunchedOpenReadyClient(
     session: CompleteSession,
     options?: SmartClientOptions,
     cache?: CacheOptions,
 ): Promise<[ReadyClient, SafeSmartStorage]> {
-    const [client, storage] = createTestClient(options, cache)
+    const [client, storage] = createOpenTestClient(options, cache)
 
     await storage.set(TEST_SESSION_ID, session)
     const ready = await client.ready()

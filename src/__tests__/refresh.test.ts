@@ -8,7 +8,7 @@ import { mockTokenRefresh } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockPractitioner } from './mocks/resources'
-import { createLaunchableSmartClient, createLaunchedReadyClient } from './utils/client'
+import { createLaunchableOpenSmartClient, createLaunchedOpenReadyClient } from './utils/client-open'
 import { expectHas, expectIs } from './utils/expect'
 import { createTestAccessToken, createTestIdToken } from './utils/token'
 
@@ -31,7 +31,7 @@ const validSession: CompleteSession = {
 }
 
 test('.ready - should not refresh token when expiry is more than 5 minutes', async () => {
-    const [client] = await createLaunchableSmartClient(
+    const [client] = await createLaunchableOpenSmartClient(
         {
             ...validSession,
             accessToken: await createTestAccessToken(60 * 6), // 6 minutes
@@ -49,7 +49,7 @@ test('.ready - should not refresh token when expiry is more than 5 minutes', asy
 })
 
 test('.ready - should refresh token when expiry is less than 5 minutes', async () => {
-    const [client] = await createLaunchableSmartClient(
+    const [client] = await createLaunchableOpenSmartClient(
         {
             ...validSession,
             accessToken: await createTestAccessToken(60 * 4.99),
@@ -68,7 +68,7 @@ test('.ready - should refresh token when expiry is less than 5 minutes', async (
 })
 
 test('.ready - should refresh token when expiry is long ago', async () => {
-    const [client] = await createLaunchableSmartClient(
+    const [client] = await createLaunchableOpenSmartClient(
         {
             ...validSession,
             accessToken: await createTestAccessToken(-60 * 10), // 10 minutes ago
@@ -87,7 +87,7 @@ test('.ready - should refresh token when expiry is long ago', async () => {
 })
 
 test('SmartClient.request - Should refresh token when server says 401', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession, {
+    const [ready] = await createLaunchedOpenReadyClient(validSession, {
         autoRefresh: true,
     })
 
@@ -116,7 +116,7 @@ test('SmartClient.request - Should refresh token when server says 401', async ()
 })
 
 test('SmartClient.create - Should refresh token when server says 401', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession, {
+    const [ready] = await createLaunchedOpenReadyClient(validSession, {
         autoRefresh: true,
     })
 
@@ -148,7 +148,7 @@ test('SmartClient.create - Should refresh token when server says 401', async () 
 })
 
 test('SmartClient.update - Should refresh token when server says 401', async () => {
-    const [ready] = await createLaunchedReadyClient(validSession, {
+    const [ready] = await createLaunchedOpenReadyClient(validSession, {
         autoRefresh: true,
     })
 
