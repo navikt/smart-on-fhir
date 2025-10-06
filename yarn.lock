@@ -834,9 +834,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@navikt/pino-logger@npm:^4.1.5":
-  version: 4.3.1
-  resolution: "@navikt/pino-logger@npm:4.3.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F4.3.1%2Fba14a959e47e65c8e31fad5806ae74fd49544902"
+"@navikt/pino-logger@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "@navikt/pino-logger@npm:4.3.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F4.3.2%2F205722e2a88c3a10eb22af238bf4e86e790a4de7"
   dependencies:
     pino-roll: "npm:3"
     pino-socket: "npm:7"
@@ -847,7 +847,7 @@ __metadata:
       optional: true
     pino-socket:
       optional: true
-  checksum: 10c0/ca267a582d3832235e0b2c8053e2da9d4eff19acb8fdd4a7a50e24f8fd901be2f96f3eb0f438b4d2a6e5601f61df3339f08fb865417befb3dd0a72fa8d99f194
+  checksum: 10c0/567a825e3ed027e991861289c113c85860235b4b666a15777b2520b4aa0279b6bc33efa2f90af1f2b7634ecd9ce1aad917eead05a3e669375d25a9ae11d96313
   languageName: node
   linkType: hard
 
@@ -857,7 +857,7 @@ __metadata:
   dependencies:
     "@biomejs/biome": "npm:2.2.5"
     "@karl-run/prettier-config": "npm:^1.1.0"
-    "@navikt/pino-logger": "npm:^4.1.5"
+    "@navikt/pino-logger": "npm:^4.3.2"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/core": "npm:^2.1.0"
     "@types/node": "npm:22.18.8"
@@ -867,7 +867,7 @@ __metadata:
     lint-staged: "npm:^16.2.3"
     nock: "npm:^14.0.10"
     openid-client: "npm:^6.8.1"
-    pino: "npm:^9.12.0"
+    pino: "npm:^10.0.0"
     pinst: "npm:^3.0.0"
     prettier: "npm:^3.6.2"
     quick-lru: "npm:^7.2.0"
@@ -3309,9 +3309,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:^9.12.0":
-  version: 9.13.1
-  resolution: "pino@npm:9.13.1"
+"pino@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "pino@npm:10.0.0"
   dependencies:
     atomic-sleep: "npm:^1.0.0"
     on-exit-leak-free: "npm:^2.1.0"
@@ -3326,7 +3326,7 @@ __metadata:
     thread-stream: "npm:^3.0.0"
   bin:
     pino: bin.js
-  checksum: 10c0/c99e879f9538f7255488ad276a46a857cf9114217b754b850b7f1441e31b724a6d6f0697228ead954d3d9601522704e03cad5d441c228108073eed2f37ea0e41
+  checksum: 10c0/f95fcc51523310e9ece1822f8ef4d8e6c2b35f67eca9805fe18fdef21dfac81fa128f1ebaa3c9a11571120854391b10b3b339f2e5836f805edaf6936781c6e6f
   languageName: node
   linkType: hard
 
