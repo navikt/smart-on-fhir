@@ -1,0 +1,4281 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "name": "SmartClient",
+      "isDefault": false,
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 28,
+        "col": 0,
+        "byteIndex": 1670
+      },
+      "declarationKind": "export",
+      "jsDoc": {
+        "doc": "The smart client is used to handle the launch of the Smart on FHIR application. It requires at the very least:\n- A asynchronous storage implementation that implements the `SmartStorage` interface, for example Valkey.\n- A FHIR server to launch towards, where the application is registered.\n\nNote: It's the responsibility of the application using this library to limit which issuers are allowed to be launched.\n      This may part of this applications configuration in the future."
+      },
+      "kind": "class",
+      "classDef": {
+        "isAbstract": false,
+        "constructors": [
+          {
+            "jsDoc": {
+              "doc": "Single launch mode. Any subsequent launches using the same sessionId will overwrite the previous\nsession completely. If the EHR-system supports multiple tabs that use non-isolated browser sessions\nthis could be an issue."
+            },
+            "accessibility": null,
+            "name": "constructor",
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "sessionId",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "union",
+                  "union": [
+                    {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "keyword": "string"
+                    },
+                    {
+                      "repr": "null",
+                      "kind": "keyword",
+                      "keyword": "null"
+                    },
+                    {
+                      "repr": "undefined",
+                      "kind": "keyword",
+                      "keyword": "undefined"
+                    }
+                  ]
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "clientConfiguration",
+                "optional": false,
+                "tsType": {
+                  "repr": "SmartClientConfiguration",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "SmartClientConfiguration"
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "configuration",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "typeLiteral",
+                  "typeLiteral": {
+                    "constructors": [],
+                    "methods": [],
+                    "properties": [
+                      {
+                        "name": "cache",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 63,
+                          "col": 12,
+                          "byteIndex": 3069
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "CacheOptions",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CacheOptions"
+                          }
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "storage",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 64,
+                          "col": 12,
+                          "byteIndex": 3102
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": false,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "union",
+                          "union": [
+                            {
+                              "repr": "SmartStorage",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "SmartStorage"
+                              }
+                            },
+                            {
+                              "repr": "Promise",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": [
+                                  {
+                                    "repr": "SmartStorage",
+                                    "kind": "typeRef",
+                                    "typeRef": {
+                                      "typeParams": null,
+                                      "typeName": "SmartStorage"
+                                    }
+                                  }
+                                ],
+                                "typeName": "Promise"
+                              }
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "options",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 65,
+                          "col": 12,
+                          "byteIndex": 3160
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "SmartClientOptions",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "SmartClientOptions"
+                          }
+                        },
+                        "typeParams": []
+                      }
+                    ],
+                    "callSignatures": [],
+                    "indexSignatures": []
+                  }
+                }
+              }
+            ],
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 59,
+              "col": 4,
+              "byteIndex": 2918
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "Multi-launch mode. Subsequent launches are stored both by sessionId and the launched patient. This allows\nyou to use have several launched apps active at the same time in multiple tabs, but requires the application\nto keep track of the launched patient's ID and pass it back during ReadyClient-instantiation, using for example\nsessionStorage (tab-scoped) in the browser."
+            },
+            "accessibility": null,
+            "name": "constructor",
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "session",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "typeLiteral",
+                  "typeLiteral": {
+                    "constructors": [],
+                    "methods": [],
+                    "properties": [
+                      {
+                        "name": "sessionId",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 75,
+                          "col": 19,
+                          "byteIndex": 3657
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": false,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "union",
+                          "union": [
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "keyword": "string"
+                            },
+                            {
+                              "repr": "null",
+                              "kind": "keyword",
+                              "keyword": "null"
+                            },
+                            {
+                              "repr": "undefined",
+                              "kind": "keyword",
+                              "keyword": "undefined"
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "activePatient",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 75,
+                          "col": 57,
+                          "byteIndex": 3695
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": false,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "union",
+                          "union": [
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "keyword": "string"
+                            },
+                            {
+                              "repr": "null",
+                              "kind": "keyword",
+                              "keyword": "null"
+                            },
+                            {
+                              "repr": "undefined",
+                              "kind": "keyword",
+                              "keyword": "undefined"
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      }
+                    ],
+                    "callSignatures": [],
+                    "indexSignatures": []
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "clientConfiguration",
+                "optional": false,
+                "tsType": {
+                  "repr": "SmartClientConfiguration",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "SmartClientConfiguration"
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "configuration",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "typeLiteral",
+                  "typeLiteral": {
+                    "constructors": [],
+                    "methods": [],
+                    "properties": [
+                      {
+                        "name": "cache",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 78,
+                          "col": 12,
+                          "byteIndex": 3831
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "CacheOptions",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CacheOptions"
+                          }
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "storage",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 79,
+                          "col": 12,
+                          "byteIndex": 3864
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": false,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "union",
+                          "union": [
+                            {
+                              "repr": "SmartStorage",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "SmartStorage"
+                              }
+                            },
+                            {
+                              "repr": "Promise",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": [
+                                  {
+                                    "repr": "SmartStorage",
+                                    "kind": "typeRef",
+                                    "typeRef": {
+                                      "typeParams": null,
+                                      "typeName": "SmartStorage"
+                                    }
+                                  }
+                                ],
+                                "typeName": "Promise"
+                              }
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "options",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 80,
+                          "col": 12,
+                          "byteIndex": 3922
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "intersection",
+                          "intersection": [
+                            {
+                              "repr": "SmartClientOptions",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "SmartClientOptions"
+                              }
+                            },
+                            {
+                              "repr": "",
+                              "kind": "typeLiteral",
+                              "typeLiteral": {
+                                "constructors": [],
+                                "methods": [],
+                                "properties": [
+                                  {
+                                    "name": "enableMultiLaunch",
+                                    "jsDoc": {
+                                      "doc": "When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the\nclient to store this ID at their own leisure, and using it for subsequent requests, enabling multiple\nsimultaneous launched sessions with different patients."
+                                    },
+                                    "location": {
+                                      "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                                      "line": 86,
+                                      "col": 16,
+                                      "byteIndex": 4324
+                                    },
+                                    "params": [],
+                                    "computed": false,
+                                    "optional": true,
+                                    "tsType": {
+                                      "repr": "true",
+                                      "kind": "literal",
+                                      "literal": {
+                                        "kind": "boolean",
+                                        "boolean": true
+                                      }
+                                    },
+                                    "typeParams": []
+                                  }
+                                ],
+                                "callSignatures": [],
+                                "indexSignatures": []
+                              }
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      }
+                    ],
+                    "callSignatures": [],
+                    "indexSignatures": []
+                  }
+                }
+              }
+            ],
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 74,
+              "col": 4,
+              "byteIndex": 3625
+            }
+          },
+          {
+            "accessibility": null,
+            "hasBody": true,
+            "name": "constructor",
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "sessionIdOrSession",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "union",
+                  "union": [
+                    {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "keyword": "string"
+                    },
+                    {
+                      "repr": "null",
+                      "kind": "keyword",
+                      "keyword": "null"
+                    },
+                    {
+                      "repr": "undefined",
+                      "kind": "keyword",
+                      "keyword": "undefined"
+                    },
+                    {
+                      "repr": "",
+                      "kind": "typeLiteral",
+                      "typeLiteral": {
+                        "constructors": [],
+                        "methods": [],
+                        "properties": [
+                          {
+                            "name": "sessionId",
+                            "location": {
+                              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                              "line": 95,
+                              "col": 16,
+                              "byteIndex": 4505
+                            },
+                            "params": [],
+                            "computed": false,
+                            "optional": false,
+                            "tsType": {
+                              "repr": "",
+                              "kind": "union",
+                              "union": [
+                                {
+                                  "repr": "string",
+                                  "kind": "keyword",
+                                  "keyword": "string"
+                                },
+                                {
+                                  "repr": "null",
+                                  "kind": "keyword",
+                                  "keyword": "null"
+                                },
+                                {
+                                  "repr": "undefined",
+                                  "kind": "keyword",
+                                  "keyword": "undefined"
+                                }
+                              ]
+                            },
+                            "typeParams": []
+                          },
+                          {
+                            "name": "activePatient",
+                            "location": {
+                              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                              "line": 95,
+                              "col": 54,
+                              "byteIndex": 4543
+                            },
+                            "params": [],
+                            "computed": false,
+                            "optional": false,
+                            "tsType": {
+                              "repr": "",
+                              "kind": "union",
+                              "union": [
+                                {
+                                  "repr": "string",
+                                  "kind": "keyword",
+                                  "keyword": "string"
+                                },
+                                {
+                                  "repr": "null",
+                                  "kind": "keyword",
+                                  "keyword": "null"
+                                },
+                                {
+                                  "repr": "undefined",
+                                  "kind": "keyword",
+                                  "keyword": "undefined"
+                                }
+                              ]
+                            },
+                            "typeParams": []
+                          }
+                        ],
+                        "callSignatures": [],
+                        "indexSignatures": []
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "clientConfiguration",
+                "optional": false,
+                "tsType": {
+                  "repr": "SmartClientConfiguration",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "SmartClientConfiguration"
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "configuration",
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "typeLiteral",
+                  "typeLiteral": {
+                    "constructors": [],
+                    "methods": [],
+                    "properties": [
+                      {
+                        "name": "cache",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 98,
+                          "col": 12,
+                          "byteIndex": 4679
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "CacheOptions",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CacheOptions"
+                          }
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "storage",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 99,
+                          "col": 12,
+                          "byteIndex": 4712
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": false,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "union",
+                          "union": [
+                            {
+                              "repr": "SmartStorage",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "SmartStorage"
+                              }
+                            },
+                            {
+                              "repr": "Promise",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": [
+                                  {
+                                    "repr": "SmartStorage",
+                                    "kind": "typeRef",
+                                    "typeRef": {
+                                      "typeParams": null,
+                                      "typeName": "SmartStorage"
+                                    }
+                                  }
+                                ],
+                                "typeName": "Promise"
+                              }
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      },
+                      {
+                        "name": "options",
+                        "location": {
+                          "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                          "line": 100,
+                          "col": 12,
+                          "byteIndex": 4770
+                        },
+                        "params": [],
+                        "computed": false,
+                        "optional": true,
+                        "tsType": {
+                          "repr": "",
+                          "kind": "intersection",
+                          "intersection": [
+                            {
+                              "repr": "SmartClientOptions",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "SmartClientOptions"
+                              }
+                            },
+                            {
+                              "repr": "",
+                              "kind": "typeLiteral",
+                              "typeLiteral": {
+                                "constructors": [],
+                                "methods": [],
+                                "properties": [
+                                  {
+                                    "name": "enableMultiLaunch",
+                                    "location": {
+                                      "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                                      "line": 100,
+                                      "col": 45,
+                                      "byteIndex": 4803
+                                    },
+                                    "params": [],
+                                    "computed": false,
+                                    "optional": true,
+                                    "tsType": {
+                                      "repr": "true",
+                                      "kind": "literal",
+                                      "literal": {
+                                        "kind": "boolean",
+                                        "boolean": true
+                                      }
+                                    },
+                                    "typeParams": []
+                                  }
+                                ],
+                                "callSignatures": [],
+                                "indexSignatures": []
+                              }
+                            }
+                          ]
+                        },
+                        "typeParams": []
+                      }
+                    ],
+                    "callSignatures": [],
+                    "indexSignatures": []
+                  }
+                }
+              }
+            ],
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 90,
+              "col": 4,
+              "byteIndex": 4384
+            }
+          }
+        ],
+        "properties": [
+          {
+            "jsDoc": {
+              "doc": "Every smart client _must_ be initialized with a unique sessionId. This is used to store the session\ninformation in the storage implementation. If this is not cryptographically random and unique, there\nwill be issues with multiple users accessing the same storage and authentication flow."
+            },
+            "tsType": {
+              "repr": "string",
+              "kind": "keyword",
+              "keyword": "string"
+            },
+            "readonly": true,
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "sessionId",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 34,
+              "col": 4,
+              "byteIndex": 2026
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "When using the SmartClient in \"multi-patient\"-mode, i.e. allowing multiple launches, the consumer of the\nSmartClient will keep track of the active patient (using for example sessionStorage)."
+            },
+            "tsType": {
+              "repr": "",
+              "kind": "union",
+              "union": [
+                {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "keyword": "string"
+                },
+                {
+                  "repr": "null",
+                  "kind": "keyword",
+                  "keyword": "null"
+                }
+              ]
+            },
+            "readonly": true,
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "activePatient",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 40,
+              "col": 4,
+              "byteIndex": 2279
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "Configuration for this instance, based on options passed to the constructor + defaults."
+            },
+            "tsType": {
+              "repr": "",
+              "kind": "typeLiteral",
+              "typeLiteral": {
+                "constructors": [],
+                "methods": [],
+                "properties": [
+                  {
+                    "name": "autoRefresh",
+                    "location": {
+                      "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                      "line": 46,
+                      "col": 8,
+                      "byteIndex": 2461
+                    },
+                    "params": [],
+                    "computed": false,
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "keyword": "boolean"
+                    },
+                    "typeParams": []
+                  },
+                  {
+                    "name": "multiLaunch",
+                    "location": {
+                      "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                      "line": 47,
+                      "col": 8,
+                      "byteIndex": 2490
+                    },
+                    "params": [],
+                    "computed": false,
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "keyword": "boolean"
+                    },
+                    "typeParams": []
+                  },
+                  {
+                    "name": "cache",
+                    "location": {
+                      "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                      "line": 48,
+                      "col": 8,
+                      "byteIndex": 2519
+                    },
+                    "params": [],
+                    "computed": false,
+                    "optional": false,
+                    "tsType": {
+                      "repr": "CacheOptions",
+                      "kind": "typeRef",
+                      "typeRef": {
+                        "typeParams": null,
+                        "typeName": "CacheOptions"
+                      }
+                    },
+                    "typeParams": []
+                  }
+                ],
+                "callSignatures": [],
+                "indexSignatures": []
+              }
+            },
+            "readonly": true,
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "options",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 45,
+              "col": 4,
+              "byteIndex": 2433
+            }
+          },
+          {
+            "tsType": {
+              "repr": "SafeSmartStorage",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "SafeSmartStorage"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_storage",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 51,
+              "col": 4,
+              "byteIndex": 2550
+            }
+          },
+          {
+            "tsType": {
+              "repr": "SmartClientConfiguration",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "SmartClientConfiguration"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_clientConfig",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 52,
+              "col": 4,
+              "byteIndex": 2598
+            }
+          }
+        ],
+        "indexSignatures": [],
+        "methods": [
+          {
+            "jsDoc": {
+              "doc": "**Smart App Launch reference**\n- EHR Launch: https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#launch-app-ehr-launch\n- Auth URL:   https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#obtain-authorization-code\n\nThe EHR-system provides the issuer URL and the launch context to the application. Initiates a partial session\nin the session storage.\n\nAn authorization URL is created using the OAuth 2.0 state parameter and PKCE (Proof Key for Code Exchange).\n\nCallee is responsible for redirecting the user to the returned `redirect_url`."
+            },
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "launch",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "params",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "typeLiteral",
+                    "typeLiteral": {
+                      "constructors": [],
+                      "methods": [],
+                      "properties": [
+                        {
+                          "name": "iss",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                            "line": 142,
+                            "col": 27,
+                            "byteIndex": 6459
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "keyword": "string"
+                          },
+                          "typeParams": []
+                        },
+                        {
+                          "name": "launch",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                            "line": 142,
+                            "col": 40,
+                            "byteIndex": 6472
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "keyword": "string"
+                          },
+                          "typeParams": []
+                        }
+                      ],
+                      "callSignatures": [],
+                      "indexSignatures": []
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "Launch",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "Launch"
+                          }
+                        },
+                        {
+                          "repr": "SmartConfigurationErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "SmartConfigurationErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 142,
+              "col": 4,
+              "byteIndex": 6436
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "**Smart App Launch reference**\n - Callback:       https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#response-4\n - Token exchange: https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#obtain-access-token\n\n The callback is called after the user has been redirected back to the application with code and state.\n\n Completes the partial session created in the `launch` method by exchanging the code for tokens."
+            },
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "callback",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "params",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "typeLiteral",
+                    "typeLiteral": {
+                      "constructors": [],
+                      "methods": [],
+                      "properties": [
+                        {
+                          "name": "code",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                            "line": 207,
+                            "col": 29,
+                            "byteIndex": 9091
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "keyword": "string"
+                          },
+                          "typeParams": []
+                        },
+                        {
+                          "name": "state",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                            "line": 207,
+                            "col": 43,
+                            "byteIndex": 9105
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "keyword": "string"
+                          },
+                          "typeParams": []
+                        }
+                      ],
+                      "callSignatures": [],
+                      "indexSignatures": []
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "Callback",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "Callback"
+                          }
+                        },
+                        {
+                          "repr": "CallbackError",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CallbackError"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 207,
+              "col": 4,
+              "byteIndex": 9066
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "**Smart App Launch reference**\n- Accessing the FHIR API: https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#access-fhir-api\n\nOnce the launch has been completed, a ReadyClient {@link ReadyClient} can be created using the\nsessionId that was used in the `launch` and `callback` methods."
+            },
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "ready",
+            "kind": "method",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "ReadyClient",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ReadyClient"
+                          }
+                        },
+                        {
+                          "repr": "",
+                          "kind": "parenthesized",
+                          "parenthesized": {
+                            "repr": "",
+                            "kind": "intersection",
+                            "intersection": [
+                              {
+                                "repr": "SmartClientReadyErrors",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "SmartClientReadyErrors"
+                                }
+                              },
+                              {
+                                "repr": "",
+                                "kind": "typeLiteral",
+                                "typeLiteral": {
+                                  "constructors": [],
+                                  "methods": [],
+                                  "properties": [
+                                    {
+                                      "name": "validate",
+                                      "location": {
+                                        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                                        "line": 283,
+                                        "col": 14,
+                                        "byteIndex": 12160
+                                      },
+                                      "params": [],
+                                      "computed": false,
+                                      "optional": false,
+                                      "tsType": {
+                                        "repr": "",
+                                        "kind": "indexedAccess",
+                                        "indexedAccess": {
+                                          "readonly": false,
+                                          "objType": {
+                                            "repr": "ReadyClient",
+                                            "kind": "typeRef",
+                                            "typeRef": {
+                                              "typeParams": null,
+                                              "typeName": "ReadyClient"
+                                            }
+                                          },
+                                          "indexType": {
+                                            "repr": "validate",
+                                            "kind": "literal",
+                                            "literal": {
+                                              "kind": "string",
+                                              "string": "validate"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "typeParams": []
+                                    }
+                                  ],
+                                  "callSignatures": [],
+                                  "indexSignatures": []
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 280,
+              "col": 4,
+              "byteIndex": 12062
+            }
+          },
+          {
+            "jsDoc": {
+              "doc": "Explicitly refreshes the session by exchanging the refresh token for a new access token.\n\nThis will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`."
+            },
+            "accessibility": null,
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "refresh",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "session",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "CompleteSession",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "CompleteSession"
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "CompleteSession",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CompleteSession"
+                          }
+                        },
+                        {
+                          "repr": "RefreshTokenErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "RefreshTokenErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 317,
+              "col": 4,
+              "byteIndex": 13442
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getCompleteSession",
+            "kind": "method",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "CompleteSession",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CompleteSession"
+                          }
+                        },
+                        {
+                          "repr": "CompleteSessionErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CompleteSessionErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 335,
+              "col": 4,
+              "byteIndex": 14183
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getInitialSession",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "sessionId",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "InitialSession",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "InitialSession"
+                          }
+                        },
+                        {
+                          "repr": "InitialSessionErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "InitialSessionErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 361,
+              "col": 4,
+              "byteIndex": 15218
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getOrRefresh",
+            "kind": "method",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "CompleteSession",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CompleteSession"
+                          }
+                        },
+                        {
+                          "repr": "CompleteSessionErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "CompleteSessionErrors"
+                          }
+                        },
+                        {
+                          "repr": "RefreshTokenErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "RefreshTokenErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 374,
+              "col": 4,
+              "byteIndex": 15822
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "validateIssuer",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "issuer",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "keyword": "boolean"
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 413,
+              "col": 4,
+              "byteIndex": 17477
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getAuthMode",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "server",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "FhirAuthMode",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": null,
+                  "typeName": "FhirAuthMode"
+                }
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 424,
+              "col": 4,
+              "byteIndex": 17856
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getKnownFhirServer",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "issuer",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "",
+                "kind": "union",
+                "union": [
+                  {
+                    "repr": "KnownFhirServer",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "KnownFhirServer"
+                    }
+                  },
+                  {
+                    "repr": "null",
+                    "kind": "keyword",
+                    "keyword": "null"
+                  }
+                ]
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 428,
+              "col": 4,
+              "byteIndex": 17988
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "buildAuthorizationUrl",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "opts",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "intersection",
+                    "intersection": [
+                      {
+                        "repr": "Pick",
+                        "kind": "typeRef",
+                        "typeRef": {
+                          "typeParams": [
+                            {
+                              "repr": "InitialSession",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "InitialSession"
+                              }
+                            },
+                            {
+                              "repr": "",
+                              "kind": "union",
+                              "union": [
+                                {
+                                  "repr": "issuer",
+                                  "kind": "literal",
+                                  "literal": {
+                                    "kind": "string",
+                                    "string": "issuer"
+                                  }
+                                },
+                                {
+                                  "repr": "state",
+                                  "kind": "literal",
+                                  "literal": {
+                                    "kind": "string",
+                                    "string": "state"
+                                  }
+                                },
+                                {
+                                  "repr": "authorizationEndpoint",
+                                  "kind": "literal",
+                                  "literal": {
+                                    "kind": "string",
+                                    "string": "authorizationEndpoint"
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "typeName": "Pick"
+                        }
+                      },
+                      {
+                        "repr": "",
+                        "kind": "typeLiteral",
+                        "typeLiteral": {
+                          "constructors": [],
+                          "methods": [],
+                          "properties": [
+                            {
+                              "name": "launch",
+                              "location": {
+                                "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                                "line": 448,
+                                "col": 12,
+                                "byteIndex": 18775
+                              },
+                              "params": [],
+                              "computed": false,
+                              "optional": false,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "keyword": "string"
+                              },
+                              "typeParams": []
+                            },
+                            {
+                              "name": "codeChallenge",
+                              "location": {
+                                "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                                "line": 449,
+                                "col": 12,
+                                "byteIndex": 18802
+                              },
+                              "params": [],
+                              "computed": false,
+                              "optional": false,
+                              "tsType": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "keyword": "string"
+                              },
+                              "typeParams": []
+                            }
+                          ],
+                          "callSignatures": [],
+                          "indexSignatures": []
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "string",
+                "kind": "keyword",
+                "keyword": "string"
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+              "line": 446,
+              "col": 4,
+              "byteIndex": 18647
+            }
+          }
+        ],
+        "extends": null,
+        "implements": [],
+        "typeParams": [],
+        "superTypeParams": []
+      }
+    },
+    {
+      "name": "Launch",
+      "isDefault": false,
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 472,
+        "col": 0,
+        "byteIndex": 19548
+      },
+      "declarationKind": "export",
+      "jsDoc": {
+        "doc": "A successful launch will end up in a redirectUrl for the user to be redirected to.\n\nThe responsibility to redirect the user lies with the application using the SmartClient."
+      },
+      "kind": "typeAlias",
+      "typeAliasDef": {
+        "tsType": {
+          "repr": "",
+          "kind": "typeLiteral",
+          "typeLiteral": {
+            "constructors": [],
+            "methods": [],
+            "properties": [
+              {
+                "name": "redirectUrl",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                  "line": 473,
+                  "col": 4,
+                  "byteIndex": 19575
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "keyword": "string"
+                },
+                "typeParams": []
+              }
+            ],
+            "callSignatures": [],
+            "indexSignatures": []
+          }
+        },
+        "typeParams": []
+      }
+    },
+    {
+      "name": "Callback",
+      "isDefault": false,
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 480,
+        "col": 0,
+        "byteIndex": 19802
+      },
+      "declarationKind": "export",
+      "jsDoc": {
+        "doc": "A successful callback will end up in a redirectUrl for the user to be redirected to, this URL is configured\nby the application using the SmartClient and is typically part of the app itself."
+      },
+      "kind": "typeAlias",
+      "typeAliasDef": {
+        "tsType": {
+          "repr": "",
+          "kind": "typeLiteral",
+          "typeLiteral": {
+            "constructors": [],
+            "methods": [],
+            "properties": [
+              {
+                "name": "redirectUrl",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+                  "line": 481,
+                  "col": 4,
+                  "byteIndex": 19831
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "keyword": "string"
+                },
+                "typeParams": []
+              }
+            ],
+            "callSignatures": [],
+            "indexSignatures": []
+          }
+        },
+        "typeParams": []
+      }
+    },
+    {
+      "name": "calculatePKCECodeChallenge",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 1,
+        "col": 0,
+        "byteIndex": 0
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/openid-client@6.8.1/node_modules/openid-client/build/index.d.ts",
+        "imported": "calculatePKCECodeChallenge"
+      }
+    },
+    {
+      "name": "randomPKCECodeVerifier",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 1,
+        "col": 0,
+        "byteIndex": 0
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/openid-client@6.8.1/node_modules/openid-client/build/index.d.ts",
+        "imported": "randomPKCECodeVerifier"
+      }
+    },
+    {
+      "name": "randomState",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 1,
+        "col": 0,
+        "byteIndex": 0
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/openid-client@6.8.1/node_modules/openid-client/build/index.d.ts",
+        "imported": "randomState"
+      }
+    },
+    {
+      "name": "CacheOptions",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 3,
+        "col": 0,
+        "byteIndex": 97
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/cache/index.ts",
+        "imported": "CacheOptions"
+      }
+    },
+    {
+      "name": "SafeSmartStorage",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 4,
+        "col": 0,
+        "byteIndex": 142
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/index.ts",
+        "imported": "SafeSmartStorage"
+      }
+    },
+    {
+      "name": "SmartStorage",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 4,
+        "col": 0,
+        "byteIndex": 142
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/index.ts",
+        "imported": "SmartStorage"
+      }
+    },
+    {
+      "name": "safeSmartStorage",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 5,
+        "col": 0,
+        "byteIndex": 207
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/index.ts",
+        "imported": "safeSmartStorage"
+      }
+    },
+    {
+      "name": "CompleteSession",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 253
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/schema.ts",
+        "imported": "CompleteSession"
+      }
+    },
+    {
+      "name": "InitialSession",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 253
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/schema.ts",
+        "imported": "InitialSession"
+      }
+    },
+    {
+      "name": "CompleteSessionErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 7,
+        "col": 0,
+        "byteIndex": 326
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/storage-errors.ts",
+        "imported": "CompleteSessionErrors"
+      }
+    },
+    {
+      "name": "InitialSessionErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 7,
+        "col": 0,
+        "byteIndex": 326
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/storage-errors.ts",
+        "imported": "InitialSessionErrors"
+      }
+    },
+    {
+      "name": "FhirAuthMode",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 9,
+        "col": 0,
+        "byteIndex": 420
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/client-auth-method/config.ts",
+        "imported": "FhirAuthMode"
+      }
+    },
+    {
+      "name": "KnownFhirServer",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 9,
+        "col": 0,
+        "byteIndex": 420
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/client-auth-method/config.ts",
+        "imported": "KnownFhirServer"
+      }
+    },
+    {
+      "name": "failSpan",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 10,
+        "col": 0,
+        "byteIndex": 501
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "failSpan"
+      }
+    },
+    {
+      "name": "OtelTaxonomy",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 10,
+        "col": 0,
+        "byteIndex": 501
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "OtelTaxonomy"
+      }
+    },
+    {
+      "name": "spanAsync",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 10,
+        "col": 0,
+        "byteIndex": 501
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "spanAsync"
+      }
+    },
+    {
+      "name": "assertGoodSessionId",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 11,
+        "col": 0,
+        "byteIndex": 564
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/utils.ts",
+        "imported": "assertGoodSessionId"
+      }
+    },
+    {
+      "name": "assertNotBrowser",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 11,
+        "col": 0,
+        "byteIndex": 564
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/utils.ts",
+        "imported": "assertNotBrowser"
+      }
+    },
+    {
+      "name": "removeTrailingSlash",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 11,
+        "col": 0,
+        "byteIndex": 564
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/utils.ts",
+        "imported": "removeTrailingSlash"
+      }
+    },
+    {
+      "name": "ReadyClient",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 12,
+        "col": 0,
+        "byteIndex": 653
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "imported": "ReadyClient"
+      }
+    },
+    {
+      "name": "exchangeToken",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 697
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token.ts",
+        "imported": "exchangeToken"
+      }
+    },
+    {
+      "name": "refreshToken",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 697
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token.ts",
+        "imported": "refreshToken"
+      }
+    },
+    {
+      "name": "tokenExpiresIn",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 697
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token.ts",
+        "imported": "tokenExpiresIn"
+      }
+    },
+    {
+      "name": "RefreshTokenErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 14,
+        "col": 0,
+        "byteIndex": 773
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token-errors.ts",
+        "imported": "RefreshTokenErrors"
+      }
+    },
+    {
+      "name": "CallbackError",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 15,
+        "col": 0,
+        "byteIndex": 836
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/client-errors.ts",
+        "imported": "CallbackError"
+      }
+    },
+    {
+      "name": "SmartClientReadyErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 15,
+        "col": 0,
+        "byteIndex": 836
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/client-errors.ts",
+        "imported": "SmartClientReadyErrors"
+      }
+    },
+    {
+      "name": "SmartClientConfiguration",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 16,
+        "col": 0,
+        "byteIndex": 919
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/config.ts",
+        "imported": "SmartClientConfiguration"
+      }
+    },
+    {
+      "name": "SmartClientOptions",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 16,
+        "col": 0,
+        "byteIndex": 919
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/config.ts",
+        "imported": "SmartClientOptions"
+      }
+    },
+    {
+      "name": "fetchSmartConfiguration",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 1002
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/well-known/smart-configuration.ts",
+        "imported": "fetchSmartConfiguration"
+      }
+    },
+    {
+      "name": "SmartConfigurationErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "line": 18,
+        "col": 0,
+        "byteIndex": 1077
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/well-known/smart-configuration-errors.ts",
+        "imported": "SmartConfigurationErrors"
+      }
+    },
+    {
+      "name": "ReadyClient",
+      "isDefault": false,
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 32,
+        "col": 0,
+        "byteIndex": 1416
+      },
+      "declarationKind": "export",
+      "jsDoc": {
+        "doc": "**Smart App Launch reference**\n- Accessing the FHIR API: https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#access-fhir-api\n\nA client that is ready to access the FHIR API after a successful Smart App Launch.\n\nEverything is strongly typed and zod'd!"
+      },
+      "kind": "class",
+      "classDef": {
+        "isAbstract": false,
+        "constructors": [
+          {
+            "accessibility": null,
+            "hasBody": true,
+            "name": "constructor",
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "client",
+                "optional": false,
+                "tsType": {
+                  "repr": "SmartClient",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "SmartClient"
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "session",
+                "optional": false,
+                "tsType": {
+                  "repr": "CompleteSession",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "CompleteSession"
+                  }
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "issuerName",
+                "optional": false,
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "keyword": "string"
+                }
+              }
+            ],
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 40,
+              "col": 4,
+              "byteIndex": 1658
+            }
+          }
+        ],
+        "properties": [
+          {
+            "tsType": {
+              "repr": "SmartClient",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "SmartClient"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_client",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 33,
+              "col": 4,
+              "byteIndex": 1447
+            }
+          },
+          {
+            "tsType": {
+              "repr": "CompleteSession",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "CompleteSession"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_session",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 34,
+              "col": 4,
+              "byteIndex": 1489
+            }
+          },
+          {
+            "tsType": {
+              "repr": "IdToken",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "IdToken"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_idToken",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 35,
+              "col": 4,
+              "byteIndex": 1536
+            }
+          },
+          {
+            "tsType": {
+              "repr": "CacheOptions",
+              "kind": "typeRef",
+              "typeRef": {
+                "typeParams": null,
+                "typeName": "CacheOptions"
+              }
+            },
+            "readonly": true,
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "_cache",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 36,
+              "col": 4,
+              "byteIndex": 1575
+            }
+          },
+          {
+            "tsType": {
+              "repr": "string",
+              "kind": "keyword",
+              "keyword": "string"
+            },
+            "readonly": true,
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "issuerName",
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 38,
+              "col": 4,
+              "byteIndex": 1618
+            }
+          }
+        ],
+        "indexSignatures": [],
+        "methods": [
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "patient",
+            "kind": "getter",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "ValueAccessor",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "FhirPatient",
+                      "kind": "typeRef",
+                      "typeRef": {
+                        "typeParams": null,
+                        "typeName": "FhirPatient"
+                      }
+                    },
+                    {
+                      "repr": "Patient",
+                      "kind": "literal",
+                      "literal": {
+                        "kind": "string",
+                        "string": "Patient"
+                      }
+                    }
+                  ],
+                  "typeName": "ValueAccessor"
+                }
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 49,
+              "col": 4,
+              "byteIndex": 1973
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "encounter",
+            "kind": "getter",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "ValueAccessor",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "FhirEncounter",
+                      "kind": "typeRef",
+                      "typeRef": {
+                        "typeParams": null,
+                        "typeName": "FhirEncounter"
+                      }
+                    },
+                    {
+                      "repr": "Encounter",
+                      "kind": "literal",
+                      "literal": {
+                        "kind": "string",
+                        "string": "Encounter"
+                      }
+                    }
+                  ],
+                  "typeName": "ValueAccessor"
+                }
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 58,
+              "col": 4,
+              "byteIndex": 2277
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "user",
+            "kind": "getter",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "",
+                "kind": "typeLiteral",
+                "typeLiteral": {
+                  "constructors": [],
+                  "methods": [],
+                  "properties": [
+                    {
+                      "name": "type",
+                      "location": {
+                        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                        "line": 68,
+                        "col": 8,
+                        "byteIndex": 2628
+                      },
+                      "params": [],
+                      "computed": false,
+                      "optional": false,
+                      "tsType": {
+                        "repr": "Practitioner",
+                        "kind": "literal",
+                        "literal": {
+                          "kind": "string",
+                          "string": "Practitioner"
+                        }
+                      },
+                      "typeParams": []
+                    },
+                    {
+                      "name": "id",
+                      "location": {
+                        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                        "line": 69,
+                        "col": 8,
+                        "byteIndex": 2657
+                      },
+                      "params": [],
+                      "computed": false,
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "keyword": "string"
+                      },
+                      "typeParams": []
+                    },
+                    {
+                      "name": "fhirUser",
+                      "location": {
+                        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                        "line": 70,
+                        "col": 8,
+                        "byteIndex": 2676
+                      },
+                      "params": [],
+                      "computed": false,
+                      "optional": false,
+                      "tsType": {
+                        "repr": "Practitioner/${\u001b[0m\u001b[36mstring\u001b[0m}",
+                        "kind": "literal",
+                        "literal": {
+                          "kind": "template",
+                          "tsTypes": [
+                            {
+                              "repr": "Practitioner/",
+                              "kind": "literal",
+                              "literal": {
+                                "kind": "string",
+                                "string": "Practitioner/"
+                              }
+                            },
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "keyword": "string"
+                            },
+                            {
+                              "repr": "",
+                              "kind": "literal",
+                              "literal": {
+                                "kind": "string",
+                                "string": ""
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "typeParams": []
+                    },
+                    {
+                      "name": "request",
+                      "location": {
+                        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                        "line": 71,
+                        "col": 8,
+                        "byteIndex": 2719
+                      },
+                      "params": [],
+                      "computed": false,
+                      "optional": false,
+                      "tsType": {
+                        "repr": "",
+                        "kind": "fnOrConstructor",
+                        "fnOrConstructor": {
+                          "constructor": false,
+                          "tsType": {
+                            "repr": "Promise",
+                            "kind": "typeRef",
+                            "typeRef": {
+                              "typeParams": [
+                                {
+                                  "repr": "",
+                                  "kind": "union",
+                                  "union": [
+                                    {
+                                      "repr": "FhirPractitioner",
+                                      "kind": "typeRef",
+                                      "typeRef": {
+                                        "typeParams": null,
+                                        "typeName": "FhirPractitioner"
+                                      }
+                                    },
+                                    {
+                                      "repr": "ResourceRequestErrors",
+                                      "kind": "typeRef",
+                                      "typeRef": {
+                                        "typeParams": null,
+                                        "typeName": "ResourceRequestErrors"
+                                      }
+                                    }
+                                  ]
+                                }
+                              ],
+                              "typeName": "Promise"
+                            }
+                          },
+                          "params": [],
+                          "typeParams": []
+                        }
+                      },
+                      "typeParams": []
+                    }
+                  ],
+                  "callSignatures": [],
+                  "indexSignatures": []
+                }
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 67,
+              "col": 4,
+              "byteIndex": 2599
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "validate",
+            "kind": "method",
+            "functionDef": {
+              "params": [],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "keyword": "boolean"
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 85,
+              "col": 4,
+              "byteIndex": 3150
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "create",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "resource",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "Path",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "Path"
+                    }
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "params",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "typeLiteral",
+                    "typeLiteral": {
+                      "constructors": [],
+                      "methods": [],
+                      "properties": [
+                        {
+                          "name": "payload",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                            "line": 116,
+                            "col": 18,
+                            "byteIndex": 4290
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "PayloadForCreate",
+                            "kind": "typeRef",
+                            "typeRef": {
+                              "typeParams": [
+                                {
+                                  "repr": "Path",
+                                  "kind": "typeRef",
+                                  "typeRef": {
+                                    "typeParams": null,
+                                    "typeName": "Path"
+                                  }
+                                }
+                              ],
+                              "typeName": "PayloadForCreate"
+                            }
+                          },
+                          "typeParams": []
+                        }
+                      ],
+                      "callSignatures": [],
+                      "indexSignatures": []
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "ResponseForCreate",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": [
+                              {
+                                "repr": "Path",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "Path"
+                                }
+                              }
+                            ],
+                            "typeName": "ResponseForCreate"
+                          }
+                        },
+                        {
+                          "repr": "ResourceCreateErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ResourceCreateErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": [
+                {
+                  "name": "Path",
+                  "constraint": {
+                    "repr": "KnownCreatePaths",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "KnownCreatePaths"
+                    }
+                  }
+                }
+              ]
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 114,
+              "col": 4,
+              "byteIndex": 4196
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "update",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "resource",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "Path",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "Path"
+                    }
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "params",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "typeLiteral",
+                    "typeLiteral": {
+                      "constructors": [],
+                      "methods": [],
+                      "properties": [
+                        {
+                          "name": "id",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                            "line": 163,
+                            "col": 18,
+                            "byteIndex": 6184
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "keyword": "string"
+                          },
+                          "typeParams": []
+                        },
+                        {
+                          "name": "payload",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                            "line": 163,
+                            "col": 30,
+                            "byteIndex": 6196
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": false,
+                          "tsType": {
+                            "repr": "PayloadForCreate",
+                            "kind": "typeRef",
+                            "typeRef": {
+                              "typeParams": [
+                                {
+                                  "repr": "Path",
+                                  "kind": "typeRef",
+                                  "typeRef": {
+                                    "typeParams": null,
+                                    "typeName": "Path"
+                                  }
+                                }
+                              ],
+                              "typeName": "PayloadForCreate"
+                            }
+                          },
+                          "typeParams": []
+                        }
+                      ],
+                      "callSignatures": [],
+                      "indexSignatures": []
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "ResponseForCreate",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": [
+                              {
+                                "repr": "Path",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "Path"
+                                }
+                              }
+                            ],
+                            "typeName": "ResponseForCreate"
+                          }
+                        },
+                        {
+                          "repr": "ResourceCreateErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ResourceCreateErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": [
+                {
+                  "name": "Path",
+                  "constraint": {
+                    "repr": "KnownCreatePaths",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "KnownCreatePaths"
+                    }
+                  }
+                }
+              ]
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 161,
+              "col": 4,
+              "byteIndex": 6090
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "request",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "resource",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "Path",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "Path"
+                    }
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "config",
+                  "optional": true,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "typeLiteral",
+                    "typeLiteral": {
+                      "constructors": [],
+                      "methods": [],
+                      "properties": [
+                        {
+                          "name": "cache",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                            "line": 213,
+                            "col": 19,
+                            "byteIndex": 8255
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": true,
+                          "tsType": {
+                            "repr": "",
+                            "kind": "typeLiteral",
+                            "typeLiteral": {
+                              "constructors": [],
+                              "methods": [],
+                              "properties": [
+                                {
+                                  "name": "ttl",
+                                  "location": {
+                                    "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                                    "line": 213,
+                                    "col": 29,
+                                    "byteIndex": 8265
+                                  },
+                                  "params": [],
+                                  "computed": false,
+                                  "optional": false,
+                                  "tsType": {
+                                    "repr": "number",
+                                    "kind": "keyword",
+                                    "keyword": "number"
+                                  },
+                                  "typeParams": []
+                                }
+                              ],
+                              "callSignatures": [],
+                              "indexSignatures": []
+                            }
+                          },
+                          "typeParams": []
+                        },
+                        {
+                          "name": "expectNotFound",
+                          "location": {
+                            "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                            "line": 213,
+                            "col": 44,
+                            "byteIndex": 8280
+                          },
+                          "params": [],
+                          "computed": false,
+                          "optional": true,
+                          "tsType": {
+                            "repr": "true",
+                            "kind": "literal",
+                            "literal": {
+                              "kind": "boolean",
+                              "boolean": true
+                            }
+                          },
+                          "typeParams": []
+                        }
+                      ],
+                      "callSignatures": [],
+                      "indexSignatures": []
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "",
+                      "kind": "union",
+                      "union": [
+                        {
+                          "repr": "ResponseFor",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": [
+                              {
+                                "repr": "Path",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "Path"
+                                }
+                              }
+                            ],
+                            "typeName": "ResponseFor"
+                          }
+                        },
+                        {
+                          "repr": "ResourceRequestErrors",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ResourceRequestErrors"
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": [
+                {
+                  "name": "Path",
+                  "constraint": {
+                    "repr": "KnownPaths",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "KnownPaths"
+                    }
+                  }
+                }
+              ]
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 208,
+              "col": 4,
+              "byteIndex": 8046
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getClaim",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "claim",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "",
+                "kind": "union",
+                "union": [
+                  {
+                    "repr": "ClaimErrors",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "ClaimErrors"
+                    }
+                  },
+                  {
+                    "repr": "unknown",
+                    "kind": "keyword",
+                    "keyword": "unknown"
+                  }
+                ]
+              },
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 283,
+              "col": 4,
+              "byteIndex": 11143
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getClaim",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "claim",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "schema",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "ExpectedClaimSchema",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "ExpectedClaimSchema"
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "",
+                "kind": "union",
+                "union": [
+                  {
+                    "repr": "z.infer",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": [
+                        {
+                          "repr": "ExpectedClaimSchema",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ExpectedClaimSchema"
+                          }
+                        }
+                      ],
+                      "typeName": "z.infer"
+                    }
+                  },
+                  {
+                    "repr": "ClaimErrors",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "ClaimErrors"
+                    }
+                  }
+                ]
+              },
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": [
+                {
+                  "name": "ExpectedClaimSchema",
+                  "constraint": {
+                    "repr": "z.ZodType",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "z.ZodType"
+                    }
+                  }
+                }
+              ]
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 284,
+              "col": 4,
+              "byteIndex": 11201
+            }
+          },
+          {
+            "accessibility": "public",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "getClaim",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "claim",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "string",
+                    "kind": "keyword",
+                    "keyword": "string"
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "schema",
+                  "optional": true,
+                  "tsType": {
+                    "repr": "ExpectedClaimSchema",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "ExpectedClaimSchema"
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "",
+                "kind": "union",
+                "union": [
+                  {
+                    "repr": "z.infer",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": [
+                        {
+                          "repr": "ExpectedClaimSchema",
+                          "kind": "typeRef",
+                          "typeRef": {
+                            "typeParams": null,
+                            "typeName": "ExpectedClaimSchema"
+                          }
+                        }
+                      ],
+                      "typeName": "z.infer"
+                    }
+                  },
+                  {
+                    "repr": "ClaimErrors",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "ClaimErrors"
+                    }
+                  },
+                  {
+                    "repr": "unknown",
+                    "kind": "keyword",
+                    "keyword": "unknown"
+                  }
+                ]
+              },
+              "hasBody": true,
+              "isAsync": false,
+              "isGenerator": false,
+              "typeParams": [
+                {
+                  "name": "ExpectedClaimSchema",
+                  "constraint": {
+                    "repr": "z.ZodType",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "z.ZodType"
+                    }
+                  }
+                }
+              ]
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 288,
+              "col": 4,
+              "byteIndex": 11371
+            }
+          },
+          {
+            "accessibility": "private",
+            "optional": false,
+            "isAbstract": false,
+            "isStatic": false,
+            "name": "fetchWithRefresh",
+            "kind": "method",
+            "functionDef": {
+              "params": [
+                {
+                  "kind": "identifier",
+                  "name": "fetcher",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "",
+                    "kind": "fnOrConstructor",
+                    "fnOrConstructor": {
+                      "constructor": false,
+                      "tsType": {
+                        "repr": "Promise",
+                        "kind": "typeRef",
+                        "typeRef": {
+                          "typeParams": [
+                            {
+                              "repr": "Response",
+                              "kind": "typeRef",
+                              "typeRef": {
+                                "typeParams": null,
+                                "typeName": "Response"
+                              }
+                            }
+                          ],
+                          "typeName": "Promise"
+                        }
+                      },
+                      "params": [],
+                      "typeParams": []
+                    }
+                  }
+                },
+                {
+                  "kind": "identifier",
+                  "name": "span",
+                  "optional": false,
+                  "tsType": {
+                    "repr": "Span",
+                    "kind": "typeRef",
+                    "typeRef": {
+                      "typeParams": null,
+                      "typeName": "Span"
+                    }
+                  }
+                }
+              ],
+              "returnType": {
+                "repr": "Promise",
+                "kind": "typeRef",
+                "typeRef": {
+                  "typeParams": [
+                    {
+                      "repr": "Response",
+                      "kind": "typeRef",
+                      "typeRef": {
+                        "typeParams": null,
+                        "typeName": "Response"
+                      }
+                    }
+                  ],
+                  "typeName": "Promise"
+                }
+              },
+              "hasBody": true,
+              "isAsync": true,
+              "isGenerator": false,
+              "typeParams": []
+            },
+            "location": {
+              "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+              "line": 305,
+              "col": 4,
+              "byteIndex": 11956
+            }
+          }
+        ],
+        "extends": null,
+        "implements": [],
+        "typeParams": [],
+        "superTypeParams": []
+      }
+    },
+    {
+      "name": "ValueAccessor",
+      "isDefault": false,
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 326,
+        "col": 0,
+        "byteIndex": 12748
+      },
+      "declarationKind": "private",
+      "kind": "typeAlias",
+      "typeAliasDef": {
+        "tsType": {
+          "repr": "",
+          "kind": "typeLiteral",
+          "typeLiteral": {
+            "constructors": [],
+            "methods": [],
+            "properties": [
+              {
+                "name": "id",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                  "line": 327,
+                  "col": 4,
+                  "byteIndex": 12814
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "keyword": "string"
+                },
+                "typeParams": []
+              },
+              {
+                "name": "type",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                  "line": 328,
+                  "col": 4,
+                  "byteIndex": 12829
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "Type",
+                  "kind": "typeRef",
+                  "typeRef": {
+                    "typeParams": null,
+                    "typeName": "Type"
+                  }
+                },
+                "typeParams": []
+              },
+              {
+                "name": "request",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                  "line": 329,
+                  "col": 4,
+                  "byteIndex": 12844
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "",
+                  "kind": "fnOrConstructor",
+                  "fnOrConstructor": {
+                    "constructor": false,
+                    "tsType": {
+                      "repr": "Promise",
+                      "kind": "typeRef",
+                      "typeRef": {
+                        "typeParams": [
+                          {
+                            "repr": "",
+                            "kind": "union",
+                            "union": [
+                              {
+                                "repr": "Resource",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "Resource"
+                                }
+                              },
+                              {
+                                "repr": "ResourceRequestErrors",
+                                "kind": "typeRef",
+                                "typeRef": {
+                                  "typeParams": null,
+                                  "typeName": "ResourceRequestErrors"
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "typeName": "Promise"
+                      }
+                    },
+                    "params": [],
+                    "typeParams": []
+                  }
+                },
+                "typeParams": []
+              },
+              {
+                "name": "reference",
+                "location": {
+                  "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+                  "line": 330,
+                  "col": 4,
+                  "byteIndex": 12905
+                },
+                "params": [],
+                "computed": false,
+                "optional": false,
+                "tsType": {
+                  "repr": "${\u001b[0m\u001b[38;5;12mType\u001b[0m}/${\u001b[0m\u001b[36mstring\u001b[0m}",
+                  "kind": "literal",
+                  "literal": {
+                    "kind": "template",
+                    "tsTypes": [
+                      {
+                        "repr": "",
+                        "kind": "literal",
+                        "literal": {
+                          "kind": "string",
+                          "string": ""
+                        }
+                      },
+                      {
+                        "repr": "Type",
+                        "kind": "typeRef",
+                        "typeRef": {
+                          "typeParams": null,
+                          "typeName": "Type"
+                        }
+                      },
+                      {
+                        "repr": "/",
+                        "kind": "literal",
+                        "literal": {
+                          "kind": "string",
+                          "string": "/"
+                        }
+                      },
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "keyword": "string"
+                      },
+                      {
+                        "repr": "",
+                        "kind": "literal",
+                        "literal": {
+                          "kind": "string",
+                          "string": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                "typeParams": []
+              }
+            ],
+            "callSignatures": [],
+            "indexSignatures": []
+          }
+        },
+        "typeParams": [
+          {
+            "name": "Resource"
+          },
+          {
+            "name": "Type",
+            "constraint": {
+              "repr": "string",
+              "kind": "keyword",
+              "keyword": "string"
+            },
+            "default": {
+              "repr": "never",
+              "kind": "keyword",
+              "keyword": "never"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "decodeJwt",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 1,
+        "col": 0,
+        "byteIndex": 0
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/jose@6.1.0/node_modules/jose/dist/types/index.d.ts",
+        "imported": "decodeJwt"
+      }
+    },
+    {
+      "name": "jwtVerify",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 1,
+        "col": 0,
+        "byteIndex": 0
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/jose@6.1.0/node_modules/jose/dist/types/index.d.ts",
+        "imported": "jwtVerify"
+      }
+    },
+    {
+      "name": "z",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 2,
+        "col": 0,
+        "byteIndex": 44
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/node_modules/.deno/zod@4.1.11/node_modules/zod/index.d.cts",
+        "imported": null
+      }
+    },
+    {
+      "name": "FhirEncounter",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 4,
+        "col": 0,
+        "byteIndex": 75
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/zod/index.ts",
+        "imported": "FhirEncounter"
+      }
+    },
+    {
+      "name": "FhirPatient",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 4,
+        "col": 0,
+        "byteIndex": 75
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/zod/index.ts",
+        "imported": "FhirPatient"
+      }
+    },
+    {
+      "name": "FhirPractitioner",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 4,
+        "col": 0,
+        "byteIndex": 75
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/zod/index.ts",
+        "imported": "FhirPractitioner"
+      }
+    },
+    {
+      "name": "CacheOptions",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 5,
+        "col": 0,
+        "byteIndex": 153
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/cache/index.ts",
+        "imported": "CacheOptions"
+      }
+    },
+    {
+      "name": "getCachedResource",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 5,
+        "col": 0,
+        "byteIndex": 153
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/cache/index.ts",
+        "imported": "getCachedResource"
+      }
+    },
+    {
+      "name": "setCachedResource",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 5,
+        "col": 0,
+        "byteIndex": 153
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/cache/index.ts",
+        "imported": "setCachedResource"
+      }
+    },
+    {
+      "name": "createResourceToSchema",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 236
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/create-resource-map.ts",
+        "imported": "createResourceToSchema"
+      }
+    },
+    {
+      "name": "KnownCreatePaths",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 236
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/create-resource-map.ts",
+        "imported": "KnownCreatePaths"
+      }
+    },
+    {
+      "name": "PayloadForCreate",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 236
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/create-resource-map.ts",
+        "imported": "PayloadForCreate"
+      }
+    },
+    {
+      "name": "ResponseForCreate",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 6,
+        "col": 0,
+        "byteIndex": 236
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/create-resource-map.ts",
+        "imported": "ResponseForCreate"
+      }
+    },
+    {
+      "name": "getFhir",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 12,
+        "col": 0,
+        "byteIndex": 402
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/fetcher.ts",
+        "imported": "getFhir"
+      }
+    },
+    {
+      "name": "postFhir",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 12,
+        "col": 0,
+        "byteIndex": 402
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/fetcher.ts",
+        "imported": "postFhir"
+      }
+    },
+    {
+      "name": "putFhir",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 12,
+        "col": 0,
+        "byteIndex": 402
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/fetcher.ts",
+        "imported": "putFhir"
+      }
+    },
+    {
+      "name": "KnownPaths",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 473
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/resource-map.ts",
+        "imported": "KnownPaths"
+      }
+    },
+    {
+      "name": "ResponseFor",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 473
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/resource-map.ts",
+        "imported": "ResponseFor"
+      }
+    },
+    {
+      "name": "resourceToSchema",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 13,
+        "col": 0,
+        "byteIndex": 473
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/fhir/resources/resource-map.ts",
+        "imported": "resourceToSchema"
+      }
+    },
+    {
+      "name": "CompleteSession",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 14,
+        "col": 0,
+        "byteIndex": 574
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/storage/schema.ts",
+        "imported": "CompleteSession"
+      }
+    },
+    {
+      "name": "logger",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 16,
+        "col": 0,
+        "byteIndex": 632
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/logger.ts",
+        "imported": "logger"
+      }
+    },
+    {
+      "name": "failSpan",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 670
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "failSpan"
+      }
+    },
+    {
+      "name": "OtelTaxonomy",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 670
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "OtelTaxonomy"
+      }
+    },
+    {
+      "name": "Span",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 670
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "Span"
+      }
+    },
+    {
+      "name": "spanAsync",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 670
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "spanAsync"
+      }
+    },
+    {
+      "name": "squelchTracing",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 17,
+        "col": 0,
+        "byteIndex": 670
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/otel.ts",
+        "imported": "squelchTracing"
+      }
+    },
+    {
+      "name": "getResponseError",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 18,
+        "col": 0,
+        "byteIndex": 760
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/utils.ts",
+        "imported": "getResponseError"
+      }
+    },
+    {
+      "name": "inferResourceType",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 18,
+        "col": 0,
+        "byteIndex": 760
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/lib/utils.ts",
+        "imported": "inferResourceType"
+      }
+    },
+    {
+      "name": "SmartClient",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 19,
+        "col": 0,
+        "byteIndex": 826
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/SmartClient.ts",
+        "imported": "SmartClient"
+      }
+    },
+    {
+      "name": "IdToken",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 20,
+        "col": 0,
+        "byteIndex": 875
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token-schema.ts",
+        "imported": "IdToken"
+      }
+    },
+    {
+      "name": "IdTokenSchema",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 20,
+        "col": 0,
+        "byteIndex": 875
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/token/token-schema.ts",
+        "imported": "IdTokenSchema"
+      }
+    },
+    {
+      "name": "ClaimErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 21,
+        "col": 0,
+        "byteIndex": 942
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/client-errors.ts",
+        "imported": "ClaimErrors"
+      }
+    },
+    {
+      "name": "ResourceCreateErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 21,
+        "col": 0,
+        "byteIndex": 942
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/client-errors.ts",
+        "imported": "ResourceCreateErrors"
+      }
+    },
+    {
+      "name": "ResourceRequestErrors",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 21,
+        "col": 0,
+        "byteIndex": 942
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/types/client-errors.ts",
+        "imported": "ResourceRequestErrors"
+      }
+    },
+    {
+      "name": "fetchSmartConfiguration",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 22,
+        "col": 0,
+        "byteIndex": 1044
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/well-known/smart-configuration.ts",
+        "imported": "fetchSmartConfiguration"
+      }
+    },
+    {
+      "name": "getJwkSet",
+      "location": {
+        "filename": "file:///home/karl/git/smart-on-fhir/src/client/smart/ReadyClient.ts",
+        "line": 22,
+        "col": 0,
+        "byteIndex": 1044
+      },
+      "declarationKind": "private",
+      "kind": "import",
+      "importDef": {
+        "src": "file:///home/karl/git/smart-on-fhir/src/client/smart/well-known/smart-configuration.ts",
+        "imported": "getJwkSet"
+      }
+    }
+  ]
+}

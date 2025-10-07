@@ -10,6 +10,7 @@
         "includes": [
             "src/**",
             "docs/**/*.md",
+            "docs/**/*.ts",
             "docs/.vitepress/theme/**",
             "!docs/.vitepress/theme/aksel",
             "docs/.vitepress/config.ts",
