@@ -2,7 +2,7 @@ import * as z from 'zod'
 
 import { GeneralIdentifierSchema } from './common'
 
-const TelecomSystemSchema = z.enum(['phone', 'email'], {
+const TelecomSystemSchema = z.enum(['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'], {
     error: (issue) => {
         return issue.input == null
             ? 'Telecom system is required'
