@@ -24,7 +24,10 @@ export function removeTrailingSlash(url: string): string {
 export async function getResponseError(response: Response): Promise<string> {
     if (response.headers.get('Content-Type')?.includes('text/plain')) {
         return await response.text()
-    } else if (response.headers.get('Content-Type')?.includes('application/json')) {
+    } else if (
+        response.headers.get('Content-Type')?.includes('application/json') ||
+        response.headers.get('Content-Type')?.includes('application/fhir+json')
+    ) {
         const json = await response.json()
         return JSON.stringify(json, null, 2)
     } else {
