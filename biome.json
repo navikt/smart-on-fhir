@@ -1,5 +1,6 @@
 {
     "$schema": "https://biomejs.dev/schemas/2.2.7/schema.json",
+    "extends": ["@navikt/tsm-biome"],
     "vcs": {
         "enabled": false,
         "clientKind": "git",
@@ -22,45 +23,10 @@
             ".github/**"
         ]
     },
-    "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "lineWidth": 120,
-        "indentWidth": 4
-    },
     "linter": {
         "enabled": true,
         "rules": {
             "recommended": true
-        }
-    },
-    "javascript": {
-        "formatter": {
-            "quoteStyle": "single",
-            "semicolons": "asNeeded"
-        }
-    },
-    "assist": {
-        "enabled": true,
-        "actions": {
-            "source": {
-                "organizeImports": {
-                    "level": "on",
-                    "options": {
-                        "groups": [
-                            [":NODE:", ":PACKAGE:"],
-                            ":BLANK_LINE:",
-                            ":ALIAS:",
-                            ":BLANK_LINE:",
-                            "../**",
-                            ":BLANK_LINE:",
-                            "./**",
-                            ":BLANK_LINE:",
-                            "./index"
-                        ]
-                    }
-                }
-            }
         }
     }
 }

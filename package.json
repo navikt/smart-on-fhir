@@ -54,6 +54,7 @@
     "devDependencies": {
         "@biomejs/biome": "2.2.7",
         "@karl-run/prettier-config": "^1.1.0",
+        "@navikt/tsm-biome": "^1.0.0",
         "@types/node": "24.9.1",
         "@vitest/coverage-v8": "4.0.0-beta.19",
         "husky": "^9.1.7",

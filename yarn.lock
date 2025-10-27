@@ -842,6 +842,7 @@ __metadata:
     "@biomejs/biome": "npm:2.2.7"
     "@karl-run/prettier-config": "npm:^1.1.0"
     "@navikt/pino-logger": "npm:^4.4.1"
+    "@navikt/tsm-biome": "npm:^1.0.0"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/core": "npm:^2.2.0"
     "@types/node": "npm:24.9.1"
@@ -867,6 +868,15 @@ __metadata:
     zod: 4
   languageName: unknown
   linkType: soft
+
+"@navikt/tsm-biome@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@navikt/tsm-biome@npm:1.0.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Ftsm-biome%2F1.0.0%2Fe38ed7fd4f5d0348a8fe55d9be1e77c5e31c9729"
+  peerDependencies:
+    biome: ">= 3"
+  checksum: 10c0/8e9a77b5542614697eea5864077012f492fcbfdf84f65386c71e8ec951624c053dee91f848e696391750c7486ee7da745ca95c7fbbaddb3252cb33be183e9dc0
+  languageName: node
+  linkType: hard
 
 "@npmcli/agent@npm:^3.0.0":
   version: 3.0.0
