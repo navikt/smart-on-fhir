@@ -73,6 +73,22 @@ describe('Inmemory Cache', () => {
             'Nock: No match for request',
         )
     })
+
+    test('SmartClient.user.request - /Practitioner should fetch and cache Practitioner resource', async () => {
+        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const cacheConfig = { cache: { ttl: 15 * 1000 } }
+
+        const [ready] = await createLaunchedOpenReadyClient(validSession, undefined, 'in-memory')
+
+        mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
+        const practitioner = await ready.user.request(cacheConfig)
+
+        expectHas(practitioner, 'resourceType')
+        expect(practitioner.resourceType).toBe('Practitioner')
+
+        const cached = await ready.request(ready.user.fhirUser, cacheConfig)
+        expect(practitioner).toBe(cached)
+    })
 })
 
 describe('ResourceCache Cache', () => {

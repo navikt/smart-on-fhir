@@ -51,7 +51,7 @@ export class ReadyClient {
             type: 'Patient',
             reference: `Patient/${this._session.patient}`,
             id: this._session.patient,
-            request: () => this.request(`Patient/${this._session.patient}`),
+            request: (config) => this.request(`Patient/${this._session.patient}`, config),
         }
     }
 
@@ -60,7 +60,7 @@ export class ReadyClient {
             type: 'Encounter',
             reference: `Encounter/${this._session.encounter}`,
             id: this._session.encounter,
-            request: () => this.request(`Encounter/${this._session.encounter}`),
+            request: (config) => this.request(`Encounter/${this._session.encounter}`, config),
         }
     }
 
@@ -68,7 +68,7 @@ export class ReadyClient {
         type: 'Practitioner'
         id: string
         fhirUser: `Practitioner/${string}`
-        request: () => Promise<FhirPractitioner | ResourceRequestErrors>
+        request: (config?: CacheableResource) => Promise<FhirPractitioner | ResourceRequestErrors>
     } {
         const idToken = this._idToken
 
@@ -78,7 +78,7 @@ export class ReadyClient {
             get fhirUser(): `Practitioner/${string}` {
                 return idToken.fhirUser as `Practitioner/${string}`
             },
-            request: () => this.request(this.user.fhirUser),
+            request: (config) => this.request(this.user.fhirUser, config),
         }
     }
 
@@ -210,7 +210,7 @@ export class ReadyClient {
         /**
          * If set to true, will not mark the OTEL span as failed if the resource is not found.
          */
-        config?: { cache?: { ttl: number }; expectNotFound?: true },
+        config?: CacheableResource & { expectNotFound?: true },
     ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
         const resourceType = inferResourceType(resource)
 
@@ -323,9 +323,13 @@ export class ReadyClient {
     }
 }
 
+type CacheableResource = {
+    cache?: { ttl: number }
+}
+
 type ValueAccessor<Resource, Type extends string = never> = {
     id: string
     type: Type
-    request: () => Promise<Resource | ResourceRequestErrors>
+    request: (config?: CacheableResource) => Promise<Resource | ResourceRequestErrors>
     reference: `${Type}/${string}`
 }
