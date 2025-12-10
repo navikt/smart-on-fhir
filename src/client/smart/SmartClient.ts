@@ -293,7 +293,7 @@ export class SmartClient {
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
-            const currentIssuer = this.getKnownFhirServer(session.issuer)
+            const currentIssuer = this.getKnownFhirServer(session.server)
 
             try {
                 return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer')
