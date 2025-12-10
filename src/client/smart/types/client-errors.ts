@@ -12,7 +12,7 @@ export type SmartClientReadyErrors =
     | CompleteSessionErrors
     | RefreshTokenErrors
     | {
-          error: 'NO_ACTIVE_SESSION' | 'INVALID_ID_TOKEN' | 'INVALID_TOKEN' | 'REFRESH_FAILED'
+          error: 'NO_ACTIVE_SESSION' | 'INVALID_ID_TOKEN' | 'INVALID_TOKEN' | 'REFRESH_FAILED' | 'UNKNOWN_ISSUER'
       }
 
 export type ResourceCreateErrors = {

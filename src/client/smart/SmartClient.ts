@@ -294,6 +294,15 @@ export class SmartClient {
             })
 
             const currentIssuer = this.getKnownFhirServer(session.server)
+            const validatedIssuer = await this.validateIssuer(session.server)
+            if (!validatedIssuer) {
+                failSpan(
+                    span,
+                    `Tried .ready() with active session, but FHIR server was not known`,
+                    new Error(`Issuer ${session.server} was not known in client configuration`),
+                )
+                return { error: 'UNKNOWN_ISSUER', validate: async () => false }
+            }
 
             try {
                 return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer')
@@ -412,8 +421,9 @@ export class SmartClient {
 
     private async validateIssuer(issuer: string): Promise<boolean> {
         if ('allowAnyIssuer' in this._clientConfig) {
-            if (!this._clientConfig.allowAnyIssuer)
+            if (!this._clientConfig.allowAnyIssuer) {
                 throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
+            }
 
             return true
         }
