@@ -833,21 +833,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@navikt/pino-logger@npm:^4.4.1":
-  version: 4.4.1
-  resolution: "@navikt/pino-logger@npm:4.4.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F4.4.1%2F8fd55667f2e3180e5157641d0bac10dafe4c3613"
+"@navikt/pino-logger@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "@navikt/pino-logger@npm:4.5.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F4.5.0%2Ffb8ef5d9337db96d9a7bb0f4e2375e2f652f4b08"
   dependencies:
     "@opentelemetry/api": "npm:^1.9.0"
-    pino-roll: "npm:3"
-    pino-socket: "npm:7"
+    pino-socket: "npm:7.4.0"
   peerDependencies:
     pino: 8 || 9 || 10
   dependenciesMeta:
-    pino-roll:
-      optional: true
     pino-socket:
       optional: true
-  checksum: 10c0/97a36d0c55bfc7310eeec4ae32a090727592f271f13612f713da3d4c9c42fdab855a9ab949017fb37980406802b55670457ac4b155d74f764ca7d0d94d0e2d6c
+  checksum: 10c0/14beec5e964edc0f9c60e305cb3cc82d0cda366846760fd39eb6895ad95a39d73da376bb1f07228536d1d3268917915931e5c2b58d17d45fc3d80ade1e9721bd
   languageName: node
   linkType: hard
 
@@ -857,7 +854,7 @@ __metadata:
   dependencies:
     "@biomejs/biome": "npm:2.3.5"
     "@karl-run/prettier-config": "npm:^1.1.0"
-    "@navikt/pino-logger": "npm:^4.4.1"
+    "@navikt/pino-logger": "npm:^4.5.0"
     "@navikt/tsm-biome": "npm:^1.0.1"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/core": "npm:^2.2.0"
@@ -1980,13 +1977,6 @@ __metadata:
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: 10c0/80c089d6f7e0c5b2bd83cf0539ab41474198579584fa10d86d0cafe0642202343cbc119e076a0b1aece191989477081415d66c9fefbf3c957fc2fc4b7009f248
-  languageName: node
-  linkType: hard
-
-"date-fns@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "date-fns@npm:4.1.0"
-  checksum: 10c0/b79ff32830e6b7faa009590af6ae0fb8c3fd9ffad46d930548fbb5acf473773b4712ae887e156ba91a7b3dc30591ce0f517d69fd83bd9c38650fdc03b4e0bac8
   languageName: node
   linkType: hard
 
@@ -3305,17 +3295,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-roll@npm:3":
-  version: 3.1.0
-  resolution: "pino-roll@npm:3.1.0"
-  dependencies:
-    date-fns: "npm:^4.1.0"
-    sonic-boom: "npm:^4.0.1"
-  checksum: 10c0/0ae1b475889748d8f87f9a4bd622b841500b76ae279a2409e1453e74bed23d227b1a7a21069c8226e65311e37cc34217592199a09d4b01db5e5c236678b67040
-  languageName: node
-  linkType: hard
-
-"pino-socket@npm:7":
+"pino-socket@npm:7.4.0":
   version: 7.4.0
   resolution: "pino-socket@npm:7.4.0"
   dependencies:
