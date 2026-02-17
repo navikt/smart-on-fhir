@@ -13,6 +13,31 @@ export function mockPractitioner(id: string): Scope {
         } satisfies FhirPractitioner)
 }
 
+export function mockPractitionerWithOperationOutcome(id: string): Scope {
+    return nock('http://fhir-server')
+        .get(`/Practitioner/${id}`)
+        .reply(
+            500,
+            {
+                resourceType: 'OperationOutcome',
+                id: '259e8ad3-1def-456e-93dd-09840f689cc4',
+                meta: {
+                    lastUpdated: '2026-02-16T14:11:13.6531423+00:00',
+                },
+                issue: [
+                    {
+                        severity: 'error',
+                        code: 'exception',
+                        diagnostics: 'Unexpected exception on resource Practitioner',
+                    },
+                ],
+            },
+            {
+                'Content-Type': 'application/fhir+json',
+            },
+        )
+}
+
 export function mockEncounter(id: string): Scope {
     return nock('http://fhir-server')
         .get(`/Encounter/${id}`)

@@ -21,20 +21,6 @@ export function removeTrailingSlash(url: string): string {
     return url.replace(/\/$/, '')
 }
 
-export async function getResponseError(response: Response): Promise<string> {
-    if (response.headers.get('Content-Type')?.includes('text/plain')) {
-        return await response.text()
-    } else if (
-        response.headers.get('Content-Type')?.includes('application/json') ||
-        response.headers.get('Content-Type')?.includes('application/fhir+json')
-    ) {
-        const json = await response.json()
-        return JSON.stringify(json, null, 2)
-    } else {
-        return `Unknown error (content-type was: ${response.headers.get('Content-Type')})`
-    }
-}
-
 export function inferResourceType(path: string): string {
     return path.match(/(\w+)\b/)?.[1] ?? 'Unknown'
 }

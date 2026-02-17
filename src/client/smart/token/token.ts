@@ -3,9 +3,9 @@ import { decodeJwt } from 'jose'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { FhirAuthMode } from '../client-auth-method/config'
 import { postFormEncoded } from '../client-auth-method/fetch'
+import { fhirResponseToFormattedError } from '../lib/error'
 import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
-import { getResponseError } from '../lib/utils'
 import type { SmartClientConfiguration } from '../types/config'
 
 import type { RefreshTokenErrors, TokenExchangeErrors } from './token-errors'
@@ -53,7 +53,7 @@ export async function exchangeToken(
          * Upon successful verification the authorization server issues id_token, access_token and (optional) refresh_token.
          */
         if (!response.ok) {
-            const responseError = await getResponseError(response)
+            const responseError = await fhirResponseToFormattedError(response)
             logger.error(
                 `Token exchange failed, token_endpoint responed with ${response.status} ${response.statusText}, server says: ${responseError}`,
             )
@@ -111,7 +111,7 @@ export async function refreshToken(
         )
 
         if (!response.ok) {
-            const responseError = await getResponseError(response)
+            const responseError = await fhirResponseToFormattedError(response)
 
             failSpan(
                 span,

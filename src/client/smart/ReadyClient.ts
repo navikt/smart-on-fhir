@@ -13,9 +13,10 @@ import { getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
 import type { CompleteSession } from '../storage/schema'
 
+import { fhirResponseToFormattedError } from './lib/error'
 import { logger } from './lib/logger'
 import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
-import { getResponseError, inferResourceType } from './lib/utils'
+import { inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
 import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './types/client-errors'
@@ -129,18 +130,12 @@ export class ReadyClient {
             )
 
             if (!response.ok) {
-                const responseError = await getResponseError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
-                failSpan(
-                    span,
-                    `Request to create ${resourceType} failed`,
-                    new Error(
-                        `Request to create ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
-                    ),
-                )
+                failSpan(span, `Request to create ${resourceType} failed`, responseError)
 
-                return { error: 'CREATE_FAILED_NON_OK_RESPONSE' }
+                return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
             }
 
             const result = await response.json()
@@ -176,18 +171,12 @@ export class ReadyClient {
             )
 
             if (!response.ok) {
-                const responseError = await getResponseError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
-                failSpan(
-                    span,
-                    `Request to update (PUT) ${resourceType} failed`,
-                    new Error(
-                        `Request to update (PUT) ${resourceType} failed, ${response.url} responded with ${response.status} ${response.statusText}, server says: ${responseError}`,
-                    ),
-                )
+                failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
 
-                return { error: 'CREATE_FAILED_NON_OK_RESPONSE' }
+                return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
             }
 
             const result = await response.json()
@@ -240,22 +229,16 @@ export class ReadyClient {
                 if (!config?.expectNotFound) {
                     logger.warn(`Resource (${resource}) was not found on FHIR server`)
                 }
-                return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND' }
+                return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: null }
             }
 
             if (!response.ok) {
-                const responseError = await getResponseError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
-                failSpan(
-                    span,
-                    `Request to get ${resource} failed`,
-                    new Error(
-                        `Request to get ${resource} failed, ${response.url} responded with ${response.status} ${response.statusText}, server said: ${responseError}`,
-                    ),
-                )
+                failSpan(span, `Request to get ${resource} failed`, responseError)
 
-                return { error: 'REQUEST_FAILED_NON_OK_RESPONSE' }
+                return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: operationOutcome }
             }
 
             const result = await response.json()

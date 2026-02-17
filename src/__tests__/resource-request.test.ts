@@ -3,7 +3,7 @@ import { expect, test } from 'vitest'
 import type { CompleteSession } from '../client/storage/schema'
 
 import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
-import { mockEncounter, mockPatient, mockPractitioner } from './mocks/resources'
+import { mockEncounter, mockPatient, mockPractitioner, mockPractitionerWithOperationOutcome } from './mocks/resources'
 import { createLaunchedOpenReadyClient } from './utils/client-open'
 import { expectHas } from './utils/expect'
 import { createTestIdToken } from './utils/token'
@@ -55,6 +55,17 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
     expect(mock.isDone()).toBe(true)
     expectHas(practitioner, 'resourceType')
     expect(practitioner.resourceType).toBe('Practitioner')
+})
+
+test('SmartClient.request - Should handle FHIR errors (OperationOutcome)', async () => {
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
+
+    const mock = mockPractitionerWithOperationOutcome('ac768edb-d56a-4304-8574-f866c6af4e7e')
+    const practitioner = await ready.request(ready.user.fhirUser)
+
+    expect(mock.isDone()).toBe(true)
+    expectHas(practitioner, 'error')
+    expectHas(practitioner, 'operationOutcome')
 })
 
 test('SmartClient.create - /DocumentReference should POST and parse DocumentReference resource', async () => {

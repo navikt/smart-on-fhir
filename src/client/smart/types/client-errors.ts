@@ -1,3 +1,4 @@
+import type { OperationOutcome } from '../../../zod/errors'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../../storage/storage-errors'
 import type { RefreshTokenErrors, TokenExchangeErrors } from '../token/token-errors'
 
@@ -17,10 +18,12 @@ export type SmartClientReadyErrors =
 
 export type ResourceCreateErrors = {
     error: 'CREATE_FAILED_NON_OK_RESPONSE' | 'CREATE_FAILED_INVALID_RESPONSE'
+    operationOutcome?: OperationOutcome | null
 }
 
 export type ResourceRequestErrors = {
     error: 'REQUEST_FAILED_NON_OK_RESPONSE' | 'REQUEST_FAILED_INVALID_RESPONSE' | 'REQUEST_FAILED_RESOURCE_NOT_FOUND'
+    operationOutcome?: OperationOutcome | null
 }
 
 export type ClaimErrors = {
