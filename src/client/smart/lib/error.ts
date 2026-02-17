@@ -15,7 +15,7 @@ export async function fhirResponseToFormattedError(response: Response): Promise<
     if (contentType.includes('application/fhir+json')) {
         const { success, data } = OperationOutcomeSchema.safeParse(JSON.parse(body))
         if (success) {
-            return [new Error(formatOperationOutcome(data), { cause: JSON.stringify(data, null, 2) }), data]
+            return [operationOutcomeToError(data), data]
         }
     } else if (contentType.includes('application/json')) {
         try {
