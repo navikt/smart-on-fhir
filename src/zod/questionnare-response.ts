@@ -1,7 +1,7 @@
 import * as z from 'zod'
 
-type QuestionnaireResponseAnswer = z.infer<typeof QuestionnaireResponseAnswerSchema>
-const QuestionnaireResponseAnswerSchema = z.object({
+export type FhirQuestionnaireResponseAnswer = z.infer<typeof FhirQuestionnaireResponseAnswerSchema>
+export const FhirQuestionnaireResponseAnswerSchema = z.object({
     valueString: z.string().optional(),
     valueInteger: z.number().int().optional(),
     valueBoolean: z.boolean().optional(),
@@ -18,20 +18,23 @@ const QuestionnaireResponseAnswerSchema = z.object({
         .optional(),
 })
 
-type QuestionnaireResponseItem = z.infer<typeof QuestionnaireResponseItemSchema>
-const QuestionnaireResponseItemSchema = z.object({
+export type FhirQuestionnaireResponseItem = z.infer<typeof FhirQuestionnaireResponseItemSchema>
+export const FhirQuestionnaireResponseItemSchema = z.object({
     linkId: z.string(),
     text: z.string(),
-    answer: z.array(QuestionnaireResponseAnswerSchema).optional(),
+    answer: z.array(FhirQuestionnaireResponseAnswerSchema).optional(),
     get item() {
-        return z.array(QuestionnaireResponseItemSchema).optional()
+        return z.array(FhirQuestionnaireResponseItemSchema).optional()
     },
 })
 
-export type QuestionaireResponse = z.infer<typeof QuestionnaireResponseSchema>
-const QuestionnaireResponseSchema = z.object({
+export type FhirQuestionaireResponse = z.infer<typeof FhirQuestionnaireResponseSchema>
+export const FhirQuestionnaireResponseSchema = z.object({
     resourceType: z.literal('QuestionnaireResponse'),
     id: z.string(),
     status: z.literal('completed'),
-    item: z.array(QuestionnaireResponseItemSchema),
+    item: z.array(FhirQuestionnaireResponseItemSchema),
+    subject: z.object({ reference: z.string() }).optional(),
+    author: z.object({ reference: z.string() }).optional(),
+    encounter: z.object({ reference: z.string() }).optional(),
 })

@@ -1,20 +1,27 @@
 import type * as z from 'zod'
 
-import { type FhirDocumentReference, FhirDocumentReferenceBaseSchema } from '../../../zod'
+import {
+    type FhirDocumentReference,
+    FhirDocumentReferenceBaseSchema,
+    type FhirQuestionaireResponse,
+    FhirQuestionnaireResponseSchema,
+} from '../../../zod'
 
 /**
  * A map of FHIR paths in a FHIR server and their known corresponding resource types.
  */
 type CreateMap = {
     DocumentReference: FhirDocumentReference
+    QuestionnaireResponse: FhirQuestionaireResponse
 }
 
 type PayloadMap = {
     DocumentReference: Partial<FhirDocumentReference>
+    QuestionnaireResponse: Partial<FhirQuestionaireResponse>
 }
 
 /**
- * All known paths based on keys of createable resources
+ * All known paths based on keys of creatable resources
  */
 export type KnownCreatePaths = keyof CreateMap
 
@@ -38,9 +45,12 @@ export type PayloadForCreate<T extends string> = {
  * This function is a type-hole, the callee will have to as the resulting parsed schema to the correct type.
  */
 export function createResourceToSchema(resource: KnownCreatePaths): z.ZodObject {
-    if (resource === 'DocumentReference') {
-        return FhirDocumentReferenceBaseSchema
+    switch (resource) {
+        case 'DocumentReference':
+            return FhirDocumentReferenceBaseSchema
+        case 'QuestionnaireResponse':
+            return FhirQuestionnaireResponseSchema
+        default:
+            throw new Error(`Unknown resource type (or not implemented): ${resource}`)
     }
-
-    throw new Error(`Unknown resource type (or not implemented): ${resource}`)
 }

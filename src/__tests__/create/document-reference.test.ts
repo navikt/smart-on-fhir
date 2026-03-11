@@ -1,30 +1,11 @@
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../client/storage/schema'
-import type { FhirDocumentReference, QuestionaireResponse } from '../zod'
-
-import { mockUpdateDocumentReference } from './mocks/create-resources'
-import { createLaunchedOpenReadyClient } from './utils/client-open'
-import { expectHas } from './utils/expect'
-import { createTestIdToken } from './utils/token'
-
-const validSession: CompleteSession = {
-    // Initial
-    server: 'http://fhir-server',
-    issuer: 'http://fhir-auth-server',
-    authorizationEndpoint: 'http://fhir-auth-server/authorize',
-    tokenEndpoint: 'http://fhir-auth-server/token',
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    // Completed
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
+import type { CompleteSession } from '../../client/storage/schema'
+import type { FhirDocumentReference, FhirQuestionaireResponse } from '../../zod'
+import { mockUpdateDocumentReference } from '../mocks/create-resources'
+import { createLaunchedOpenReadyClient } from '../utils/client-open'
+import { expectHas } from '../utils/expect'
+import { createTestIdToken } from '../utils/token'
 
 test('SmartClient.create - /DocumentReference with QuestionaireResponse as base64 payload', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
@@ -82,7 +63,7 @@ test('SmartClient.create - /DocumentReference with QuestionaireResponse as base6
                                     ],
                                 },
                             ],
-                        } satisfies QuestionaireResponse),
+                        } satisfies FhirQuestionaireResponse),
                         'base64',
                     ).toString('utf-8'),
                 },
@@ -116,3 +97,21 @@ test('SmartClient.create - /DocumentReference with QuestionaireResponse as base6
     expect(documentReference.content[0].attachment.contentType).toEqual('application/pdf')
     expect(documentReference.content[1].attachment.contentType).toEqual('application/fhir+json')
 })
+
+const validSession: CompleteSession = {
+    // Initial
+    server: 'http://fhir-server',
+    issuer: 'http://fhir-auth-server',
+    authorizationEndpoint: 'http://fhir-auth-server/authorize',
+    tokenEndpoint: 'http://fhir-auth-server/token',
+    codeVerifier: 'valid-code-verifier',
+    state: 'valid-state',
+    // Completed
+    accessToken: 'valid-access-token',
+    idToken: await createTestIdToken({
+        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
+    }),
+    refreshToken: 'valid-refresh-token',
+    patient: 'valid-patient-id',
+    encounter: 'valid-encounter-id',
+}
