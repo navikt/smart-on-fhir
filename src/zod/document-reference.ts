@@ -5,7 +5,7 @@ export const FhirDocumentReferenceBaseSchema = z.object({
     resourceType: z.literal('DocumentReference'),
     id: z.string(),
     meta: z.object({
-        versionId: z.string(),
+        versionId: z.string().optional(),
         lastUpdated: z.string(),
     }),
 })
@@ -36,7 +36,7 @@ export const FhirDocumentReferenceSchema = z.object({
             attachment: z.object({
                 title: z.string(),
                 language: z.string(),
-                contentType: z.string(),
+                contentType: z.union([z.literal('application/pdf'), z.literal('application/fhir+json')]),
                 data: z.string(),
             }),
         }),
@@ -47,5 +47,11 @@ export const FhirDocumentReferenceSchema = z.object({
                 reference: z.string(),
             }),
         ),
+        period: z
+            .object({
+                start: z.string(),
+                end: z.string(),
+            })
+            .optional(),
     }),
 })

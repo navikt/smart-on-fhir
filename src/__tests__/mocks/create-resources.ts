@@ -27,10 +27,10 @@ const createdDocumentReference: FhirDocumentReference = {
     content: [
         {
             attachment: {
-                contentType: 'text/plain; charset=utf-8',
-                language: 'en',
+                contentType: 'application/pdf',
+                language: 'no',
                 title: 'Sykmelding',
-                data: '',
+                data: 'osanetaonteuhnaoec',
             },
         },
     ],
@@ -39,17 +39,25 @@ const createdDocumentReference: FhirDocumentReference = {
     },
 }
 
-export function mockCreateDocumentReference(expectedPayload: PayloadForCreate<'DocumentReference'>): Scope {
-    return nock('http://fhir-server')
-        .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
-        .reply(200, createdDocumentReference satisfies FhirDocumentReference)
-}
-
-export function mockUpdateDocumentReference(
-    expectedId: string,
+export function mockCreateDocumentReference(
     expectedPayload: PayloadForCreate<'DocumentReference'>,
+    onSuccess: FhirDocumentReference = createdDocumentReference,
 ): Scope {
     return nock('http://fhir-server')
+        .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
+        .reply(200, onSuccess)
+}
+
+export function mockUpdateDocumentReference({
+    expectedId,
+    expectedPayload,
+    onSuccess = createdDocumentReference,
+}: {
+    expectedId: string
+    expectedPayload: PayloadForCreate<'DocumentReference'>
+    onSuccess?: FhirDocumentReference
+}): Scope {
+    return nock('http://fhir-server')
         .put(`/DocumentReference/${expectedId}`, expectedPayload as RequestBodyMatcher)
-        .reply(200, createdDocumentReference satisfies FhirDocumentReference)
+        .reply(200, onSuccess)
 }

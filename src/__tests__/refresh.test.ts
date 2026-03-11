@@ -162,8 +162,11 @@ test('SmartClient.update - Should refresh token when server says 401', async () 
     })
 
     // And finally, the request should succeed with the refreshed token
-    const documentReferenceActual = mockUpdateDocumentReference('my-id', {
-        resourceType: 'DocumentReference',
+    const documentReferenceActual = mockUpdateDocumentReference({
+        expectedId: 'my-id',
+        expectedPayload: {
+            resourceType: 'DocumentReference',
+        },
     })
 
     const documentReference = await ready.update('DocumentReference', {

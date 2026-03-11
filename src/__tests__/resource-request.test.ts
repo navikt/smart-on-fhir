@@ -92,8 +92,11 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
 test('SmartClient.update - /DocumentReference should PUT and parse DocumentReference resource', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
 
-    const mock = mockUpdateDocumentReference('my-id', {
-        resourceType: 'DocumentReference',
+    const mock = mockUpdateDocumentReference({
+        expectedId: 'my-id',
+        expectedPayload: {
+            resourceType: 'DocumentReference',
+        },
     })
 
     const documentReference = await ready.update('DocumentReference', {
