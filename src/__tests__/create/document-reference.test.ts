@@ -1,13 +1,13 @@
 import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../../client/storage/schema'
-import type { FhirDocumentReference, FhirQuestionaireResponse } from '../../zod'
+import type { FhirDocumentReference, FhirQuestionnaireResponse } from '../../zod'
 import { mockUpdateDocumentReference } from '../mocks/create-resources'
 import { createLaunchedOpenReadyClient } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
 import { createTestIdToken } from '../utils/token'
 
-test('SmartClient.create - /DocumentReference with QuestionaireResponse as base64 payload', async () => {
+test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const documentReferencePayloadWithQuestionnaire: Omit<FhirDocumentReference, 'id'> = {
@@ -63,7 +63,7 @@ test('SmartClient.create - /DocumentReference with QuestionaireResponse as base6
                                     ],
                                 },
                             ],
-                        } satisfies FhirQuestionaireResponse),
+                        } satisfies FhirQuestionnaireResponse),
                         'base64',
                     ).toString('utf-8'),
                 },

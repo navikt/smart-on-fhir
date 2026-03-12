@@ -28,7 +28,7 @@ export const FhirQuestionnaireResponseItemSchema = z.object({
     },
 })
 
-export type FhirQuestionaireResponse = z.infer<typeof FhirQuestionnaireResponseSchema>
+export type FhirQuestionnaireResponse = z.infer<typeof FhirQuestionnaireResponseSchema>
 export const FhirQuestionnaireResponseSchema = z.object({
     resourceType: z.literal('QuestionnaireResponse'),
     id: z.string(),

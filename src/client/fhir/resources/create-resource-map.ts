@@ -3,7 +3,7 @@ import type * as z from 'zod'
 import {
     type FhirDocumentReference,
     FhirDocumentReferenceBaseSchema,
-    type FhirQuestionaireResponse,
+    type FhirQuestionnaireResponse,
     FhirQuestionnaireResponseSchema,
 } from '../../../zod'
 
@@ -12,12 +12,12 @@ import {
  */
 type CreateMap = {
     DocumentReference: FhirDocumentReference
-    QuestionnaireResponse: FhirQuestionaireResponse
+    QuestionnaireResponse: FhirQuestionnaireResponse
 }
 
 type PayloadMap = {
     DocumentReference: Partial<FhirDocumentReference>
-    QuestionnaireResponse: Partial<FhirQuestionaireResponse>
+    QuestionnaireResponse: Partial<FhirQuestionnaireResponse>
 }
 
 /**

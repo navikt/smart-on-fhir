@@ -1,16 +1,16 @@
 import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../../client/storage/schema'
-import type { FhirQuestionaireResponse } from '../../zod'
+import type { FhirQuestionnaireResponse } from '../../zod'
 import { mockUpdateQuestionnaireResponse } from '../mocks/create-resources'
 import { createLaunchedOpenReadyClient } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
 import { createTestIdToken } from '../utils/token'
 
-test('SmartClient.create - /DocumentReference with QuestionaireResponse as base64 payload', async () => {
+test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
 
-    const questionnaireResponsePayload: Omit<FhirQuestionaireResponse, 'id'> = {
+    const questionnaireResponsePayload: Omit<FhirQuestionnaireResponse, 'id'> = {
         resourceType: 'QuestionnaireResponse',
         status: 'completed',
         item: [
@@ -42,7 +42,7 @@ test('SmartClient.create - /DocumentReference with QuestionaireResponse as base6
         onSuccess: {
             id: 'min-kule-sykmelding-id',
             ...questionnaireResponsePayload,
-        } satisfies FhirQuestionaireResponse,
+        } satisfies FhirQuestionnaireResponse,
     })
 
     const questionnaireResponse = await ready.update('QuestionnaireResponse', {
