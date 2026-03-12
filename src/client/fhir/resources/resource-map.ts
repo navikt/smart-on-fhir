@@ -15,6 +15,8 @@ import {
     FhirPatientSchema,
     type FhirPractitioner,
     FhirPractitionerSchema,
+    type FhirQuestionnaireResponse,
+    FhirQuestionnaireResponseSchema,
 } from '../../../zod'
 
 /**
@@ -27,6 +29,7 @@ type ResourceMap = {
     'Organization/': FhirOrganization
     'DocumentReference/': FhirDocumentReferenceBase
     'Practitioner/': FhirPractitioner
+    'QuestionnaireResponse/': FhirQuestionnaireResponse
 }
 
 /**
@@ -63,6 +66,8 @@ export function resourceToSchema(resource: KnownPaths): z.ZodObject {
         return createFhirBundleSchema(FhirConditionSchema)
     } else if (resource.startsWith('Organization')) {
         return FhirOrganizationSchema
+    } else if (resource.startsWith('QuestionnaireResponse')) {
+        return FhirQuestionnaireResponseSchema
     }
 
     throw new Error(`Unknown resource type (or not implemented): ${resource}`)
