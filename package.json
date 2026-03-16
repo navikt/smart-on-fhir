@@ -52,13 +52,13 @@
         "zod": "4"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.4.6",
+        "@biomejs/biome": "2.4.7",
         "@karl-run/prettier-config": "^1.1.0",
         "@navikt/tsm-biome": "^1.0.1",
         "@types/node": "24.12.0",
-        "@vitest/coverage-v8": "4.0.18",
+        "@vitest/coverage-v8": "4.1.0",
         "husky": "^9.1.7",
-        "lint-staged": "^16.3.2",
+        "lint-staged": "^16.4.0",
         "nock": "^14.0.11",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
@@ -68,8 +68,8 @@
         "vitepress": "^1.6.4",
         "vitepress-plugin-npm-commands": "^0.9.0",
         "vitepress-plugin-tabs": "^0.8.0",
-        "vitest": "^4.0.18",
-        "vue": "^3.5.29",
+        "vitest": "^4.1.0",
+        "vue": "^3.5.30",
         "zod": "^4.3.6"
     },
     "prettier": "@karl-run/prettier-config"
