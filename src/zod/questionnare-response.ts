@@ -33,6 +33,10 @@ export const FhirQuestionnaireResponseSchema = z.object({
     resourceType: z.literal('QuestionnaireResponse'),
     id: z.string(),
     status: z.literal('completed'),
+    /**
+     * canonical(Questionnaire) - Full URI identifier or internal ID reference.
+     */
+    questionnaire: z.string().optional(),
     item: z.array(FhirQuestionnaireResponseItemSchema),
     subject: z.object({ reference: z.string() }).optional(),
     author: z.object({ reference: z.string() }).optional(),

@@ -142,7 +142,7 @@ export class ReadyClient {
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(span, 'Failed to parse DocumentReference', parsed.error)
+                failSpan(span, `Failed to parse ${resourceType}`, parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
