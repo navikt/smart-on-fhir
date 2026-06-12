@@ -53,5 +53,6 @@ export const FhirDocumentReferenceSchema = z.object({
                 end: z.string(),
             })
             .optional(),
+        related: z.array(z.object({ reference: z.string() })).optional()
     }),
 })
