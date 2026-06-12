@@ -40,5 +40,6 @@ export const FhirQuestionnaireResponseSchema = z.object({
     item: z.array(FhirQuestionnaireResponseItemSchema),
     subject: z.object({ reference: z.string() }).optional(),
     author: z.object({ reference: z.string() }).optional(),
+    authored: z.string().optional(),
     encounter: z.object({ reference: z.string() }).optional(),
 })
