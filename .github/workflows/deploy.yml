@@ -80,9 +80,6 @@ jobs:
         with:
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
-      - name: Summarize tsup build
-        run: |
-          ./scripts/meta.mjs . >> $GITHUB_STEP_SUMMARY
       - name: Publish package
         run: |
           yarn pinst --disable
