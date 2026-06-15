@@ -62,9 +62,6 @@ jobs:
               with:
                   READER_TOKEN: ${{ secrets.READER_TOKEN }}
             - run: yarn build
-            - name: Summarize tsup build
-              run: |
-                  ./scripts/meta.mjs . >> $GITHUB_STEP_SUMMARY
 
     # Full build and release of library artifact, only on main
     build_and_release:
