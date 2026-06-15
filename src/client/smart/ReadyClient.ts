@@ -13,7 +13,7 @@ import { getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
 import type { CompleteSession } from '../storage/schema'
 
-import { fhirResponseToFormattedError } from './lib/error'
+import { responseToFormattedError } from './lib/error'
 import { logger } from './lib/logger'
 import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
 import { inferResourceType } from './lib/utils'
@@ -130,7 +130,7 @@ export class ReadyClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+                const [responseError, operationOutcome] = await responseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
@@ -171,7 +171,7 @@ export class ReadyClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+                const [responseError, operationOutcome] = await responseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
@@ -233,7 +233,7 @@ export class ReadyClient {
             }
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+                const [responseError, operationOutcome] = await responseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
                 failSpan(span, `Request to get ${resource} failed`, responseError)
@@ -263,7 +263,7 @@ export class ReadyClient {
         })
     }
 
-    public getClaim(claim: string): ClaimErrors | unknown
+    public getClaim(claim: string): ClaimErrors | string | Record<string, unknown>
     public getClaim<ExpectedClaimSchema extends z.ZodType>(
         claim: string,
         schema: ExpectedClaimSchema,
@@ -271,8 +271,8 @@ export class ReadyClient {
     public getClaim<ExpectedClaimSchema extends z.ZodType>(
         claim: string,
         schema?: ExpectedClaimSchema,
-    ): z.infer<ExpectedClaimSchema> | ClaimErrors | unknown {
-        const claimValue = this._idToken[claim]
+    ): z.infer<ExpectedClaimSchema> | ClaimErrors | string | Record<string, unknown> {
+        const claimValue = this._idToken[claim] as string | Record<string, unknown> | undefined
         if (claimValue == null) {
             return { error: 'CLAIM_NOT_FOUND' }
         }

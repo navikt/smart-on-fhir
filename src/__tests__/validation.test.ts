@@ -91,7 +91,7 @@ test('.getClaim - should handle getting arbitrary claims and validating them wit
     const ready = await client.ready()
     expectIs(ready, ReadyClient)
 
-    const claim = await ready.getClaim('https://helseid.nhn.no')
+    const claim = ready.getClaim('https://helseid.nhn.no')
     expect(claim).not.toBeNull()
 
     const parsedClaim = ready.getClaim(

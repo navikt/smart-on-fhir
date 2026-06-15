@@ -6,7 +6,7 @@ const TelecomSystemSchema = z.enum(['phone', 'fax', 'email', 'pager', 'url', 'sm
     error: (issue) => {
         return issue.input == null
             ? 'Telecom system is required'
-            : `Telecom system must be either phone or email, was ${issue.input}`
+            : `Telecom system must be either phone or email, was ${typeof issue.input === 'string' ? issue.input : JSON.stringify(issue.input)}`
     },
 })
 

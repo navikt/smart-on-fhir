@@ -13,7 +13,7 @@ export type ResourceCache = {
          */
         ttl: number,
     ) => Promise<void>
-    get: (key: string) => Promise<unknown | null>
+    get: (key: string) => Promise<unknown>
 }
 
 export async function getCachedResourceCustom<Path extends KnownPaths>(

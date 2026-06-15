@@ -2,7 +2,10 @@ import { type OperationOutcome, OperationOutcomeSchema } from '../../../zod/erro
 
 const status = (response: Response): string => `${response.status} ${response.statusText}`
 
-export async function fhirResponseToFormattedError(response: Response): Promise<[Error, OperationOutcome | null]> {
+/**
+ * Converts a non-OK response into a human-readable error message, attempting to parse FHIR OperationOutcome if possible.
+ */
+export async function responseToFormattedError(response: Response): Promise<[Error, OperationOutcome | null]> {
     const contentType = response.headers.get('Content-Type')
     if (!contentType) {
         return [

@@ -6,8 +6,8 @@ export default defineConfig({
     },
     options: {
         // TODO: Enable this, they are good
-        typeAware: false,
-        typeCheck: false,
+        typeAware: true,
+        typeCheck: true,
     },
     ignorePatterns: ['docs/.vitepress/**'],
 })
