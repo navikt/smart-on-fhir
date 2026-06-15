@@ -1,8 +1,10 @@
+import { removeTrailingSlash } from '../../smart/lib/utils'
+
 import type { KnownCreatePaths } from './create-resource-map'
 import type { KnownPaths } from './resource-map'
 
 type AuthenticatedServer = {
-    server: string
+    fhirServer: string
     accessToken: string
 }
 
@@ -15,7 +17,7 @@ export async function postFhir(
     path: KnownCreatePaths,
     { payload }: PostFhir,
 ): Promise<Response> {
-    const resourcePath = `${server.server}/${path}`
+    const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}`
 
     return await fetch(resourcePath, {
         method: 'POST',
@@ -38,7 +40,7 @@ export async function putFhir(
     { path, id }: PutFhir,
     { payload }: PostFhir,
 ): Promise<Response> {
-    const resourcePath = `${server.server}/${path}/${id}`
+    const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}/${id}`
 
     return await fetch(resourcePath, {
         method: 'PUT',
@@ -52,7 +54,7 @@ export async function putFhir(
 }
 
 export async function getFhir(server: AuthenticatedServer, path: KnownPaths): Promise<Response> {
-    const resourcePath = `${server.server}/${path}`
+    const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}`
 
     return await fetch(resourcePath, {
         method: 'GET',

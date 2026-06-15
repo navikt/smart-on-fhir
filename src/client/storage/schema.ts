@@ -2,8 +2,8 @@ import * as z from 'zod'
 
 export type InitialSession = z.infer<typeof InitialSessionSchema>
 export const InitialSessionSchema = z.object({
-    server: z.string(),
-    issuer: z.string(),
+    fhirServer: z.string(),
+    tokenIssuer: z.string(),
     authorizationEndpoint: z.string(),
     tokenEndpoint: z.string(),
     codeVerifier: z.string(),

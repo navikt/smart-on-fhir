@@ -1,6 +1,7 @@
 import QuickLRU from 'quick-lru'
 
 import type { KnownPaths, ResponseFor } from '../fhir/resources/resource-map'
+import { removeTrailingSlash } from '../smart/lib/utils'
 
 import type { CacheItem, CacheValueItem } from './resource-cache'
 
@@ -9,13 +10,13 @@ const resourceCache = new QuickLRU({
 })
 
 export function setCachedResourceInMemory<Path extends KnownPaths>(item: CacheValueItem<Path>, cache: { ttl: number }) {
-    const key = `${item.session.server}|${item.resource}`
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
     resourceCache.set(key, item.values, { maxAge: cache.ttl })
 }
 
 export function getCachedResourceInMemory<Path extends KnownPaths>(item: CacheItem<Path>): ResponseFor<Path> | null {
-    const key = `${item.session.server}|${item.resource}`
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
     if (!resourceCache.has(key)) return null
 

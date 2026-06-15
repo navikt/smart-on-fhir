@@ -4,6 +4,7 @@ import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } 
 import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
+import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { fhirNock, mockSmartConfiguration } from './mocks/issuer'
 import { TEST_SESSION_ID } from './utils/client-open'
 import { expectHas, expectIs } from './utils/expect'
@@ -16,7 +17,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
     const smartConfigNock = mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expect(smartConfigNock.isDone()).toBe(true)
@@ -25,10 +26,10 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
      * Should store partial session in the storage
      */
     expect(storage.setFn).toHaveBeenCalledWith(TEST_SESSION_ID, {
-        issuer: 'http://fhir-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
-        server: 'http://fhir-server',
+        tokenIssuer: AUTH_SERVER,
+        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+        tokenEndpoint: `${AUTH_SERVER}/token`,
+        fhirServer: FHIR_SERVER,
         codeVerifier: expect.any(String),
         state: expect.any(String),
     })
@@ -42,7 +43,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
         client_id: 'test-client',
         code_challenge_method: 'S256',
         redirect_uri: 'http://app/callback',
-        aud: 'http://fhir-server',
+        aud: FHIR_SERVER,
         launch: 'test-launch',
         response_type: 'code',
         scope: 'openid fhirUser launch/patient',
@@ -58,7 +59,7 @@ test('.launch - should gracefully handle well-known not responding correctly', a
     fhirNock().get('/.well-known/smart-configuration').reply(500, { hey_crashy: true })
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'error')
@@ -72,7 +73,7 @@ test('.launch - should gracefully handle well-known responding with invalid payl
     fhirNock().get('/.well-known/smart-configuration').reply(200, { this_is_garbage: 'foo-bar-baz' })
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'error')
@@ -82,10 +83,10 @@ test('.launch - should gracefully handle well-known responding with invalid payl
 test('.callback should exchange code for token', async () => {
     const storage = createMockedStorage()
     storage.getFn.mockImplementationOnce(() => ({
-        server: 'http://fhir-server',
-        issuer: 'http://auth-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
+        fhirServer: FHIR_SERVER,
+        tokenIssuer: AUTH_SERVER,
+        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+        tokenEndpoint: `${AUTH_SERVER}/token`,
         codeVerifier: 'test-code-verifier',
         state: 'some-value',
     }))
@@ -111,10 +112,10 @@ test('.callback should exchange code for token', async () => {
 test('.callback should gracefully handle state mismatch', async () => {
     const storage = createMockedStorage()
     storage.getFn.mockImplementationOnce(() => ({
-        server: 'http://fhir-server',
-        issuer: 'http://auth-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
+        fhirServer: FHIR_SERVER,
+        tokenIssuer: AUTH_SERVER,
+        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+        tokenEndpoint: `${AUTH_SERVER}/token`,
         codeVerifier: 'test-code-verifier',
         state: 'this-expected-value',
     }))
@@ -139,10 +140,10 @@ test('.callback should gracefully handle state mismatch', async () => {
 test('.callback should redirect with patient ID when enableMultiLaunch=true', async () => {
     const storage = createMockedStorage()
     storage.getFn.mockImplementationOnce(() => ({
-        server: 'http://fhir-server',
-        issuer: 'http://auth-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
+        fhirServer: FHIR_SERVER,
+        tokenIssuer: AUTH_SERVER,
+        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+        tokenEndpoint: `${AUTH_SERVER}/token`,
         codeVerifier: 'test-code-verifier',
         state: 'some-value',
     }))
@@ -177,7 +178,7 @@ test('full simulated launch flow, .ready() → .callback() → .ready()', async 
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'public',
                 },
             ],
@@ -191,7 +192,7 @@ test('full simulated launch flow, .ready() → .callback() → .ready()', async 
     mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
     expectHas(result, 'redirectUrl')
 

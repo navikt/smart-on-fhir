@@ -146,7 +146,7 @@ export class SmartClient {
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
-            const validIssuer = await this.validateIssuer(params.iss)
+            const validIssuer = this.validateFhirServer(params.iss)
             if (!validIssuer) {
                 failSpan(span, 'Issuer was not found in known FHIR servers')
                 return { error: 'UNKNOWN_ISSUER' }
@@ -165,8 +165,8 @@ export class SmartClient {
             const codeVerifier = randomPKCECodeVerifier()
             const state = randomState()
             const initialSessionPayload: InitialSession = {
-                server: removeTrailingSlash(params.iss),
-                issuer: smartConfig.issuer,
+                fhirServer: params.iss,
+                tokenIssuer: smartConfig.issuer,
                 authorizationEndpoint: smartConfig.authorization_endpoint,
                 tokenEndpoint: smartConfig.token_endpoint,
                 codeVerifier: codeVerifier,
@@ -210,7 +210,7 @@ export class SmartClient {
             if ('error' in initialSession) return initialSession
 
             span.setAttributes({
-                [OtelTaxonomy.FhirServer]: initialSession.server,
+                [OtelTaxonomy.FhirServer]: initialSession.fhirServer,
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
@@ -229,16 +229,9 @@ export class SmartClient {
                 params.code,
                 initialSession,
                 this._clientConfig,
-                this.getAuthMode(
-                    /*
-                        TODO: Is it correct using session.server here? Aren't the knownFhirServer configurations
-                        based on issuer?
-
-                        We'll see once we go live with multiple FHIR servers.
-                     */
-                    initialSession.server,
-                ),
+                this.getKnownFhirServer(initialSession.fhirServer) ?? { type: 'public' },
             )
+
             if ('error' in tokenResponse) {
                 return { error: tokenResponse.error }
             }
@@ -289,22 +282,23 @@ export class SmartClient {
             if ('error' in session) return { error: session.error, validate: async () => false }
 
             span.setAttributes({
-                [OtelTaxonomy.FhirServer]: session.server,
+                [OtelTaxonomy.FhirServer]: session.fhirServer,
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
-            const currentIssuer = this.getKnownFhirServer(session.server)
-            const validatedIssuer = await this.validateIssuer(session.server)
+            const validatedIssuer = this.validateFhirServer(session.fhirServer)
             if (!validatedIssuer) {
                 failSpan(
                     span,
                     `Tried .ready() with active session, but FHIR server was not known`,
-                    new Error(`Issuer ${session.server} was not known in client configuration`),
+                    new Error(`FHIR server ${session.fhirServer} was not a known fhir server!`),
                 )
                 return { error: 'UNKNOWN_ISSUER', validate: async () => false }
             }
 
             try {
+                const currentIssuer = this.getKnownFhirServer(session.fhirServer)
+
                 return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer')
             } catch (error) {
                 failSpan(
@@ -324,7 +318,8 @@ export class SmartClient {
      * This will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
-        const refreshResponse = await refreshToken(session, this._clientConfig, this.getAuthMode(session.server))
+        const authMode: FhirAuthMode = this.getKnownFhirServer(session.fhirServer) ?? { type: 'public' }
+        const refreshResponse = await refreshToken(session, this._clientConfig, authMode)
         if ('error' in refreshResponse) return refreshResponse
 
         const refreshedSessionValues: CompleteSession = {
@@ -419,23 +414,22 @@ export class SmartClient {
         })
     }
 
-    private async validateIssuer(issuer: string): Promise<boolean> {
+    private validateFhirServer(fhirServer: string): boolean {
         if ('allowAnyIssuer' in this._clientConfig) {
             if (!this._clientConfig.allowAnyIssuer) {
                 throw new Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
             }
 
+            /**
+             * With allowAnyIssuer=true, any fhirServer is valid.
+             */
             return true
         }
 
-        return this.getKnownFhirServer(issuer) != null
+        return this.getKnownFhirServer(fhirServer) != null
     }
 
-    private getAuthMode(server: string): FhirAuthMode {
-        return this.getKnownFhirServer(server) ?? { type: 'public' }
-    }
-
-    private getKnownFhirServer(issuer: string): KnownFhirServer | null {
+    private getKnownFhirServer(fhirServer: string): KnownFhirServer | null {
         if ('allowAnyIssuer' in this._clientConfig) {
             if (!this._clientConfig.allowAnyIssuer) {
                 throw Error('Invariant violation: allowAnyIssuer is false, should only ever be true')
@@ -444,7 +438,7 @@ export class SmartClient {
             return null
         }
 
-        const [withoutQuery] = issuer.split('?')
+        const [withoutQuery] = fhirServer.split('?')
         const withoutTrailingSlash = removeTrailingSlash(withoutQuery)
         const knownFhirServer = this._clientConfig.knownFhirServers.find(
             (it) => it.issuer.replace(/\/$/, '') === withoutTrailingSlash,
@@ -454,7 +448,7 @@ export class SmartClient {
     }
 
     private buildAuthorizationUrl(
-        opts: Pick<InitialSession, 'issuer' | 'state' | 'authorizationEndpoint'> & {
+        opts: Pick<InitialSession, 'fhirServer' | 'state' | 'authorizationEndpoint'> & {
             launch: string
             codeChallenge: string
         },
@@ -464,7 +458,7 @@ export class SmartClient {
             client_id: this._clientConfig.clientId,
             scope: this._clientConfig.scope,
             redirect_uri: this._clientConfig.callbackUrl,
-            aud: opts.issuer,
+            aud: opts.fhirServer,
             launch: opts.launch,
             state: opts.state,
             code_challenge: opts.codeChallenge,

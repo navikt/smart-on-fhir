@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../../client/storage/schema'
 import type { FhirDocumentReference, FhirQuestionnaireResponse } from '../../zod'
+import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
 import { mockUpdateDocumentReference } from '../mocks/create-resources'
 import { createLaunchedOpenReadyClient } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
@@ -100,10 +101,10 @@ test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base
 
 const validSession: CompleteSession = {
     // Initial
-    server: 'http://fhir-server',
-    issuer: 'http://fhir-auth-server',
-    authorizationEndpoint: 'http://fhir-auth-server/authorize',
-    tokenEndpoint: 'http://fhir-auth-server/token',
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
+    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+    tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',
     state: 'valid-state',
     // Completed

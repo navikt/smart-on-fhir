@@ -4,16 +4,17 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import type { ResourceCache } from '../client/cache/resource-cache-custom'
 import type { CompleteSession } from '../client/storage/schema'
 
+import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockPractitioner } from './mocks/resources'
 import { expectHas } from './utils/expect'
 import { createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
-    server: 'http://fhir-server',
-    issuer: 'http://fhir-auth-server',
-    authorizationEndpoint: 'http://fhir-auth-server/authorize',
-    tokenEndpoint: 'http://fhir-auth-server/token',
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
+    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+    tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',
     state: 'valid-state',
     // Completed

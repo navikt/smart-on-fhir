@@ -85,9 +85,9 @@ export class ReadyClient {
 
     public async validate(): Promise<boolean> {
         return spanAsync('validate', async (span) => {
-            span.setAttribute(OtelTaxonomy.FhirServer, this._session.server)
+            span.setAttribute(OtelTaxonomy.FhirServer, this._session.fhirServer)
 
-            const smartConfig = await fetchSmartConfiguration(this._session.server)
+            const smartConfig = await fetchSmartConfiguration(this._session.fhirServer)
             if ('error' in smartConfig) {
                 failSpan(span, `Failed to fetch smart configuration`, smartConfig.error)
 
@@ -96,10 +96,10 @@ export class ReadyClient {
 
             try {
                 return await spanAsync('jwt-verify', async (span) => {
-                    span.setAttribute(OtelTaxonomy.FhirServer, this._session.server)
+                    span.setAttribute(OtelTaxonomy.FhirServer, this._session.fhirServer)
 
                     await jwtVerify(this._session.accessToken, getJwkSet(smartConfig.jwks_uri), {
-                        issuer: this._session.issuer,
+                        issuer: this._session.tokenIssuer,
                         algorithms: ['RS256'],
                     })
 
@@ -121,7 +121,7 @@ export class ReadyClient {
         return spanAsync(`create.${resourceType}`, async (span) => {
             span.setAttributes({
                 [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.server,
+                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
             })
 
             const response = await this.fetchWithRefresh(
@@ -162,7 +162,7 @@ export class ReadyClient {
         return spanAsync(`update.${resourceType}`, async (span) => {
             span.setAttributes({
                 [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.server,
+                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
             })
 
             const response = await this.fetchWithRefresh(
@@ -206,7 +206,7 @@ export class ReadyClient {
         return spanAsync(`request.${resourceType}`, async (span) => {
             span.setAttributes({
                 [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.server,
+                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
                 [OtelTaxonomy.ResourceCacheEnabled]: config?.cache != null,
             })
 
