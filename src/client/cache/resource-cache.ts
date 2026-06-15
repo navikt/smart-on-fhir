@@ -6,7 +6,7 @@ import { getCachedResourceInMemory, setCachedResourceInMemory } from './resource
 import type { CacheOptions } from './'
 
 export type CacheItem<Path extends KnownPaths> = {
-    session: { server: string }
+    session: { fhirServer: string }
     resource: Path
 }
 

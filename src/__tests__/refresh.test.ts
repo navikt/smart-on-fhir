@@ -14,8 +14,8 @@ import { createTestAccessToken, createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
-    server: FHIR_SERVER,
-    issuer: AUTH_SERVER,
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
     authorizationEndpoint: `${AUTH_SERVER}/authorize`,
     tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',
@@ -92,7 +92,7 @@ test('SmartClient.request - Should refresh token when server says 401', async ()
     })
 
     // First request should fail with 401 Unauthorized
-    const practitionerUnauthorized = nock('http://fhir-server')
+    const practitionerUnauthorized = nock(FHIR_SERVER)
         .get(`/Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e`)
         .reply(401)
 
@@ -121,7 +121,7 @@ test('SmartClient.create - Should refresh token when server says 401', async () 
     })
 
     // First request should fail with 401 Unauthorized
-    const documentReferenceUnauthorized = nock('http://fhir-server').post(`/DocumentReference`).reply(401)
+    const documentReferenceUnauthorized = nock(FHIR_SERVER).post(`/DocumentReference`).reply(401)
 
     // We then expect the token to be refreshed
     const tokenMock = await mockTokenRefresh({
@@ -153,7 +153,7 @@ test('SmartClient.update - Should refresh token when server says 401', async () 
     })
 
     // First request should fail with 401 Unauthorized
-    const documentReferenceUnauthorized = nock('http://fhir-server').put(`/DocumentReference/my-id`).reply(401)
+    const documentReferenceUnauthorized = nock(FHIR_SERVER).put(`/DocumentReference/my-id`).reply(401)
 
     // We then expect the token to be refreshed
     const tokenMock = await mockTokenRefresh({

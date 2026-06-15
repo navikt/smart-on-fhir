@@ -10,12 +10,13 @@ import { expectHas } from './utils/expect'
 test('should cache smart configuration', async () => {
     mockSmartConfiguration()
 
-    // First fetch works
+    // First fetch hits the nocked network and caches the result
     expectHas(await fetchSmartConfiguration(FHIR_SERVER), 'issuer')
-    // Second fetch hits cache
+    // Second request hits the cache
     expectHas(await fetchSmartConfiguration(FHIR_SERVER), 'issuer')
 
-    // Third fails because its no longer cached and hits the network (which is not nocked anymore)
     clearSmartConfigurationCache()
+
+    // Third fails because its no longer cached and hits the network (which is not nocked anymore)
     expectHas(await fetchSmartConfiguration(FHIR_SERVER), 'error')
 })

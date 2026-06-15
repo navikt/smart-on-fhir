@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import type { CompleteSession } from '../client/storage/schema'
 
+import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockEncounter, mockPatient, mockPractitioner, mockPractitionerWithOperationOutcome } from './mocks/resources'
 import { createLaunchedOpenReadyClient } from './utils/client-open'
@@ -10,10 +11,10 @@ import { createTestIdToken } from './utils/token'
 
 const validSession: CompleteSession = {
     // Initial
-    server: 'http://fhir-server',
-    issuer: 'http://fhir-auth-server',
-    authorizationEndpoint: 'http://fhir-auth-server/authorize',
-    tokenEndpoint: 'http://fhir-auth-server/token',
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
+    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+    tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',
     state: 'valid-state',
     // Completed

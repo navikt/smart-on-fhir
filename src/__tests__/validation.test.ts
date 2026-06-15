@@ -12,8 +12,8 @@ import { createOtherToken, createTestAccessToken, createTestIdToken } from './ut
 
 const validSession: CompleteSession = {
     // Initial
-    server: FHIR_SERVER,
-    issuer: AUTH_SERVER,
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
     authorizationEndpoint: `${AUTH_SERVER}/authorize`,
     tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',

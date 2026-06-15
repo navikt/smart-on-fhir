@@ -3,6 +3,8 @@ import nock, { type RequestBodyMatcher, type Scope } from 'nock'
 import type { PayloadForCreate, ResponseForCreate } from '../../client/fhir/resources/create-resource-map'
 import type { FhirDocumentReference } from '../../zod'
 
+import { FHIR_SERVER } from './common'
+
 const createdDocumentReference: FhirDocumentReference = {
     resourceType: 'DocumentReference',
     id: 'aa66036d-b63c-4c5a-b3d5-b1d1f80000d',
@@ -43,7 +45,7 @@ export function mockCreateDocumentReference(
     expectedPayload: PayloadForCreate<'DocumentReference'>,
     onSuccess: FhirDocumentReference = createdDocumentReference,
 ): Scope {
-    return nock('http://fhir-server')
+    return nock(FHIR_SERVER)
         .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
         .reply(200, onSuccess)
 }
@@ -57,7 +59,7 @@ export function mockUpdateDocumentReference({
     expectedPayload: PayloadForCreate<'DocumentReference'>
     onSuccess?: ResponseForCreate<'DocumentReference'>
 }): Scope {
-    return nock('http://fhir-server')
+    return nock(FHIR_SERVER)
         .put(`/DocumentReference/${expectedId}`, expectedPayload as RequestBodyMatcher)
         .reply(200, onSuccess)
 }
@@ -71,7 +73,7 @@ export function mockUpdateQuestionnaireResponse({
     expectedPayload: PayloadForCreate<'QuestionnaireResponse'>
     onSuccess: ResponseForCreate<'QuestionnaireResponse'>
 }): Scope {
-    return nock('http://fhir-server')
+    return nock(FHIR_SERVER)
         .put(`/QuestionnaireResponse/${expectedId}`, expectedPayload as RequestBodyMatcher)
         .reply(200, onSuccess)
 }

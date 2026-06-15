@@ -2,8 +2,10 @@ import { expect, test } from 'vitest'
 
 import { SmartClient } from '../client'
 import { safeSmartStorage } from '../client/storage'
+import type { InitialSession } from '../client/storage/schema'
 
 import { mockTokenExchange } from './mocks/auth'
+import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockSmartConfiguration } from './mocks/issuer'
 import { expectHas } from './utils/expect'
 import { createMockedStorage, createTestStorage } from './utils/storage'
@@ -20,7 +22,7 @@ test('public, launch - should allow launches for known issuers', async () => {
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'public',
                 },
             ],
@@ -31,7 +33,7 @@ test('public, launch - should allow launches for known issuers', async () => {
     mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'redirectUrl')
@@ -59,7 +61,7 @@ test('public, launch - should block launches for unknown issuers if allowAnyIssu
 
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'error')
@@ -78,7 +80,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'confidential-symmetric',
                     method: 'client_secret_basic',
                     clientSecret: 'test-secret',
@@ -91,7 +93,7 @@ test('confidential-symmentric, launch - should allow launches for known issuers'
     mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'redirectUrl')
@@ -110,7 +112,7 @@ test('confidential-symmentric, .ready() - should gracefully handle when issuer i
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'confidential-symmetric',
                     method: 'client_secret_basic',
                     clientSecret: 'test-secret',
@@ -123,7 +125,7 @@ test('confidential-symmentric, .ready() - should gracefully handle when issuer i
     mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
 
     expectHas(result, 'redirectUrl')
@@ -171,14 +173,17 @@ test('confidential-symmentric, .ready() - should gracefully handle when issuer i
 
 test('confidential-symmentric, token - should set correct authorization headers when client_secret_basic', async () => {
     const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(() => ({
-        server: 'http://fhir-server',
-        issuer: 'http://auth-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
-        codeVerifier: 'test-code-verifier',
-        state: 'some-value',
-    }))
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'some-value',
+            }) satisfies InitialSession,
+    )
 
     const client = new SmartClient(
         'test-session',
@@ -190,7 +195,7 @@ test('confidential-symmentric, token - should set correct authorization headers 
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'confidential-symmetric',
                     method: 'client_secret_basic',
                     clientSecret: 'test-secret',
@@ -222,14 +227,17 @@ test('confidential-symmentric, token - should set correct authorization headers 
 
 test('confidential-symmentric, token - should set correct authorization property when client_secret_post', async () => {
     const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(() => ({
-        server: 'http://fhir-server',
-        issuer: 'http://auth-server',
-        authorizationEndpoint: 'http://auth-server/authorize',
-        tokenEndpoint: 'http://auth-server/token',
-        codeVerifier: 'test-code-verifier',
-        state: 'some-value',
-    }))
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'some-value',
+            }) satisfies InitialSession,
+    )
 
     const client = new SmartClient(
         'test-session',
@@ -241,7 +249,7 @@ test('confidential-symmentric, token - should set correct authorization property
             knownFhirServers: [
                 {
                     name: 'TestMed',
-                    issuer: 'http://fhir-server',
+                    issuer: FHIR_SERVER,
                     type: 'confidential-symmetric',
                     method: 'client_secret_post',
                     clientSecret: 'test-secret',

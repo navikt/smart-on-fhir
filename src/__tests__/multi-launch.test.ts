@@ -4,6 +4,7 @@ import { ReadyClient, SmartClient, type SmartStorage } from '../client'
 import { safeSmartStorage } from '../client/storage'
 
 import { mockTokenExchange } from './mocks/auth'
+import { FHIR_SERVER } from './mocks/common'
 import { mockSmartConfiguration } from './mocks/issuer'
 import { TEST_SESSION_ID } from './utils/client-open'
 import { expectHas, expectIs } from './utils/expect'
@@ -140,7 +141,7 @@ async function fullLaunch(patient: string, storage: SmartStorage, client?: Smart
     mockSmartConfiguration()
     const result = await client.launch({
         launch: 'test-launch',
-        iss: 'http://fhir-server',
+        iss: FHIR_SERVER,
     })
     expectHas(result, 'redirectUrl')
 

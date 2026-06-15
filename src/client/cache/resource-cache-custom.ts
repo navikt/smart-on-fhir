@@ -1,4 +1,5 @@
 import type { KnownPaths, ResponseFor } from '../fhir/resources/resource-map'
+import { removeTrailingSlash } from '../smart/lib/utils'
 
 import type { CacheItem } from './resource-cache'
 
@@ -20,7 +21,7 @@ export async function getCachedResourceCustom<Path extends KnownPaths>(
     cache: ResourceCache | Promise<ResourceCache>,
     item: CacheItem<Path>,
 ): Promise<ResponseFor<Path> | null> {
-    const key = `${item.session.server}|${item.resource}`
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
     const itemInCache = await (await cache).get(key)
 
@@ -32,7 +33,7 @@ export async function setCachedResourceCustom<Path extends KnownPaths>(
     item: CacheItem<Path> & { values: ResponseFor<Path> },
     cacheOptions: { ttl: number },
 ): Promise<void> {
-    const key = `${item.session.server}|${item.resource}`
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
     return (await cache).set(key, item.values, cacheOptions.ttl)
 }
