@@ -11,8 +11,8 @@
         "test": "vitest",
         "tsc": "tsc",
         "lint": "biome check",
-        "format": "biome format --write",
-        "format:markdown": "bunx prettier --write docs/**/*.md",
+        "fmt": "oxfmt",
+        "fmt:check": "oxfmt --check",
         "postinstall": "husky",
         "next:major": "yarn version -i major",
         "next:minor": "yarn version -i minor",
@@ -53,16 +53,16 @@
     },
     "devDependencies": {
         "@biomejs/biome": "2.5.0",
-        "@karl-run/prettier-config": "^1.1.0",
         "@navikt/tsm-biome": "^1.0.1",
+        "@navikt/tsm-oxfmt": "^0.0.5",
         "@types/node": "24.13.2",
         "@vitest/coverage-v8": "4.1.8",
         "husky": "^9.1.7",
         "lint-staged": "^17.0.7",
         "nock": "^14.0.15",
+        "oxfmt": "^0.54.0",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
-        "prettier": "^3.8.4",
         "tsdown": "^0.22.2",
         "typescript": "^6.0.3",
         "vitepress": "^1.6.4",
@@ -71,6 +71,5 @@
         "vitest": "^4.1.8",
         "vue": "^3.5.38",
         "zod": "^4.4.3"
-    },
-    "prettier": "@karl-run/prettier-config"
+    }
 }

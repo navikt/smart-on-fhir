@@ -1,6 +1,6 @@
 body,
 :host {
-    font-family: var(--ax-font-family, "Source Sans 3", "Source Sans Pro", Arial, sans-serif);
+    font-family: var(--ax-font-family, 'Source Sans 3', 'Source Sans Pro', Arial, sans-serif);
     font-size: 1.125rem;
     line-height: 1.333;
 }

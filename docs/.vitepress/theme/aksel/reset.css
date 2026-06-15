@@ -14,8 +14,8 @@ html {
         Helvetica,
         Arial,
         sans-serif,
-        "Apple Color Emoji",
-        "Segoe UI Emoji";
+        'Apple Color Emoji',
+        'Segoe UI Emoji';
     line-height: 1.15;
 }
 
@@ -78,9 +78,9 @@ textarea {
 }
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
     -webkit-appearance: button;
 }
 
@@ -100,7 +100,7 @@ progress {
     height: auto;
 }
 
-[type="search"] {
+[type='search'] {
     -webkit-appearance: textfield;
     outline-offset: -2px;
 }
