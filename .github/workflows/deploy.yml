@@ -18,7 +18,7 @@ jobs:
     outputs:
       skip: ${{ steps.check.outputs.skip }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: check
         run: |
           if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
@@ -40,16 +40,10 @@ jobs:
     name: Test, lint and verify
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: corepack enable
-      - uses: actions/setup-node@v4
-        id: setup-node
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
         with:
-          node-version: 24.x
-          cache: yarn
-      - run: yarn install --immutable
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn tsc
       - run: yarn test
       - name: Test report
@@ -63,16 +57,10 @@ jobs:
     needs: [ should_release ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: corepack enable
-      - uses: actions/setup-node@v4
-        id: setup-node
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
         with:
-          node-version: 24.x
-          cache: yarn
-      - run: yarn install --immutable
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
       - name: Summarize tsup build
         run: |
@@ -87,16 +75,10 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
         with:
-          fetch-depth: '0'
-      - run: corepack enable
-      - uses: actions/setup-node@v4
-        id: setup-node
-        with:
-          node-version: 24.x
-          cache: yarn
-      - run: yarn install --immutable
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
       - name: Summarize tsup build
         run: |
