@@ -1,8 +1,9 @@
 import type { KnownPaths, ResponseFor } from '../fhir/resources/resource-map'
 
-import type { CacheOptions } from './index'
 import { getCachedResourceCustom, setCachedResourceCustom } from './resource-cache-custom'
 import { getCachedResourceInMemory, setCachedResourceInMemory } from './resource-cache-inmem'
+
+import type { CacheOptions } from './'
 
 export type CacheItem<Path extends KnownPaths> = {
     session: { server: string }

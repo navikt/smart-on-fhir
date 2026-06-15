@@ -10,7 +10,8 @@
         "build": "tsdown",
         "test": "vitest",
         "tsc": "tsc",
-        "lint": "biome check",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
         "fmt": "oxfmt",
         "fmt:check": "oxfmt --check",
         "postinstall": "husky",
@@ -52,8 +53,6 @@
         "zod": "4"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.5.0",
-        "@navikt/tsm-biome": "^1.0.1",
         "@navikt/tsm-oxfmt": "^0.0.5",
         "@types/node": "24.13.2",
         "@vitest/coverage-v8": "4.1.8",
@@ -61,6 +60,8 @@
         "lint-staged": "^17.0.7",
         "nock": "^14.0.15",
         "oxfmt": "^0.54.0",
+        "oxlint": "^1.69.0",
+        "oxlint-tsgolint": "^0.23.0",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
         "tsdown": "^0.22.2",
