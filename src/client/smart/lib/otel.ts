@@ -64,4 +64,5 @@ export const OtelTaxonomy = {
     SessionError: 'session.error',
     SessionRefreshed: 'session.refreshed',
     SessionMulti: 'session.multi-launch',
+    SessionMultiFallback: 'session.multi-launch.hit-fallback',
 }

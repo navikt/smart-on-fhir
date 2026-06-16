@@ -173,7 +173,9 @@ export class SmartClient {
                 state: state,
             }
 
-            await this._storage.set(this.sessionId, initialSessionPayload)
+            await spanAsync('save-initial-session', async () =>
+                this._storage.set(this.sessionId, initialSessionPayload),
+            )
 
             /**
              * PKCE STEP 2
@@ -245,7 +247,7 @@ export class SmartClient {
                 encounter: tokenResponse.encounter,
             }
 
-            await this._storage.set(this.sessionId, completeSessionValues)
+            await spanAsync('save-complete-session', () => this._storage.set(this.sessionId, completeSessionValues))
 
             if (!this.options.multiLaunch) {
                 return { redirectUrl: this._clientConfig.redirectUrl }
@@ -255,7 +257,9 @@ export class SmartClient {
              * When multi-launch is enabled, we also store the session under <sessionId>:<patientId> to allow
              * for the state to be retrieved in a activePatient-context later.
              */
-            await this._storage.set(`${this.sessionId}:${tokenResponse.patient}`, completeSessionValues)
+            await spanAsync('save-complete-multi-session', () =>
+                this._storage.set(`${this.sessionId}:${tokenResponse.patient}`, completeSessionValues),
+            )
 
             const url = new URL(this._clientConfig.redirectUrl)
             url.searchParams.set('patient', completeSessionValues.patient)
@@ -328,9 +332,11 @@ export class SmartClient {
             refreshToken: refreshResponse.refresh_token,
         }
 
-        await this._storage.set(this.sessionId, refreshedSessionValues)
+        await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
         if (this.activePatient) {
-            await this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues)
+            await spanAsync('refresh-multi-session', () =>
+                this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues),
+            )
         }
 
         return refreshedSessionValues
@@ -340,15 +346,19 @@ export class SmartClient {
         return spanAsync('get-complete', async (span) => {
             let session: CompleteSession | CompleteSessionErrors
             if (this.activePatient != null) {
-                const activePatientSession = await this._storage.getComplete(`${this.sessionId}:${this.activePatient}`)
+                const activePatientSession = await spanAsync('get-complete-multi-session', () =>
+                    this._storage.getComplete(`${this.sessionId}:${this.activePatient}`),
+                )
 
                 if ('error' in activePatientSession) {
-                    session = await this._storage.getComplete(this.sessionId)
+                    span.setAttribute(OtelTaxonomy.SessionMultiFallback, true)
+                    session = await spanAsync('get-complete-session', () => this._storage.getComplete(this.sessionId))
                 } else {
+                    span.setAttribute(OtelTaxonomy.SessionMultiFallback, false)
                     session = activePatientSession
                 }
             } else {
-                session = await this._storage.getComplete(this.sessionId)
+                session = await spanAsync('get-complete-session', () => this._storage.getComplete(this.sessionId))
             }
 
             if ('error' in session) {
@@ -364,7 +374,9 @@ export class SmartClient {
 
     private async getInitialSession(sessionId: string): Promise<InitialSession | InitialSessionErrors> {
         return spanAsync('get-partial', async (span) => {
-            const existingSession = await this._storage.getPartial(sessionId)
+            const existingSession = await spanAsync('get-complete-multi-session', () =>
+                this._storage.getPartial(sessionId),
+            )
             if ('error' in existingSession) {
                 span.setAttribute(OtelTaxonomy.SessionError, existingSession.error)
                 failSpan(span, `Session not found for sessionId ${sessionId}, was ${existingSession.error}`)
