@@ -178,6 +178,8 @@ test('confidential-symmentric, token - should set correct authorization headers 
             ({
                 fhirServer: FHIR_SERVER,
                 tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
                 authorizationEndpoint: `${AUTH_SERVER}/authorize`,
                 tokenEndpoint: `${AUTH_SERVER}/token`,
                 codeVerifier: 'test-code-verifier',
@@ -232,6 +234,8 @@ test('confidential-symmentric, token - should set correct authorization property
             ({
                 fhirServer: FHIR_SERVER,
                 tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
                 authorizationEndpoint: `${AUTH_SERVER}/authorize`,
                 tokenEndpoint: `${AUTH_SERVER}/token`,
                 codeVerifier: 'test-code-verifier',

@@ -1,5 +1,6 @@
 import nock, { type Scope } from 'nock'
 
+import type { SmartConfiguration } from '../../client/smart/well-known/smart-configuration-schema'
 import { createKeys } from '../utils/jwt'
 
 import { AUTH_SERVER, FHIR_SERVER } from './common'
@@ -14,9 +15,10 @@ export function mockSmartConfiguration(): Scope {
         .reply(200, {
             issuer: AUTH_SERVER,
             jwks_uri: `${AUTH_SERVER}/jwks`,
+            introspection_endpoint: `${AUTH_SERVER}/introspect`,
             authorization_endpoint: `${AUTH_SERVER}/authorize`,
             token_endpoint: `${AUTH_SERVER}/token`,
-        })
+        } satisfies SmartConfiguration)
 }
 
 export function mockJwks(): Scope {

@@ -67,6 +67,8 @@ const validSession: CompleteSession = {
     // Initial
     fhirServer: FHIR_SERVER,
     tokenIssuer: AUTH_SERVER,
+    jwksUri: `${AUTH_SERVER}/jwks`,
+    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
     authorizationEndpoint: `${AUTH_SERVER}/authorize`,
     tokenEndpoint: `${AUTH_SERVER}/token`,
     codeVerifier: 'valid-code-verifier',

@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../client'
 import { safeSmartStorage } from '../client/storage'
+import type { InitialSession } from '../client/storage/schema'
 
 import { mockTokenExchange } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
@@ -27,12 +28,14 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
      */
     expect(storage.setFn).toHaveBeenCalledWith(TEST_SESSION_ID, {
         tokenIssuer: AUTH_SERVER,
+        jwksUri: `${AUTH_SERVER}/jwks`,
+        introspectionEndpoint: `${AUTH_SERVER}/introspect`,
         authorizationEndpoint: `${AUTH_SERVER}/authorize`,
         tokenEndpoint: `${AUTH_SERVER}/token`,
         fhirServer: FHIR_SERVER,
         codeVerifier: expect.any(String),
         state: expect.any(String),
-    })
+    } satisfies InitialSession)
 
     /**
      * Should create a redirect URL with PKCE and state
@@ -82,14 +85,19 @@ test('.launch - should gracefully handle well-known responding with invalid payl
 
 test('.callback should exchange code for token', async () => {
     const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(() => ({
-        fhirServer: FHIR_SERVER,
-        tokenIssuer: AUTH_SERVER,
-        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-        tokenEndpoint: `${AUTH_SERVER}/token`,
-        codeVerifier: 'test-code-verifier',
-        state: 'some-value',
-    }))
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'some-value',
+            }) satisfies InitialSession,
+    )
     const client = createSmartClient(storage)
 
     const tokenResponseNock = await mockTokenExchange({
@@ -111,14 +119,19 @@ test('.callback should exchange code for token', async () => {
 
 test('.callback should gracefully handle state mismatch', async () => {
     const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(() => ({
-        fhirServer: FHIR_SERVER,
-        tokenIssuer: AUTH_SERVER,
-        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-        tokenEndpoint: `${AUTH_SERVER}/token`,
-        codeVerifier: 'test-code-verifier',
-        state: 'this-expected-value',
-    }))
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'this-expected-value',
+            }) satisfies InitialSession,
+    )
     const client = createSmartClient(storage)
 
     await mockTokenExchange({
@@ -139,14 +152,19 @@ test('.callback should gracefully handle state mismatch', async () => {
 
 test('.callback should redirect with patient ID when enableMultiLaunch=true', async () => {
     const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(() => ({
-        fhirServer: FHIR_SERVER,
-        tokenIssuer: AUTH_SERVER,
-        authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-        tokenEndpoint: `${AUTH_SERVER}/token`,
-        codeVerifier: 'test-code-verifier',
-        state: 'some-value',
-    }))
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'some-value',
+            }) satisfies InitialSession,
+    )
     const client = createSmartClient(storage, { enableMultiLaunch: true })
 
     const tokenResponseNock = await mockTokenExchange({

@@ -1,4 +1,4 @@
-import { decodeJwt, jwtVerify } from 'jose'
+import { decodeJwt } from 'jose'
 import type * as z from 'zod'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
@@ -18,9 +18,9 @@ import { logger } from './lib/logger'
 import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
 import { inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
+import { validateToken } from './token/token'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
 import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './types/client-errors'
-import { fetchSmartConfiguration, getJwkSet } from './well-known/smart-configuration'
 
 /**
  * **Smart App Launch reference**
@@ -84,32 +84,9 @@ export class ReadyClient {
     }
 
     public async validate(): Promise<boolean> {
-        return spanAsync('validate', async (span) => {
-            span.setAttribute(OtelTaxonomy.FhirServer, this._session.fhirServer)
+        const validationResult = await validateToken(this._session)
 
-            const smartConfig = await fetchSmartConfiguration(this._session.fhirServer)
-            if ('error' in smartConfig) {
-                failSpan(span, `Failed to fetch smart configuration`, smartConfig.error)
-
-                return false
-            }
-
-            try {
-                return await spanAsync('jwt-verify', async (span) => {
-                    span.setAttribute(OtelTaxonomy.FhirServer, this._session.fhirServer)
-
-                    await jwtVerify(this._session.accessToken, getJwkSet(smartConfig.jwks_uri), {
-                        issuer: this._session.tokenIssuer,
-                        algorithms: ['RS256'],
-                    })
-
-                    return true
-                })
-            } catch (error) {
-                failSpan(span, 'Token validation failed', error)
-                return false
-            }
-        })
+        return validationResult.valid
     }
 
     public async create<Path extends KnownCreatePaths>(

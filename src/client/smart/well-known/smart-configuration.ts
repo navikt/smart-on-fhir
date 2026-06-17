@@ -1,5 +1,3 @@
-import { createRemoteJWKSet } from 'jose'
-
 import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
 import { removeTrailingSlash } from '../lib/utils'
@@ -8,7 +6,7 @@ import { getCachedSmartConfiguration, setSmartConfigurationCache } from './smart
 import type { SmartConfigurationErrors } from './smart-configuration-errors'
 import { type SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
 
-export async function fetchSmartConfiguration(
+export async function getSmartConfiguration(
     fhirServer: string,
 ): Promise<SmartConfiguration | SmartConfigurationErrors> {
     fhirServer = removeTrailingSlash(fhirServer)
@@ -52,13 +50,4 @@ export async function fetchSmartConfiguration(
             return { error: 'UNKNOWN_ERROR' }
         }
     })
-}
-
-const remoteJWKSetCache: Record<string, ReturnType<typeof createRemoteJWKSet>> = {}
-export function getJwkSet(jwksUri: string): ReturnType<typeof createRemoteJWKSet> {
-    if (remoteJWKSetCache[jwksUri] == null) {
-        remoteJWKSetCache[jwksUri] = createRemoteJWKSet(new URL(jwksUri))
-    }
-
-    return remoteJWKSetCache[jwksUri]
 }

@@ -1,4 +1,5 @@
-import { decodeJwt } from 'jose'
+import { decodeJwt, jwtVerify } from 'jose'
+import { JOSEError } from 'jose/errors'
 
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { FhirAuthMode } from '../client-auth-method/config'
@@ -8,6 +9,7 @@ import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
 import type { SmartClientConfiguration } from '../types/config'
 
+import { getJwkSet } from './jwk-set'
 import type { RefreshTokenErrors, TokenExchangeErrors } from './token-errors'
 import {
     type TokenRefreshResponse,
@@ -138,6 +140,50 @@ export async function refreshToken(
         }
 
         return parsedTokenResponse.data
+    })
+}
+
+type ValidTokenValidation = {
+    valid: true
+    exp: number
+    iat: number
+}
+
+type InvalidTokenValidation = {
+    valid: false
+    reason: string
+}
+
+/**
+ * Validates JWT (does not support opaque tokens) using jose.
+ */
+export async function validateToken(session: CompleteSession): Promise<ValidTokenValidation | InvalidTokenValidation> {
+    return spanAsync('token-validate', async (span) => {
+        span.setAttribute(OtelTaxonomy.FhirServer, session.fhirServer)
+
+        try {
+            return await spanAsync('jwt-verify', async (span) => {
+                span.setAttribute(OtelTaxonomy.FhirServer, session.fhirServer)
+
+                const verified = await jwtVerify(session.accessToken, getJwkSet(session.jwksUri), {
+                    issuer: session.tokenIssuer,
+                    algorithms: ['RS256'],
+                })
+
+                return {
+                    valid: true,
+                    exp: verified.payload.exp ?? -1,
+                    iat: verified.payload.iat ?? -1,
+                } satisfies ValidTokenValidation
+            })
+        } catch (error) {
+            failSpan(span, 'Token validation failed', error)
+
+            return {
+                valid: false,
+                reason: error instanceof JOSEError ? error.code : 'OTHER',
+            }
+        }
     })
 }
 

@@ -14,7 +14,7 @@ import { exchangeToken, refreshToken, tokenExpiresIn } from './token/token'
 import type { RefreshTokenErrors } from './token/token-errors'
 import type { CallbackError, SmartClientReadyErrors } from './types/client-errors'
 import type { SmartClientConfiguration, SmartClientOptions } from './types/config'
-import { fetchSmartConfiguration } from './well-known/smart-configuration'
+import { getSmartConfiguration } from './well-known/smart-configuration'
 import type { SmartConfigurationErrors } from './well-known/smart-configuration-errors'
 
 /**
@@ -152,7 +152,7 @@ export class SmartClient {
                 return { error: 'UNKNOWN_ISSUER' }
             }
 
-            const smartConfig = await fetchSmartConfiguration(params.iss)
+            const smartConfig = await getSmartConfiguration(params.iss)
             if ('error' in smartConfig) {
                 return { error: smartConfig.error }
             }
@@ -167,6 +167,8 @@ export class SmartClient {
             const initialSessionPayload: InitialSession = {
                 fhirServer: params.iss,
                 tokenIssuer: smartConfig.issuer,
+                jwksUri: smartConfig.jwks_uri,
+                introspectionEndpoint: smartConfig.introspection_endpoint,
                 authorizationEndpoint: smartConfig.authorization_endpoint,
                 tokenEndpoint: smartConfig.token_endpoint,
                 codeVerifier: codeVerifier,
