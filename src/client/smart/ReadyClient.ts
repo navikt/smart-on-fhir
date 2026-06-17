@@ -160,7 +160,7 @@ export class ReadyClient {
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(span, 'Failed to parse DocumentReference (from PUT/update)', parsed.error)
+                failSpan(span, `Failed to parse ${resourceType} (from PUT/update)`, parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
@@ -269,11 +269,13 @@ export class ReadyClient {
 
         const refresh = await this._client.refresh(this._session)
         if ('error' in refresh) {
-            logger.error(`Failed to refresh session: ${refresh.error}`)
+            failSpan(span, `Failed to refresh session: ${refresh.error}`)
+
             span.setAttributes({
                 [OtelTaxonomy.SessionError]: refresh.error,
                 [OtelTaxonomy.SessionRefreshed]: false,
             })
+
             // Couldn't refresh, let the rest of the code handle the 401
             return response
         }

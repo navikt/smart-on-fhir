@@ -324,24 +324,29 @@ export class SmartClient {
      * This will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
-        const authMode: FhirAuthMode = this.getKnownFhirServer(session.fhirServer) ?? { type: 'public' }
-        const refreshResponse = await refreshToken(session, this._clientConfig, authMode)
-        if ('error' in refreshResponse) return refreshResponse
+        return spanAsync('refresh', async (span) => {
+            const authMode: FhirAuthMode = this.getKnownFhirServer(session.fhirServer) ?? { type: 'public' }
+            const refreshResponse = await refreshToken(session, this._clientConfig, authMode)
+            if ('error' in refreshResponse) {
+                failSpan(span, `Failed to refresh session: ${refreshResponse.error}`)
+                return refreshResponse
+            }
 
-        const refreshedSessionValues: CompleteSession = {
-            ...session,
-            accessToken: refreshResponse.access_token,
-            refreshToken: refreshResponse.refresh_token,
-        }
+            const refreshedSessionValues: CompleteSession = {
+                ...session,
+                accessToken: refreshResponse.access_token,
+                refreshToken: refreshResponse.refresh_token,
+            }
 
-        await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
-        if (this.activePatient) {
-            await spanAsync('refresh-multi-session', () =>
-                this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues),
-            )
-        }
+            await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
+            if (this.activePatient) {
+                await spanAsync('refresh-multi-session', () =>
+                    this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues),
+                )
+            }
 
-        return refreshedSessionValues
+            return refreshedSessionValues
+        })
     }
 
     private async getCompleteSession(): Promise<CompleteSession | CompleteSessionErrors> {
@@ -405,15 +410,10 @@ export class SmartClient {
                         [OtelTaxonomy.SessionRefreshed]: false,
                     })
 
-                    failSpan(span, 'SmartClient.getSession failed to refresh session', refreshResult.error)
+                    failSpan(span, `SmartClient.getSession failed to refresh session: ${refreshResult.error}`)
 
                     // Return potentially expired session, let the rest of the auth flow handle the expiredness.
                     return session
-                }
-
-                await this._storage.set(this.sessionId, refreshResult)
-                if (this.activePatient) {
-                    await this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshResult)
                 }
 
                 span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
