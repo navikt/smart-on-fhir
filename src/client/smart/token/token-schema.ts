@@ -1,5 +1,9 @@
 import * as z from 'zod'
 
+const FhirId = z.string().regex(/^[A-Za-z0-9\-.]{1,64}$/, {
+    error: 'Invalid FHIR id: must be 1-64 characters of ASCII letters, digits, "-" or "."',
+})
+
 export type TokenResponse = z.infer<typeof TokenResponseSchema>
 export const TokenResponseSchema = z.object({
     // OIDC:
@@ -7,8 +11,8 @@ export const TokenResponseSchema = z.object({
     id_token: z.string(),
     refresh_token: z.string(),
     // SMART:
-    patient: z.string(),
-    encounter: z.string(),
+    patient: FhirId,
+    encounter: FhirId,
 })
 
 export type TokenRefreshResponse = z.infer<typeof TokenRefreshResponseSchema>
