@@ -15,7 +15,7 @@ type OpenSmartClientConfiguration = {
     allowAnyIssuer: true
 }
 
-export type ClosedSmartClientConfiguration = {
+type ClosedSmartClientConfiguration = {
     /**
      * Only this list of known FHIR servers will be allowed to launch the application, using their appropirate
      * authentication methods.

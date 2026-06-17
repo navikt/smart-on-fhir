@@ -14,7 +14,7 @@ const getKeyPair = async () => {
     return keyPair
 }
 
-export async function publicJwk(): Promise<JWK> {
+async function publicJwk(): Promise<JWK> {
     const { publicKey } = await getKeyPair()
 
     return await exportJWK(publicKey)

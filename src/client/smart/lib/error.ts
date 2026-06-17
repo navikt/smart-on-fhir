@@ -40,13 +40,13 @@ export async function responseToFormattedError(response: Response): Promise<[Err
     ]
 }
 
-export function formatOperationOutcome(operationOutcome: OperationOutcome): string {
+function formatOperationOutcome(operationOutcome: OperationOutcome): string {
     const issues = operationOutcome.issue.map((it) => `${it.severity} (${it.code}): ${it.diagnostics}`)
 
     return `FHIR OperationOutcome: ${issues.join('\n')}`
 }
 
-export function operationOutcomeToError(operationOutcome: OperationOutcome): Error {
+function operationOutcomeToError(operationOutcome: OperationOutcome): Error {
     const message = formatOperationOutcome(operationOutcome)
 
     return new Error(message, { cause: new Error(JSON.stringify(operationOutcome, null, 2)) })
