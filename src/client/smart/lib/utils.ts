@@ -17,6 +17,15 @@ export function assertGoodSessionId(sessionId: string | null | undefined): asser
     }
 }
 
+export function verifyUrlIsHttps(url: string): url is `https://${string}` {
+    if (process.env.NODE_ENV !== 'production') {
+        // Allow http in local development
+        return true
+    }
+
+    return url.startsWith('https://')
+}
+
 export function removeTrailingSlash(url: string): string {
     return url.replace(/\/$/, '')
 }

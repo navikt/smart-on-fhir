@@ -8,7 +8,7 @@ import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/sto
 
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
 import { failSpan, OtelTaxonomy, spanAsync } from './lib/otel'
-import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash } from './lib/utils'
+import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash, verifyUrlIsHttps } from './lib/utils'
 import { ReadyClient } from './ReadyClient'
 import { exchangeToken, refreshToken, tokenExpiresIn } from './token/token'
 import type { RefreshTokenErrors } from './token/token-errors'
@@ -145,6 +145,11 @@ export class SmartClient {
                 [OtelTaxonomy.FhirServer]: removeTrailingSlash(params.iss),
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
+
+            if (!verifyUrlIsHttps(params.iss)) {
+                failSpan(span, 'Issuer did not use https scheme, that is illegal!')
+                return { error: 'UNKNOWN_ERROR' }
+            }
 
             const validIssuer = this.validateFhirServer(params.iss)
             if (!validIssuer) {
@@ -292,8 +297,8 @@ export class SmartClient {
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
-            const validatedIssuer = this.validateFhirServer(session.fhirServer)
-            if (!validatedIssuer) {
+            const validIssuer = this.validateFhirServer(session.fhirServer)
+            if (!validIssuer) {
                 failSpan(
                     span,
                     `Tried .ready() with active session, but FHIR server was not known`,
