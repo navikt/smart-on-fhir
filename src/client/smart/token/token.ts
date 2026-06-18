@@ -3,7 +3,7 @@ import { JOSEError } from 'jose/errors'
 
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { FhirAuthMode } from '../client-auth-method/config'
-import { postFormEncoded } from '../client-auth-method/fetch'
+import { postFormEncodedTokenEndpoint } from '../client-auth-method/fetch'
 import { responseToFormattedError } from '../lib/error'
 import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
@@ -42,7 +42,7 @@ export async function exchangeToken(
          * PKCE STEP 5
          * Send code and the code_verifier (created in step 1) to the authorization servers /oauth/token endpoint.
          */
-        const response = await postFormEncoded(
+        const response = await postFormEncodedTokenEndpoint(
             session.tokenEndpoint,
             new URLSearchParams(tokenRequestBody),
             config.clientId,
@@ -105,7 +105,7 @@ export async function refreshToken(
             refresh_token: session.refreshToken,
         }
 
-        const response = await postFormEncoded(
+        const response = await postFormEncodedTokenEndpoint(
             session.tokenEndpoint,
             new URLSearchParams(tokenRequestBody),
             config.clientId,
