@@ -1,89 +1,89 @@
 name: Build & Deploy
 on:
-    push:
-        paths-ignore:
-            - docs/**
-            - README.md
-            - .github/workflows/docs-deploy.yml
-            - biome.json
+  push:
+    paths-ignore:
+      - docs/**
+      - README.md
+      - .github/workflows/docs-deploy.yml
+      - biome.json
 
 permissions:
-    contents: read
-    id-token: write
-    packages: write
+  contents: read
+  id-token: write
+  packages: write
 
 jobs:
-    should_release:
-        runs-on: ubuntu-latest
-        outputs:
-            skip: ${{ steps.check.outputs.skip }}
-        steps:
-            - uses: actions/checkout@v6
-            - id: check
-              run: |
-                  if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
-                      echo "skip=true" >> "$GITHUB_OUTPUT"
-                      echo "⏭️ Skipping release because not on main branch." >> "$GITHUB_STEP_SUMMARY"
-                      exit 0
-                  fi
+  should_release:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: check
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "⏭️ Skipping release because not on main branch." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+          fi
 
-                  body="$(git log -1 --pretty=%B | tail -n +2)"
-                  if echo "$body" | grep -qi 'skip release'; then
-                    echo "skip=true" >> "$GITHUB_OUTPUT"
-                    echo "⏭️ Skipping release due to 'skip release' in commit message." >> "$GITHUB_STEP_SUMMARY"
-                  else
-                    echo "skip=false" >> "$GITHUB_OUTPUT"
-                    echo "✅ Proceeding with release." >> "$GITHUB_STEP_SUMMARY"
-                  fi
+          body="$(git log -1 --pretty=%B | tail -n +2)"
+          if echo "$body" | grep -qi 'skip release'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "⏭️ Skipping release due to 'skip release' in commit message." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Proceeding with release." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
-    test-and-verify:
-        name: Test, lint and verify
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v6
-            - uses: navikt/tsm-workflows/actions/yarn@main
-              with:
-                  READER_TOKEN: ${{ secrets.READER_TOKEN }}
-            - run: yarn tsc
-            - run: yarn test
-            - name: Test report
-              if: always()
-              run: |
-                  ./scripts/tests.mjs ./vitest-report.json >> "$GITHUB_STEP_SUMMARY"
+  test-and-verify:
+    name: Test, lint and verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
+        with:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - run: yarn tsc
+      - run: yarn test
+      - name: Test report
+        if: always()
+        run: |
+          ./scripts/tests.mjs ./vitest-report.json >> "$GITHUB_STEP_SUMMARY"
 
-    # Used for branches and pull requests
-    verify-build:
-        if: needs.should_release.outputs.skip == 'true'
-        needs: [should_release]
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v6
-            - uses: navikt/tsm-workflows/actions/yarn@main
-              with:
-                  READER_TOKEN: ${{ secrets.READER_TOKEN }}
-            - run: yarn build
+  # Used for branches and pull requests
+  verify-build:
+    if: needs.should_release.outputs.skip == 'true'
+    needs: [should_release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
+        with:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - run: yarn build
 
-    # Full build and release of library artifact, only on main
-    build_and_release:
-        if: github.ref == 'refs/heads/main' && needs.should_release.outputs.skip == 'false'
-        needs: [should_release, test-and-verify]
-        permissions:
-            packages: write
-            contents: write
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v6
-            - uses: navikt/tsm-workflows/actions/yarn@main
-              with:
-                  READER_TOKEN: ${{ secrets.READER_TOKEN }}
-            - run: yarn build
-            - name: Publish package
-              run: |
-                  yarn pinst --disable
-                  yarn npm publish
-                  yarn pinst --enable
-                  ./scripts/create-release.sh
-                  ./scripts/bump-version.sh
-              env:
-                  NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Full build and release of library artifact, only on main
+  build_and_release:
+    if: github.ref == 'refs/heads/main' && needs.should_release.outputs.skip == 'false'
+    needs: [should_release, test-and-verify]
+    permissions:
+      packages: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: navikt/tsm-workflows/actions/yarn@main
+        with:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - run: yarn build
+      - name: Publish package
+        run: |
+          yarn pinst --disable
+          yarn npm publish
+          yarn pinst --enable
+          ./scripts/create-release.sh
+          ./scripts/bump-version.sh
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
