@@ -1,13 +1,15 @@
-import { expect, test } from 'vitest'
+import { jwtVerify } from 'jose'
+import { describe, expect, test } from 'vitest'
 
 import { SmartClient } from '../client'
 import { safeSmartStorage } from '../client/storage'
 import type { InitialSession } from '../client/storage/schema'
 
-import { mockTokenExchange } from './mocks/auth'
+import { mockPrivateKeyJwtTokenExchange, mockTokenExchange } from './mocks/auth'
 import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockSmartConfiguration } from './mocks/issuer'
 import { expectHas } from './utils/expect'
+import { privateKeyAsJwkString, verifyPublicKey } from './utils/jwt'
 import { createMockedStorage, createTestStorage } from './utils/storage'
 
 test('public, launch - should allow launches for known issuers', async () => {
@@ -68,214 +70,285 @@ test('public, launch - should block launches for unknown issuers if allowAnyIssu
     expect(result.error).toEqual('UNKNOWN_ISSUER')
 })
 
-test('confidential-symmentric, launch - should allow launches for known issuers', async () => {
-    const storage = createMockedStorage()
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            knownFhirServers: [
-                {
-                    name: 'TestMed',
-                    issuer: FHIR_SERVER,
-                    type: 'confidential-symmetric',
-                    method: 'client_secret_basic',
-                    clientSecret: 'test-secret',
-                },
-            ],
-        },
-        { storage },
-    )
+describe('confidential-symmetric', () => {
+    test('launch - should allow launches for known issuers', async () => {
+        const storage = createMockedStorage()
+        const client = new SmartClient(
+            'test-session',
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-symmetric',
+                        method: 'client_secret_basic',
+                        clientSecret: 'test-secret',
+                    },
+                ],
+            },
+            { storage },
+        )
 
-    mockSmartConfiguration()
-    const result = await client.launch({
-        launch: 'test-launch',
-        iss: FHIR_SERVER,
+        mockSmartConfiguration()
+        const result = await client.launch({
+            launch: 'test-launch',
+            iss: FHIR_SERVER,
+        })
+
+        expectHas(result, 'redirectUrl')
     })
 
-    expectHas(result, 'redirectUrl')
-})
+    test('.ready() - should gracefully handle when issuer is not known', async () => {
+        const TEST_SESSION_ID = 'test-session'
+        const storage = createTestStorage()
+        const client = new SmartClient(
+            TEST_SESSION_ID,
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-symmetric',
+                        method: 'client_secret_basic',
+                        clientSecret: 'test-secret',
+                    },
+                ],
+            },
+            { storage },
+        )
 
-test('confidential-symmentric, .ready() - should gracefully handle when issuer is not known', async () => {
-    const TEST_SESSION_ID = 'test-session'
-    const storage = createTestStorage()
-    const client = new SmartClient(
-        TEST_SESSION_ID,
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            knownFhirServers: [
-                {
-                    name: 'TestMed',
-                    issuer: FHIR_SERVER,
-                    type: 'confidential-symmetric',
-                    method: 'client_secret_basic',
-                    clientSecret: 'test-secret',
-                },
-            ],
-        },
-        { storage },
-    )
+        mockSmartConfiguration()
+        const result = await client.launch({
+            launch: 'test-launch',
+            iss: FHIR_SERVER,
+        })
 
-    mockSmartConfiguration()
-    const result = await client.launch({
-        launch: 'test-launch',
-        iss: FHIR_SERVER,
+        expectHas(result, 'redirectUrl')
+
+        /**
+         * The user would normally be redirected to the authorization URL, and then
+         * the authorization server would redirect back to the app with a code. For testing
+         * purposes we skip this step.
+         */
+        const safeStorage = safeSmartStorage(storage)
+        const state = new URL(result.redirectUrl).searchParams.get('state') as string
+        const firstLaunchPartialSession = await safeStorage.getPartial(TEST_SESSION_ID)
+        expectHas(firstLaunchPartialSession, 'codeVerifier')
+
+        await mockTokenExchange({
+            client_id: 'test-client',
+            code: 'mock-code',
+            code_verifier: firstLaunchPartialSession.codeVerifier,
+            redirect_uri: 'http://app/callback',
+        })
+
+        /**
+         * .callback() should exchange the code for tokens and return a redirect URL to the final URL
+         */
+        const callback = await client.callback({ state, code: 'mock-code' })
+        expectHas(callback, 'redirectUrl')
+
+        const badClient = new SmartClient(
+            TEST_SESSION_ID,
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [],
+            },
+            { storage },
+        )
+
+        const ready = await badClient.ready()
+
+        expectHas(ready, 'error')
+        expect(ready.error).toEqual('UNKNOWN_ISSUER')
     })
 
-    expectHas(result, 'redirectUrl')
+    test('token - should set correct authorization headers when client_secret_basic', async () => {
+        const storage = createMockedStorage()
+        storage.getFn.mockImplementationOnce(
+            () =>
+                ({
+                    fhirServer: FHIR_SERVER,
+                    tokenIssuer: AUTH_SERVER,
+                    jwksUri: `${AUTH_SERVER}/jwks`,
+                    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                    tokenEndpoint: `${AUTH_SERVER}/token`,
+                    codeVerifier: 'test-code-verifier',
+                    state: 'some-value',
+                }) satisfies InitialSession,
+        )
 
-    /**
-     * The user would normally be redirected to the authorization URL, and then
-     * the authorization server would redirect back to the app with a code. For testing
-     * purposes we skip this step.
-     */
-    const safeStorage = safeSmartStorage(storage)
-    const state = new URL(result.redirectUrl).searchParams.get('state') as string
-    const firstLaunchPartialSession = await safeStorage.getPartial(TEST_SESSION_ID)
-    expectHas(firstLaunchPartialSession, 'codeVerifier')
+        const client = new SmartClient(
+            'test-session',
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-symmetric',
+                        method: 'client_secret_basic',
+                        clientSecret: 'test-secret',
+                    },
+                ],
+            },
+            { storage },
+        )
 
-    await mockTokenExchange({
-        client_id: 'test-client',
-        code: 'mock-code',
-        code_verifier: firstLaunchPartialSession.codeVerifier,
-        redirect_uri: 'http://app/callback',
+        const tokenResponseNock = await mockTokenExchange(
+            {
+                client_id: 'test-client',
+                code: 'køde',
+                code_verifier: 'test-code-verifier',
+                redirect_uri: 'http://app/callback',
+            },
+            {},
+            `Basic ${Buffer.from('test-client:test-secret').toString('base64')}`,
+        )
+        const callback = await client.callback({
+            state: 'some-value',
+            code: 'køde',
+        })
+
+        expect(tokenResponseNock.isDone()).toBe(true)
+        expectHas(callback, 'redirectUrl')
+        expect(callback.redirectUrl).toBe('http://app/redirect')
     })
 
-    /**
-     * .callback() should exchange the code for tokens and return a redirect URL to the final URL
-     */
-    const callback = await client.callback({ state, code: 'mock-code' })
-    expectHas(callback, 'redirectUrl')
+    test('token - should set correct authorization property when client_secret_post', async () => {
+        const storage = createMockedStorage()
+        storage.getFn.mockImplementationOnce(
+            () =>
+                ({
+                    fhirServer: FHIR_SERVER,
+                    tokenIssuer: AUTH_SERVER,
+                    jwksUri: `${AUTH_SERVER}/jwks`,
+                    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                    tokenEndpoint: `${AUTH_SERVER}/token`,
+                    codeVerifier: 'test-code-verifier',
+                    state: 'some-value',
+                }) satisfies InitialSession,
+        )
 
-    const badClient = new SmartClient(
-        TEST_SESSION_ID,
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            knownFhirServers: [],
-        },
-        { storage },
-    )
+        const client = new SmartClient(
+            'test-session',
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-symmetric',
+                        method: 'client_secret_post',
+                        clientSecret: 'test-secret',
+                    },
+                ],
+            },
+            { storage },
+        )
 
-    const ready = await badClient.ready()
-
-    expectHas(ready, 'error')
-    expect(ready.error).toEqual('UNKNOWN_ISSUER')
-})
-
-test('confidential-symmentric, token - should set correct authorization headers when client_secret_basic', async () => {
-    const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(
-        () =>
-            ({
-                fhirServer: FHIR_SERVER,
-                tokenIssuer: AUTH_SERVER,
-                jwksUri: `${AUTH_SERVER}/jwks`,
-                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-                tokenEndpoint: `${AUTH_SERVER}/token`,
-                codeVerifier: 'test-code-verifier',
-                state: 'some-value',
-            }) satisfies InitialSession,
-    )
-
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            knownFhirServers: [
-                {
-                    name: 'TestMed',
-                    issuer: FHIR_SERVER,
-                    type: 'confidential-symmetric',
-                    method: 'client_secret_basic',
-                    clientSecret: 'test-secret',
-                },
-            ],
-        },
-        { storage },
-    )
-
-    const tokenResponseNock = await mockTokenExchange(
-        {
+        const tokenResponseNock = await mockTokenExchange({
             client_id: 'test-client',
             code: 'køde',
             code_verifier: 'test-code-verifier',
             redirect_uri: 'http://app/callback',
-        },
-        {},
-        `Basic ${Buffer.from('test-client:test-secret').toString('base64')}`,
-    )
-    const callback = await client.callback({
-        state: 'some-value',
-        code: 'køde',
-    })
+            client_secret: 'test-secret',
+        })
+        const callback = await client.callback({
+            state: 'some-value',
+            code: 'køde',
+        })
 
-    expect(tokenResponseNock.isDone()).toBe(true)
-    expectHas(callback, 'redirectUrl')
-    expect(callback.redirectUrl).toBe('http://app/redirect')
+        expect(tokenResponseNock.isDone()).toBe(true)
+        expectHas(callback, 'redirectUrl')
+        expect(callback.redirectUrl).toBe('http://app/redirect')
+    })
 })
 
-test('confidential-symmentric, token - should set correct authorization property when client_secret_post', async () => {
-    const storage = createMockedStorage()
-    storage.getFn.mockImplementationOnce(
-        () =>
-            ({
-                fhirServer: FHIR_SERVER,
-                tokenIssuer: AUTH_SERVER,
-                jwksUri: `${AUTH_SERVER}/jwks`,
-                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-                tokenEndpoint: `${AUTH_SERVER}/token`,
-                codeVerifier: 'test-code-verifier',
-                state: 'some-value',
-            }) satisfies InitialSession,
-    )
+describe('confidential-asymmetric', () => {
+    test('token - should send a signed client_assertion when private_key_jwt', async () => {
+        const storage = createMockedStorage()
+        storage.getFn.mockImplementationOnce(
+            () =>
+                ({
+                    fhirServer: FHIR_SERVER,
+                    tokenIssuer: AUTH_SERVER,
+                    jwksUri: `${AUTH_SERVER}/jwks`,
+                    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                    tokenEndpoint: `${AUTH_SERVER}/token`,
+                    codeVerifier: 'test-code-verifier',
+                    state: 'some-value',
+                }) satisfies InitialSession,
+        )
 
-    const client = new SmartClient(
-        'test-session',
-        {
-            clientId: 'test-client',
-            scope: 'openid fhirUser launch/patient',
-            callbackUrl: 'http://app/callback',
-            redirectUrl: 'http://app/redirect',
-            knownFhirServers: [
-                {
-                    name: 'TestMed',
-                    issuer: FHIR_SERVER,
-                    type: 'confidential-symmetric',
-                    method: 'client_secret_post',
-                    clientSecret: 'test-secret',
-                },
-            ],
-        },
-        { storage },
-    )
+        const client = new SmartClient(
+            'test-session',
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-asymmetric',
+                        method: 'private_key_jwt',
+                        privateKey: await privateKeyAsJwkString(),
+                    },
+                ],
+            },
+            { storage },
+        )
 
-    const tokenResponseNock = await mockTokenExchange({
-        client_id: 'test-client',
-        code: 'køde',
-        code_verifier: 'test-code-verifier',
-        redirect_uri: 'http://app/callback',
-        client_secret: 'test-secret',
+        const tokenResponseNock = await mockPrivateKeyJwtTokenExchange({
+            client_id: 'test-client',
+            code: 'køde',
+            code_verifier: 'test-code-verifier',
+            redirect_uri: 'http://app/callback',
+        })
+
+        const callback = await client.callback({
+            state: 'some-value',
+            code: 'køde',
+        })
+
+        expect(tokenResponseNock.scope.isDone()).toBe(true)
+        expectHas(callback, 'redirectUrl')
+        expect(callback.redirectUrl).toBe('http://app/redirect')
+
+        /**
+         * The client_assertion is a real, signed JWT. Verify it with the matching public
+         * key (no jose mocking) and assert the claims SMART requires for token endpoint auth.
+         */
+        const clientAssertion = tokenResponseNock.getClientAssertion() as string
+        const { payload, protectedHeader } = await jwtVerify(clientAssertion, await verifyPublicKey(), {
+            audience: `${AUTH_SERVER}/token`,
+        })
+
+        expect(protectedHeader).toMatchObject({ alg: 'RS384', kid: 'foo-bar-baz-kid', typ: 'JWT' })
+        expect(payload.iss).toBe('test-client')
+        expect(payload.sub).toBe('test-client')
+        expect(payload.aud).toBe(`${AUTH_SERVER}/token`)
     })
-    const callback = await client.callback({
-        state: 'some-value',
-        code: 'køde',
-    })
-
-    expect(tokenResponseNock.isDone()).toBe(true)
-    expectHas(callback, 'redirectUrl')
-    expect(callback.redirectUrl).toBe('http://app/redirect')
 })
