@@ -45,6 +45,7 @@ export class SmartClient {
     readonly options: {
         autoRefresh: boolean
         multiLaunch: boolean
+        allowNonHttpsLaunch: boolean
         cache: CacheOptions
     }
 
@@ -123,6 +124,7 @@ export class SmartClient {
         this.options = {
             autoRefresh: configuration.options?.autoRefresh ?? false,
             multiLaunch: configuration.options?.enableMultiLaunch ?? false,
+            allowNonHttpsLaunch: configuration.options?.allowNonHttpsLaunch ?? false,
             cache: configuration.cache ?? 'disabled',
         }
     }
@@ -146,7 +148,7 @@ export class SmartClient {
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
             })
 
-            if (!verifyUrlIsHttps(params.iss)) {
+            if (!verifyUrlIsHttps(params.iss, this.options.allowNonHttpsLaunch)) {
                 failSpan(span, 'Issuer did not use https scheme, that is illegal!')
                 return { error: 'UNKNOWN_ERROR' }
             }

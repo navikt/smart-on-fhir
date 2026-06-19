@@ -17,9 +17,14 @@ export function assertGoodSessionId(sessionId: string | null | undefined): asser
     }
 }
 
-export function verifyUrlIsHttps(url: string): url is `https://${string}` {
+export function verifyUrlIsHttps(url: string, allowNonHttpsLaunch: boolean): url is `https://${string}` {
     if (process.env.NODE_ENV !== 'production') {
         // Allow http in local development
+        return true
+    }
+
+    if (allowNonHttpsLaunch) {
+        // Client is configured to explicitly allow non-https launches
         return true
     }
 

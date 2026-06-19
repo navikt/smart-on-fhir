@@ -28,4 +28,8 @@ export type SmartClientConfiguration = SmartClientBaseConfiguration &
 
 export type SmartClientOptions = {
     autoRefresh?: boolean
+    /**
+     * Skips validation of the launch URL, allowing non-https URLs. This should only be used in development or testing environments.
+     */
+    allowNonHttpsLaunch?: boolean
 }
