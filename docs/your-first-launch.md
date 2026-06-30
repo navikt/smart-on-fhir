@@ -2,16 +2,19 @@
 
 ::: danger 🚧 Under active development! 🚧
 
-This library is under active development is not ready for production. But feel free to try it out and give feedback!
+This library is under active development is not ready for production. But feel free to try it out
+and give feedback!
 
 :::
 
 This will take you through a secure
-[EHR Launch](https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#launch-app-ehr-launch) using this library.
+[EHR Launch](https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#launch-app-ehr-launch)
+using this library.
 
 A server side Smart on FHIR launch consists of the following steps:
 
-1. The EHR launches your app by redirecting the user to your app's launch URL with `launch` and `iss` parameters.
+1. The EHR launches your app by redirecting the user to your app's launch URL with `launch` and
+   `iss` parameters.
 2. Your app redirects the user to the authorization server of the EHR.
 3. The EHR server is authenticated and returns the user to your app.
 4. Your app exchanges the authorization code for an access token and an ID-token.
@@ -19,15 +22,16 @@ A server side Smart on FHIR launch consists of the following steps:
 
 ## Setting up the [SmartClient](docs/smart-client.md)
 
-First we need to configure the SmartClient, we do this by instantiating a `SmartClient` with the provided issuer.
+First we need to configure the SmartClient, we do this by instantiating a `SmartClient` with the
+provided issuer.
 
 ::: tip Caution!
 
-Remember to always instantiate the `SmartClient` _**every**_ request. You should never share an instance between
-multiple requests.
+Remember to always instantiate the `SmartClient` _**every**_ request. You should never share an
+instance between multiple requests.
 
-You can use an instance multiple times in a single request, but it's important to remember that a instance is _only_ for
-a specific launch.
+You can use an instance multiple times in a single request, but it's important to remember that a
+instance is _only_ for a specific launch.
 
 :::
 
@@ -43,12 +47,13 @@ const client = new SmartClient(sessionId, storage, {
 })
 ```
 
-The `sessionId` is up to you to control, you should use a http-only secure cookie to store the session ID. Get it from
-the request headers and pass it to the SmartClient.
+The `sessionId` is up to you to control, you should use a http-only secure cookie to store the
+session ID. Get it from the request headers and pass it to the SmartClient.
 
-Next, lets take a look at the `storage` parameter. To be able to use the SmartClient, you must provide a server-side
-session storage. You can use whatever backing-store you want, for example Valkey/Redis, or anything else. You only have
-to implement a simple interface ([SmartStorage](./docs/smart-storage.md)).
+Next, lets take a look at the `storage` parameter. To be able to use the SmartClient, you must
+provide a server-side session storage. You can use whatever backing-store you want, for example
+Valkey/Redis, or anything else. You only have to implement a simple interface
+([SmartStorage](./docs/smart-storage.md)).
 
 Here is an example using Valkey:
 
@@ -68,22 +73,27 @@ function getSmartStorage(): SmartStorage {
 }
 ```
 
-The `callbackUrl` in there whe FHIR-server will redirect the user after authorization. Redirect URL is where we'll
-redirect the user after token-exchange.
+The `callbackUrl` in there whe FHIR-server will redirect the user after authorization. Redirect URL
+is where we'll redirect the user after token-exchange.
 
-The `allowAnyIssuer: true` configuration is used to allow launches from any issuer. Normally we would want to restrict
-access to the application to a list of known issuers, but this depends on the type of application you are building.
+The `allowAnyIssuer: true` configuration is used to allow launches from any issuer. Normally we
+would want to restrict access to the application to a list of known issuers, but this depends on the
+type of application you are building.
+
+See [SmartClient configuration](./docs/smart-client-configuration.md) for more information on the
+configuration options, and how to limit the issuers.
 
 ## Launching
 
-Let's say that we have a Smart on FHIR application running at `https://example.com/fhir`. We'll configure our web server
-with the following routes:
+Let's say that we have a Smart on FHIR application running at `https://example.com/fhir`. We'll
+configure our web server with the following routes:
 
 - /fhir/launch - EHR will launch the application to this route
 - /fhir/callback - User is redirected here after authorization
 - /fhir - This is where we'll have the actual web-app
 
-You don't have to use exactly these routes, but this is a common pattern in SoF and OIDC login flows.
+You don't have to use exactly these routes, but this is a common pattern in SoF and OIDC login
+flows.
 
 ### Initial launch (/fhir/launch)
 
@@ -93,7 +103,8 @@ Given the setup above, the EHR will "launch" using the following URL:
 https://example.com/fhir/launch?iss=<EHR-FHIR-URL>&launch=12345
 ```
 
-Let's implement the `/fhir/launch` route in our web server, using standard Request/Response Web APIs:
+Let's implement the `/fhir/launch` route in our web server, using standard Request/Response Web
+APIs:
 
 ```typescript {2,8-11,22-25,34-37,49-52}
 async function launchRoute(req: Request): Promise<Response> {
@@ -152,17 +163,17 @@ async function launchRoute(req: Request): Promise<Response> {
 }
 ```
 
-The highlighted comments show the important steps in the launch process. Most of the code above is handling request
-params and graceful error handling.
+The highlighted comments show the important steps in the launch process. Most of the code above is
+handling request params and graceful error handling.
 
-The user is now redirected to the EHR's authorization server, and given a successful login, will end up back at our
-`/fhir/callback` route.
+The user is now redirected to the EHR's authorization server, and given a successful login, will end
+up back at our `/fhir/callback` route.
 
 ### Callback (/fhir/callback)
 
-When the user returns, the EHR redirects to our configured callbackUrl, which in our case is `/fhir/callback`. This
-route will verify a few OIDC security mechanism (state, PKCE) and then exchange the authorization code for our tokens,
-and update the storage with these values.
+When the user returns, the EHR redirects to our configured callbackUrl, which in our case is
+`/fhir/callback`. This route will verify a few OIDC security mechanism (state, PKCE) and then
+exchange the authorization code for our tokens, and update the storage with these values.
 
 To do this, we'll need to implement our `/fhir/callback` route:
 
@@ -223,31 +234,33 @@ async function callbackHandler(req: Request): Promise<Response> {
 }
 ```
 
-Given a successful state and PKCE verification, as well as a token exchange, the user will be completely launched and
-ready to access data from the EHR FHIR server.
+Given a successful state and PKCE verification, as well as a token exchange, the user will be
+completely launched and ready to access data from the EHR FHIR server.
 
-Once the user is finally on the web-app route, we can move on to creating a [ReadyClient](./docs/ready-client.md) to
-access the FHIR data.
+Once the user is finally on the web-app route, we can move on to creating a
+[ReadyClient](./docs/ready-client.md) to access the FHIR data.
 
 ### Ready!
 
-Now that we have a complete session for this user, we can use our `SmartClient` to instantiate a `ReadyClient`. With the
-`ReadyClient` we can easily access our [Practitioner](https://hl7.org/fhir/R4/practitioner.html),
-[Patient](https://hl7.org/fhir/R4/patient.html), [Encounter](https://hl7.org/fhir/R4/encounter.html) or any other FHIR
-resources.
+Now that we have a complete session for this user, we can use our `SmartClient` to instantiate a
+`ReadyClient`. With the `ReadyClient` we can easily access our
+[Practitioner](https://hl7.org/fhir/R4/practitioner.html),
+[Patient](https://hl7.org/fhir/R4/patient.html), [Encounter](https://hl7.org/fhir/R4/encounter.html)
+or any other FHIR resources.
 
 :::tip Important!
 
-This library, and both _SmartClient_ and _ReadyClient_ are **only** for use in a server environment. If you have a
-isomorphic web-app using frameworks such as Next.js, SvelteKit, Astro or similar, you will have ta be aware of where you
-are executing during data loading.
+This library, and both _SmartClient_ and _ReadyClient_ are **only** for use in a server environment.
+If you have a isomorphic web-app using frameworks such as Next.js, SvelteKit, Astro or similar, you
+will have ta be aware of where you are executing during data loading.
 
-The simplest approach is to create HTTP APIs in your web-app that fetches what you need, and the client-side code in
-your web-app can call these APIs.
+The simplest approach is to create HTTP APIs in your web-app that fetches what you need, and the
+client-side code in your web-app can call these APIs.
 
 :::
 
-Let's create a simple custom endpoind for our web-app that fetches some FHIR resources using the `ReadyClient`.
+Let's create a simple custom endpoind for our web-app that fetches some FHIR resources using the
+`ReadyClient`.
 
 This route can for example be configured under the route `/api/fhir-example` as a `GET` resource.
 
@@ -301,8 +314,9 @@ async function callbackHandler(req: Request): Promise<Response> {
 ```
 
 Each request for a FHIR resource requires some error handling, see the
-[ReadyClient documentation](./docs/ready-client.md) for more information on how to handle errors and responses. But all
-of the requests return a union with a potential `{ error: string }` type.
+[ReadyClient documentation](./docs/ready-client.md) for more information on how to handle errors and
+responses. But all of the requests return a union with a potential `{ error: string }` type.
 
 These examples use the short-hand API for fetching specific resources, in the
-[ReadyClient documentation](./docs/ready-client.md) you'll find more details on how to request arbitrary resources.
+[ReadyClient documentation](./docs/ready-client.md) you'll find more details on how to request
+arbitrary resources.

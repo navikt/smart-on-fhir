@@ -2,7 +2,8 @@
 
 ::: danger 🚧 Under active development! 🚧
 
-This library is under active development is not ready for production. But feel free to try it out and give feedback!
+This library is under active development is not ready for production. But feel free to try it out
+and give feedback!
 
 :::
 
@@ -10,8 +11,8 @@ This library is under active development is not ready for production. But feel f
 
 ::: info
 
-This dependency is available only on Github Package registry (GPR). GPR does not allow anonymous pulls, so you need to
-configure a personal access token (PAT).
+This dependency is available only on Github Package registry (GPR). GPR does not allow anonymous
+pulls, so you need to configure a personal access token (PAT).
 
 :::
 
@@ -19,7 +20,8 @@ See the
 [GPR documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)
 for more information.
 
-So you will need to configure the @navikt scope to use the GPR specifically. For `npm` you can follow the
+So you will need to configure the @navikt scope to use the GPR specifically. For `npm` you can
+follow the
 ["Installing a package"](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#installing-a-package)
 docs.
 
@@ -37,7 +39,8 @@ For pnpm and bun, please refer to their respective documentation on how to confi
 
 ### Installing
 
-Once you have access to GPR configured, you can install the package using your package manager of choice.
+Once you have access to GPR configured, you can install the package using your package manager of
+choice.
 
 ```sh
 npm i @navikt/smart-on-fhir // [!=npm auto]
