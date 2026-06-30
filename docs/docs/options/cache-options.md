@@ -2,6 +2,6 @@
 outline: deep
 ---
 
-# Documentation
+# Cache Options
 
 TODO

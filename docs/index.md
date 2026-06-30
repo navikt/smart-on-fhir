@@ -10,8 +10,8 @@ hero:
       text: Getting started
       link: /getting-started
     - theme: alt
-      text: Documentation
-      link: /docs
+      text: Your first launch
+      link: /your-first-launch
 
 features:
   - title: Server-first

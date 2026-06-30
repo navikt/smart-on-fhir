@@ -11,7 +11,7 @@ export default defineConfig({
         // https://vitepress.dev/reference/default-theme-config
         nav: [
             { text: 'Getting started', link: '/getting-started' },
-            { text: 'Docs', link: '/docs' },
+            { text: 'Docs', link: '/docs/smart-client' },
         ],
 
         sidebar: [
@@ -28,19 +28,18 @@ export default defineConfig({
                 link: '/your-first-launch',
                 items: [
                     {
-                        text: 'SmartClient configuration',
+                        text: '1. Setting up the SmartClient',
                         link: '/your-first-launch#setting-up-the-smartclient',
                     },
                     {
-                        text: 'Launching',
+                        text: '2. Launching',
                         link: '/your-first-launch#launching',
-                        collapsed: true,
                         items: [
-                            { text: '/fhir/launch', link: '/your-first-launch#initial-launch-fhir-launch' },
-                            { text: '/fhir/callback', link: '/your-first-launch#callback-fhir-callback' },
-                            { text: 'Ready!', link: '/your-first-launch#ready' },
+                            { text: '3. /fhir/launch', link: '/your-first-launch#initial-launch-fhir-launch' },
+                            { text: '4. /fhir/callback', link: '/your-first-launch#callback-fhir-callback' },
                         ],
                     },
+                    { text: '5. Ready!', link: '/your-first-launch#ready' },
                 ],
             },
             {
@@ -49,15 +48,29 @@ export default defineConfig({
                     {
                         text: 'SmartClient',
                         link: '/docs/smart-client',
-                        collapsed: true,
                         items: [
-                            { text: 'SmartStorage', link: '/docs/smart-storage' },
-                            { text: 'SmartClientConfiguration', link: '/docs/smart-client-configuration' },
-                            { text: 'SmartClientOptions', link: '/docs/smart-client-options' },
+                            { text: 'Client Configuration', link: '/docs/smart-client-configuration' },
+                            {
+                                text: 'Configuration and storage',
+                                base: '/docs/options',
+                                items: [
+                                    {
+                                        text: 'Storage',
+                                        link: '/smart-storage',
+                                    },
+                                    {
+                                        text: 'Options',
+                                        link: '/client-options',
+                                    },
+                                    {
+                                        text: 'Cache',
+                                        link: '/cache-options',
+                                    },
+                                ],
+                            },
                         ],
                     },
                     { text: 'ReadyClient', link: '/docs/ready-client' },
-                    { text: 'SmartStorage', link: '/docs/smart-storage' },
                 ],
             },
         ],

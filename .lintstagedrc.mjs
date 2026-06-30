@@ -1,5 +1,5 @@
 export default {
-    '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}': 'yarn fmt',
-    '*.{ts,tsx,js,jsx}': 'yarn lint:fix',
+    '*': () => 'yarn fmt --no-error-on-unmatched-pattern',
+    '*.{ts,tsx,js,ts,mjs,mts}': 'yarn lint --fix --max-warnings=0',
     '*.{ts,tsx}': () => ['yarn tsc'],
 }

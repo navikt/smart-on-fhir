@@ -57,7 +57,7 @@ session ID. Get it from the request headers and pass it to the SmartClient.
 Next, lets take a look at the `storage` parameter. To be able to use the SmartClient, you must
 provide a server-side session storage. You can use whatever backing-store you want, for example
 Valkey/Redis, or anything else. You only have to implement a simple interface
-([SmartStorage](./docs/smart-storage.md)).
+([SmartStorage](docs/options/smart-storage.md)).
 
 Here is an example using Valkey:
 
@@ -110,7 +110,7 @@ https://example.com/fhir/launch?iss=<EHR-FHIR-URL>&launch=12345
 Let's implement the `/fhir/launch` route in our web server, using standard Request/Response Web
 APIs:
 
-```typescript {2,8-11,22-25,34-37,49-52}
+```typescript {2,8-11,22-25,38-41,53-56}
 async function launchRoute(req: Request): Promise<Response> {
   /* retrieve your session ID from a secure cookie */
   const sessionId = 'foo'
@@ -185,7 +185,7 @@ exchange the authorization code for our tokens, and update the storage with thes
 
 To do this, we'll need to implement our `/fhir/callback` route:
 
-```typescript {2,8-12,23-28,37-41,49-52}
+```typescript {2,8-12,23-28,41-45,53-56}
 async function callbackHandler(req: Request): Promise<Response> {
   /* retrieve your session ID from a secure cookie */
   const sessionId = 'foo'
@@ -276,7 +276,7 @@ Let's create a simple custom endpoind for our web-app that fetches some FHIR res
 
 This route can for example be configured under the route `/api/fhir-example` as a `GET` resource.
 
-```typescript {8-13,22,25-28,31-34,39}
+```typescript {8-13,26,29-32,35-38,43}
 async function callbackHandler(req: Request): Promise<Response> {
   /* retrieve your session ID from a secure cookie */
   const sessionId = 'foo'
