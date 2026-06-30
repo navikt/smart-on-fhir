@@ -76,8 +76,8 @@ export class SmartClient {
         session: { sessionId: string | null | undefined; activePatient: string | null | undefined },
         clientConfiguration: SmartClientConfiguration,
         configuration: {
-            cache?: CacheOptions
             storage: SmartStorage | Promise<SmartStorage>
+            cache?: CacheOptions
             options?: SmartClientOptions & {
                 /**
                  * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
@@ -96,8 +96,8 @@ export class SmartClient {
             | { sessionId: string | null | undefined; activePatient: string | null | undefined },
         clientConfiguration: SmartClientConfiguration,
         configuration: {
-            cache?: CacheOptions
             storage: SmartStorage | Promise<SmartStorage>
+            cache?: CacheOptions
             options?: SmartClientOptions & { enableMultiLaunch?: true }
         },
     ) {

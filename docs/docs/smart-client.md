@@ -19,26 +19,25 @@ The SmartClient is used to:
 ## `class SmartClient(...)`
 
 Normal usage of SmartClient, only needs to provide a sessionId and client configuration, as well as
-a backing store.
+a state/cache config.
 
-| Name      | Type                                                        | Description                                        |
-| --------- | ----------------------------------------------------------- | -------------------------------------------------- |
-| sessionId | string                                                      | Current users sessionId                            |
-| storage   | [SmartStorage](./smart-storage.md)                          | Server side storage implementation                 |
-| config    | [SmartClientConfiguration](./smart-client-configuration.md) | Smart on FHIR client configuration                 |
-| options?  | [SmartClientOptions](./smart-client-options.md) \| null     | Options for enabling or disabling certain features |
+| Name          | Type                                                                                                                                                | Description                                  |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| sessionId     | string                                                                                                                                              | Current users sessionId                      |
+| clientConfig  | [SmartClientConfiguration](./smart-client-configuration.md)                                                                                         | Smart on FHIR client configuration           |
+| configuration | storage ([SmartStorage](./smart-storage.md)), options ([SmartClientOptions](./smart-client-options.md)), cache ([CacheOptions](./cache-options.md)) | Options storage, cache and optional features |
 
 ## `class SmartClient(...)` (multi-launch mode)
 
 To enable support for launching multiple sessions using the same sessionId, you need to instantiate
-the SmartClient with an extra patient ID during initialization.
+the SmartClient with an extra patient ID during initialization. Together with normal
+`SmartClientOptions` also provide `{ enableMultiLaunch: true}`.
 
-| Name     | Description                                        | Type                                                                            |
-| -------- | -------------------------------------------------- | ------------------------------------------------------------------------------- |
-| session  | Current sessionId and activePatient (if present)   | `{ sessionId: string, activePatient: string \| null }`                          |
-| storage  | Server side storage implementation                 | [SmartStorage](./smart-storage.md)                                              |
-| config   | Smart on FHIR client configuration                 | [SmartClientConfiguration](./smart-client-configuration.md)                     |
-| options? | Options for enabling or disabling certain features | [SmartClientOptions](./smart-client-options.md) `& { enableMultiLaunch: true }` |
+| Name          | Type                                                                                                                                                | Description                                        |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| session       | `{ sessionId: string, activePatient: string \| null }`                                                                                              | Current sessionId and activePatient (if present)   |
+| clientConfig  | [SmartClientConfiguration](./smart-client-configuration.md)                                                                                         | Smart on FHIR client configuration                 |
+| configuration | storage ([SmartStorage](./smart-storage.md)), options ([SmartClientOptions](./smart-client-options.md)), cache ([CacheOptions](./cache-options.md)) | Options for enabling or disabling certain features |
 
 When multi-launch mode is enabled, when the client redirects to the final `redirectUrl`, it will
 include the `patient` query parameter with the launched patients ID (FHIR). This must be parsed from

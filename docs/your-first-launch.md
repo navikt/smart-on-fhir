@@ -38,13 +38,17 @@ instance is _only_ for a specific launch.
 Let's have a look at the basic configuration needed for the `SmartClient`:
 
 ```typescript
-const client = new SmartClient(sessionId, storage, {
-  clientId: 'test-client',
-  scope: 'openid fhirUser launch/patient',
-  callbackUrl: 'https://example.com/fhir/callback',
-  redirectUrl: 'https://example.com/fhir',
-  allowAnyIssuer: true,
-})
+const client = new SmartClient(
+  sessionId,
+  {
+    clientId: 'test-client',
+    scope: 'openid fhirUser launch/patient',
+    callbackUrl: 'https://example.com/fhir/callback',
+    redirectUrl: 'https://example.com/fhir',
+    allowAnyIssuer: true,
+  },
+  { storage: storage },
+)
 ```
 
 The `sessionId` is up to you to control, you should use a http-only secure cookie to store the
@@ -132,13 +136,17 @@ async function launchRoute(req: Request): Promise<Response> {
    * Instantiate the SmartClient with our current sessionId,
    * backing Valkey store and the apps configuration.
    */
-  const client = new SmartClient(sessionId, getSmartStorage(), {
-    clientId: 'test-client',
-    scope: 'openid fhirUser launch/patient',
-    callbackUrl: 'https://example.com/fhir/callback',
-    redirectUrl: 'https://example.com/fhir',
-    allowAnyIssuer: true,
-  })
+  const client = new SmartClient(
+    sessionId,
+    {
+      clientId: 'test-client',
+      scope: 'openid fhirUser launch/patient',
+      callbackUrl: 'https://example.com/fhir/callback',
+      redirectUrl: 'https://example.com/fhir',
+      allowAnyIssuer: true,
+    },
+    { storage: getSmartStorage() },
+  )
 
   /**
    * Initiate the launch process given the provided
@@ -159,7 +167,7 @@ async function launchRoute(req: Request): Promise<Response> {
    * Given a successful launch, we redirect the user to the
    * EHR's authorization server
    */
-  return Response.redirect(launchResult.redirect_url, 302)
+  return Response.redirect(launchResult.redirectUrl, 302)
 }
 ```
 
@@ -206,13 +214,17 @@ async function callbackHandler(req: Request): Promise<Response> {
    * extracted to a reusable function (but don't share the
    * instance between requests!).
    */
-  const client = new SmartClient(sessionId, getSmartStorage(), {
-    clientId: 'test-client',
-    scope: 'openid fhirUser launch/patient',
-    callbackUrl: 'https://example.com/fhir/callback',
-    redirectUrl: 'https://example.com/fhir',
-    allowAnyIssuer: true,
-  })
+  const client = new SmartClient(
+    sessionId,
+    {
+      clientId: 'test-client',
+      scope: 'openid fhirUser launch/patient',
+      callbackUrl: 'https://example.com/fhir/callback',
+      redirectUrl: 'https://example.com/fhir',
+      allowAnyIssuer: true,
+    },
+    { storage: getSmartStorage() },
+  )
 
   /**
    * Actually complete the callback, this will verify the state,
@@ -230,7 +242,7 @@ async function callbackHandler(req: Request): Promise<Response> {
    * The callback was successful, lets redirect the user to
    * the actual web-app
    */
-  return Response.redirect(callbackResult.redirect_url, 302)
+  return Response.redirect(callbackResult.redirectUrl, 302)
 }
 ```
 
@@ -278,16 +290,20 @@ async function callbackHandler(req: Request): Promise<Response> {
    * extracted to a reusable function (but don't share the
    * instance between requests!).
    */
-  const client = new SmartClient(sessionId, getSmartStorage(), {
-    clientId: 'test-client',
-    scope: 'openid fhirUser launch/patient',
-    callbackUrl: 'https://example.com/fhir/callback',
-    redirectUrl: 'https://example.com/fhir',
-    allowAnyIssuer: true,
-  })
+  const client = new SmartClient(
+    sessionId,
+    {
+      clientId: 'test-client',
+      scope: 'openid fhirUser launch/patient',
+      callbackUrl: 'https://example.com/fhir/callback',
+      redirectUrl: 'https://example.com/fhir',
+      allowAnyIssuer: true,
+    },
+    { storage: getSmartStorage() },
+  )
 
   // Instantiate our ReadyClient given our current session
-  const readyClient = client.ready()
+  const readyClient = await client.ready()
 
   /**
    * You can chose to validate the user's session,
@@ -304,12 +320,12 @@ async function callbackHandler(req: Request): Promise<Response> {
   }
 
   // Now we can use the ReadyClient to fetch FHIR resources
+  const practitioner = await readyClient.user.request()
   const patient = await readyClient.patient.request()
-  const practitioner = await readyClient.practitioner.request()
   const encounter = await readyClient.encounter.request()
 
   // Return the resources as JSON after handling any errors
-  return new Response.json({ foo: 'baz' }, { status: 200 })
+  return Response.json({ foo: 'baz' }, { status: 200 })
 }
 ```
 
