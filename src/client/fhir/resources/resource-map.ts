@@ -1,12 +1,10 @@
 import type * as z from 'zod'
 
 import {
-    createFhirBundleSchema,
-    type FhirBundle,
+    createFhirSeachSetBundleSchema,
+    type FhirSearchsetBundle,
     type FhirCondition,
     FhirConditionSchema,
-    type FhirDocumentReferenceBase,
-    FhirDocumentReferenceBaseSchema,
     type FhirEncounter,
     FhirEncounterSchema,
     type FhirOrganization,
@@ -17,17 +15,19 @@ import {
     FhirPractitionerSchema,
     type FhirQuestionnaireResponse,
     FhirQuestionnaireResponseSchema,
+    type FhirDocumentReference,
+    FhirDocumentReferenceSchema,
 } from '../../../zod'
 
 /**
  * A map of FHIR paths in a FHIR server and their known corresponding resource types.
  */
 type ResourceMap = {
-    'Condition?': FhirBundle<FhirCondition>
+    'Condition?': FhirSearchsetBundle<FhirCondition>
     'Encounter/': FhirEncounter
     'Patient/': FhirPatient
     'Organization/': FhirOrganization
-    'DocumentReference/': FhirDocumentReferenceBase
+    'DocumentReference/': FhirDocumentReference
     'Practitioner/': FhirPractitioner
     'QuestionnaireResponse/': FhirQuestionnaireResponse
 }
@@ -57,13 +57,13 @@ export function resourceToSchema(resource: KnownPaths): z.ZodObject {
     if (resource.startsWith('Practitioner/')) {
         return FhirPractitionerSchema
     } else if (resource.startsWith('DocumentReference/')) {
-        return FhirDocumentReferenceBaseSchema
+        return FhirDocumentReferenceSchema
     } else if (resource.startsWith('Patient/')) {
         return FhirPatientSchema
     } else if (resource.startsWith('Encounter/')) {
         return FhirEncounterSchema
     } else if (resource.startsWith('Condition?')) {
-        return createFhirBundleSchema(FhirConditionSchema)
+        return createFhirSeachSetBundleSchema(FhirConditionSchema)
     } else if (resource.startsWith('Organization')) {
         return FhirOrganizationSchema
     } else if (resource.startsWith('QuestionnaireResponse')) {

@@ -1,7 +1,7 @@
 import nock, { type RequestBodyMatcher, type Scope } from 'nock'
 
 import type { PayloadForCreate, ResponseForCreate } from '../../client/fhir/resources/create-resource-map'
-import type { FhirDocumentReference } from '../../zod'
+import type { FhirBatchBundle, FhirBatchResponseBundle, FhirDocumentReference } from '../../zod'
 
 import { FHIR_SERVER } from './common'
 
@@ -47,6 +47,12 @@ export function mockCreateDocumentReference(
 ): Scope {
     return nock(FHIR_SERVER)
         .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
+        .reply(200, onSuccess)
+}
+
+export function mockBatchBundle(expectedPayload: FhirBatchBundle, onSuccess: FhirBatchResponseBundle): Scope {
+    return nock(FHIR_SERVER)
+        .post(`/Bundle`, expectedPayload as RequestBodyMatcher)
         .reply(200, onSuccess)
 }
 

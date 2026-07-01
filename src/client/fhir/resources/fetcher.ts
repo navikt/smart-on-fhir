@@ -1,3 +1,4 @@
+import type { FhirBatchBundle } from '../../../zod'
 import { removeTrailingSlash } from '../../smart/lib/utils'
 
 import type { KnownCreatePaths } from './create-resource-map'
@@ -18,6 +19,24 @@ export async function postFhir(
     { payload }: PostFhir,
 ): Promise<Response> {
     const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}`
+
+    return await fetch(resourcePath, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+            Authorization: `Bearer ${server.accessToken}`,
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+type BundleFhir = {
+    payload: FhirBatchBundle
+}
+
+export async function bundleFhir(server: AuthenticatedServer, { payload }: BundleFhir): Promise<Response> {
+    const resourcePath = `${removeTrailingSlash(server.fhirServer)}/Bundle`
 
     return await fetch(resourcePath, {
         method: 'POST',
