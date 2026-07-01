@@ -2,7 +2,7 @@ import type * as z from 'zod'
 
 import {
     type FhirDocumentReference,
-    FhirDocumentReferenceBaseSchema,
+    FhirDocumentReferenceSchema,
     type FhirQuestionnaireResponse,
     FhirQuestionnaireResponseSchema,
 } from '../../../zod'
@@ -39,7 +39,7 @@ export type PayloadForCreate<T extends string> = {
 export function createResourceToSchema(resource: KnownCreatePaths): z.ZodObject {
     switch (resource) {
         case 'DocumentReference':
-            return FhirDocumentReferenceBaseSchema
+            return FhirDocumentReferenceSchema
         case 'QuestionnaireResponse':
             return FhirQuestionnaireResponseSchema
         default:

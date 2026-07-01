@@ -1,7 +1,14 @@
 import { decodeJwt } from 'jose'
 import type * as z from 'zod'
 
-import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
+import {
+    type FhirEncounter,
+    type FhirPatient,
+    type FhirPractitioner,
+    type FhirBatchBundle,
+    type FhirBatchResponseBundle,
+    FhirBatchResponseBundleSchema,
+} from '../../zod'
 import { type CacheOptions, getCachedResource, setCachedResource } from '../cache'
 import {
     createResourceToSchema,
@@ -9,7 +16,7 @@ import {
     type PayloadForCreate,
     type ResponseForCreate,
 } from '../fhir/resources/create-resource-map'
-import { getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
+import { bundleFhir, getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
 import type { CompleteSession } from '../storage/schema'
 
@@ -20,7 +27,12 @@ import { inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
 import { validateToken } from './token/token'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
-import type { ClaimErrors, ResourceCreateErrors, ResourceRequestErrors } from './types/client-errors'
+import type {
+    ClaimErrors,
+    ResourceBatchErrors,
+    ResourceCreateErrors,
+    ResourceRequestErrors,
+} from './types/client-errors'
 
 /**
  * **Smart App Launch reference**
@@ -237,6 +249,60 @@ export class ReadyClient {
             }
 
             return parsed.data as ResponseFor<Path>
+        })
+    }
+
+    public async batch(resources: FhirBatchBundle['entry']): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
+        return spanAsync('transaction', async (span) => {
+            span.setAttributes({
+                [OtelTaxonomy.FhirResource]: 'Bundle(transaction)',
+                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
+            })
+
+            const response = await this.fetchWithRefresh(
+                () =>
+                    bundleFhir(this._session, {
+                        payload: {
+                            resourceType: 'Bundle',
+                            type: 'batch',
+                            entry: resources,
+                        },
+                    }),
+                span,
+            )
+
+            if (!response.ok) {
+                const [responseError, operationOutcome] = await responseToFormattedError(response)
+
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed')
+                failSpan(span, `Request for transaction Bundle failed`, responseError)
+
+                return { error: 'BATCH_FAILED_NON_OK_RESPONSE', operationOutcome } satisfies ResourceBatchErrors
+            }
+
+            const result = await response.json()
+            const parsed = FhirBatchResponseBundleSchema.safeParse(result)
+            if (!parsed.success) {
+                failSpan(span, `Failed to parse transaction Bundle response`, parsed.error)
+                return { error: 'BATCH_FAILED_INVALID_RESPONSE', operationOutcome: null } satisfies ResourceBatchErrors
+            }
+
+            const failed = parsed.data.entry.filter((entry) => !entry.response.status.startsWith('2'))
+            if (failed.length === 0) {
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-succeeded')
+
+                return parsed.data
+            } else if (failed.length === parsed.data.entry.length) {
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-all-failed')
+                failSpan(span, `All entries in transaction Bundle failed`)
+
+                return { error: 'BATCH_FAILED_ALL_FAILED', result: parsed.data } satisfies ResourceBatchErrors
+            } else {
+                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-some-ok')
+                failSpan(span, `Some entries in transaction Bundle failed`)
+
+                return { error: 'BATCH_FAILED_SOME_OK', result: parsed.data } satisfies ResourceBatchErrors
+            }
         })
     }
 
