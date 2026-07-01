@@ -1,15 +1,5 @@
 import * as z from 'zod'
 
-export type FhirDocumentReferenceBase = z.infer<typeof FhirDocumentReferenceBaseSchema>
-export const FhirDocumentReferenceBaseSchema = z.object({
-    resourceType: z.literal('DocumentReference'),
-    id: z.string(),
-    meta: z.object({
-        versionId: z.string().optional(),
-        lastUpdated: z.string(),
-    }),
-})
-
 export type FhirDocumentReference = z.infer<typeof FhirDocumentReferenceSchema>
 export const FhirDocumentReferenceSchema = z.object({
     resourceType: z.literal('DocumentReference'),
