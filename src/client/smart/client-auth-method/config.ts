@@ -8,7 +8,7 @@ type ConfidentialSymmetricMethod =
           clientSecret: string
       }
 
-type ConfidentialAsymmetricMethod = {
+export type ConfidentialAsymmetricMethod = {
     method: 'private_key_jwt'
     /**
      * The client's private key as a JWK (JSON Web Key) JSON string.
@@ -20,6 +20,14 @@ type ConfidentialAsymmetricMethod = {
      * registered with the authorization server.
      */
     privateKey: string
+    /**
+     * Enables strict audience validation for the client authentication JWT,
+     * this requires the `typ` header to be set to `client-authentication+jwt`,
+     * and the audience of the JWT will be the authorization URL, not the token endpoint URL.
+     *
+     * See: https://docs.duendesoftware.com/identityserver/tokens/client-authentication/#strict-audience-validation
+     */
+    strictAudienceValidation?: boolean
 }
 
 type SmartConfidentialSymmetricMode = {

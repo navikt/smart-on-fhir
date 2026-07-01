@@ -351,4 +351,79 @@ describe('confidential-asymmetric', () => {
         expect(payload.sub).toBe('test-client')
         expect(payload.aud).toBe(`${AUTH_SERVER}/token`)
     })
+
+    test('token - strict mode -should send a signed client_assertion when private_key_jwt', async () => {
+        const storage = createMockedStorage()
+        storage.getFn.mockImplementationOnce(
+            () =>
+                ({
+                    fhirServer: FHIR_SERVER,
+                    tokenIssuer: AUTH_SERVER,
+                    jwksUri: `${AUTH_SERVER}/jwks`,
+                    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                    tokenEndpoint: `${AUTH_SERVER}/token`,
+                    codeVerifier: 'test-code-verifier',
+                    state: 'some-value',
+                }) satisfies InitialSession,
+        )
+
+        const client = new SmartClient(
+            'test-session',
+            {
+                clientId: 'test-client',
+                scope: 'openid fhirUser launch/patient',
+                callbackUrl: 'http://app/callback',
+                redirectUrl: 'http://app/redirect',
+                knownFhirServers: [
+                    {
+                        name: 'TestMed',
+                        issuer: FHIR_SERVER,
+                        type: 'confidential-asymmetric',
+                        method: 'private_key_jwt',
+                        privateKey: await privateKeyAsJwkString(),
+                        strictAudienceValidation: true,
+                    },
+                ],
+            },
+            { storage },
+        )
+
+        const tokenResponseNock = await mockPrivateKeyJwtTokenExchange({
+            client_id: 'test-client',
+            code: 'køde',
+            code_verifier: 'test-code-verifier',
+            redirect_uri: 'http://app/callback',
+        })
+
+        const callback = await client.callback({
+            state: 'some-value',
+            code: 'køde',
+        })
+
+        expect(tokenResponseNock.scope.isDone()).toBe(true)
+        expectHas(callback, 'redirectUrl')
+        expect(callback.redirectUrl).toBe('http://app/redirect')
+
+        /**
+         * The client_assertion is a real, signed JWT. Verify it with the matching public
+         * key (no jose mocking) and assert the claims SMART requires for token endpoint auth.
+         */
+        const clientAssertion = tokenResponseNock.getClientAssertion() as string
+        const { payload, protectedHeader } = await jwtVerify(clientAssertion, await verifyPublicKey(), {
+            // Explicitly verify that audience is _not_ token endpoint (as in normal non-strict mode)
+            audience: `${AUTH_SERVER}`,
+        })
+
+        expect(protectedHeader).toMatchObject({
+            alg: 'RS384',
+            kid: 'foo-bar-baz-kid',
+            // In strict mode, the typ haeder must be this:
+            typ: 'client-authentication+jwt',
+        })
+        expect(payload.iss).toBe('test-client')
+        expect(payload.sub).toBe('test-client')
+        // Also not token endpoint
+        expect(payload.aud).toBe(`${AUTH_SERVER}`)
+    })
 })

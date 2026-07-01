@@ -3,7 +3,7 @@ import { JOSEError } from 'jose/errors'
 
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { FhirAuthMode } from '../client-auth-method/config'
-import { postFormEncodedTokenEndpoint } from '../client-auth-method/fetch'
+import { postFormEncodedTokenEndpoint, type TokenRequestPayload } from '../client-auth-method/token-endpoint'
 import { responseToFormattedError } from '../lib/error'
 import { logger } from '../lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from '../lib/otel'
@@ -30,7 +30,7 @@ export async function exchangeToken(
             [OtelTaxonomy.FhirAuthorizationType]: authMode.type,
         })
 
-        const tokenRequestBody = {
+        const tokenRequestBody: TokenRequestPayload = {
             client_id: config.clientId,
             grant_type: 'authorization_code',
             code: code,
@@ -42,12 +42,7 @@ export async function exchangeToken(
          * PKCE STEP 5
          * Send code and the code_verifier (created in step 1) to the authorization servers /oauth/token endpoint.
          */
-        const response = await postFormEncodedTokenEndpoint(
-            session.tokenEndpoint,
-            new URLSearchParams(tokenRequestBody),
-            config.clientId,
-            authMode,
-        )
+        const response = await postFormEncodedTokenEndpoint(tokenRequestBody, session, config.clientId, authMode)
 
         /**
          * PKCE STEP 6
@@ -99,18 +94,13 @@ export async function refreshToken(
             [OtelTaxonomy.FhirAuthorizationType]: authMode.type,
         })
 
-        const tokenRequestBody = {
-            client_id: config.clientId,
+        const tokenRequestBody: TokenRequestPayload = {
             grant_type: 'refresh_token',
+            client_id: config.clientId,
             refresh_token: session.refreshToken,
         }
 
-        const response = await postFormEncodedTokenEndpoint(
-            session.tokenEndpoint,
-            new URLSearchParams(tokenRequestBody),
-            config.clientId,
-            authMode,
-        )
+        const response = await postFormEncodedTokenEndpoint(tokenRequestBody, session, config.clientId, authMode)
 
         if (!response.ok) {
             const [responseError] = await responseToFormattedError(response)
