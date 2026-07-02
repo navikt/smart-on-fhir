@@ -19,6 +19,7 @@ import {
 import { bundleFhir, getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
 import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
 import type { CompleteSession } from '../storage/schema'
+import type { Validation } from '../validator/validations'
 
 import { responseToFormattedError } from './lib/error'
 import { logger } from './lib/logger'
@@ -281,7 +282,7 @@ export class ReadyClient {
             }
 
             const result = await response.json()
-            const parsed = FhirBatchResponseBundleSchema.safeParse(result)
+            const parsed = FhirBatchResponseBundleSchema.loose().safeParse(result)
             if (!parsed.success) {
                 failSpan(span, `Failed to parse transaction Bundle response`, parsed.error)
                 return { error: 'BATCH_FAILED_INVALID_RESPONSE', operationOutcome: null } satisfies ResourceBatchErrors
@@ -326,6 +327,10 @@ export class ReadyClient {
             logger.error(new Error(`Claim validation failed for claim ${claim}`, { cause: e }))
             return { error: 'CLAIM_INVALID' }
         }
+    }
+
+    public getValidationReport(): Validation[] {
+        return this._client.validator.report()
     }
 
     private async fetchWithRefresh(fetcher: () => Promise<Response>, span: Span): Promise<Response> {

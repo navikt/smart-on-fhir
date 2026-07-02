@@ -65,7 +65,7 @@ export async function exchangeToken(
         }
 
         const result: unknown = await response.json()
-        const parsedTokenResponse = TokenResponseSchema.safeParse(result)
+        const parsedTokenResponse = TokenResponseSchema.loose().safeParse(result)
 
         if (!parsedTokenResponse.success) {
             failSpan(
@@ -117,7 +117,7 @@ export async function refreshToken(
         }
 
         const result: unknown = await response.json()
-        const parsedTokenResponse = TokenRefreshResponseSchema.safeParse(result)
+        const parsedTokenResponse = TokenRefreshResponseSchema.loose().safeParse(result)
 
         if (!parsedTokenResponse.success) {
             failSpan(

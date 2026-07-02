@@ -16,6 +16,11 @@ export const InitialSessionSchema = z.object({
     tokenEndpoint: z.string(),
     codeVerifier: z.string(),
     state: z.string(),
+
+    /**
+     * Used to persist and rehydrate the session-wide validator runtime
+     */
+    validator: z.unknown().optional(),
 })
 
 export type CompleteSession = z.infer<typeof CompleteSessionSchema>

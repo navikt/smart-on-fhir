@@ -29,7 +29,7 @@ export async function getSmartConfiguration(
             }
 
             const result: unknown = await response.json()
-            const validatedWellKnown = SmartConfigurationSchema.safeParse(result)
+            const validatedWellKnown = SmartConfigurationSchema.loose().safeParse(result)
             if (!validatedWellKnown.success) {
                 failSpan(
                     span,

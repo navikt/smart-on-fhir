@@ -5,6 +5,7 @@ import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
+import { ValidatorRuntime } from '../validator/ValidatorRuntime'
 
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
 import { failSpan, OtelTaxonomy, spanAsync } from './lib/otel'
@@ -38,6 +39,11 @@ export class SmartClient {
      * SmartClient will keep track of the active patient (using for example sessionStorage).
      */
     readonly activePatient: string | null
+
+    /**
+     * Self-testing validator used to verify the launch and resources.
+     */
+    readonly validator: ValidatorRuntime
 
     /**
      * Configuration for this instance, based on options passed to the constructor + defaults.
@@ -127,6 +133,11 @@ export class SmartClient {
             allowNonHttpsLaunch: configuration.options?.allowNonHttpsLaunch ?? false,
             cache: configuration.cache ?? 'disabled',
         }
+
+        /**
+         * Initialize a stateless validator, this will merge with the current session later.
+         */
+        this.validator = ValidatorRuntime.blank()
     }
 
     /**
@@ -164,6 +175,8 @@ export class SmartClient {
                 return { error: smartConfig.error }
             }
 
+            this.validator.smartConfiguration(smartConfig)
+
             /**
              * PKCE STEP 1
              *
@@ -180,6 +193,7 @@ export class SmartClient {
                 tokenEndpoint: smartConfig.token_endpoint,
                 codeVerifier: codeVerifier,
                 state: state,
+                validator: this.validator.export(),
             }
 
             await spanAsync('save-initial-session', async () =>
@@ -220,6 +234,8 @@ export class SmartClient {
             const initialSession = await this.getInitialSession(this.sessionId)
             if ('error' in initialSession) return initialSession
 
+            this.validator.restore(initialSession.validator)
+
             span.setAttributes({
                 [OtelTaxonomy.FhirServer]: initialSession.fhirServer,
                 [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
@@ -247,6 +263,8 @@ export class SmartClient {
                 return { error: tokenResponse.error }
             }
 
+            this.validator.tokenResponse(tokenResponse)
+
             const completeSessionValues: CompleteSession = {
                 ...initialSession,
                 idToken: tokenResponse.id_token,
@@ -254,6 +272,7 @@ export class SmartClient {
                 refreshToken: tokenResponse.refresh_token,
                 patient: tokenResponse.patient,
                 encounter: tokenResponse.encounter,
+                validator: this.validator.export(),
             }
 
             await spanAsync('save-complete-session', () => this._storage.set(this.sessionId, completeSessionValues))
@@ -293,6 +312,8 @@ export class SmartClient {
             const session = this.options.autoRefresh ? await this.getOrRefresh() : await this.getCompleteSession()
 
             if ('error' in session) return { error: session.error, validate: async () => false }
+
+            this.validator.restore(session.validator)
 
             span.setAttributes({
                 [OtelTaxonomy.FhirServer]: session.fhirServer,
@@ -339,9 +360,12 @@ export class SmartClient {
                 return refreshResponse
             }
 
+            this.validator.tokenRefreshResponse(refreshResponse)
+
             const refreshedSessionValues: CompleteSession = {
                 ...session,
                 accessToken: refreshResponse.access_token,
+                validator: this.validator.export(),
             }
 
             /**
