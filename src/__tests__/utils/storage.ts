@@ -17,8 +17,8 @@ export function createMockedStorage(): SmartStorage & {
     getFn: Mock
     setFn: Mock
 } {
-    const getFn = vi.fn()
-    const setFn = vi.fn()
+    const getFn = vi.fn<never>()
+    const setFn = vi.fn<never>()
     return {
         get: getFn,
         set: setFn,

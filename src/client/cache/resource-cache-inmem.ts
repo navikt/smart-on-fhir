@@ -9,7 +9,10 @@ const resourceCache = new QuickLRU({
     maxSize: 1000,
 })
 
-export function setCachedResourceInMemory<Path extends KnownPaths>(item: CacheValueItem<Path>, cache: { ttl: number }) {
+export function setCachedResourceInMemory<Path extends KnownPaths>(
+    item: CacheValueItem<Path>,
+    cache: { ttl: number },
+): void {
     const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
     resourceCache.set(key, item.values, { maxAge: cache.ttl })

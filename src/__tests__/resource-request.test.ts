@@ -52,7 +52,7 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
 
     if ('error' in practitioner) {
         // Verify union types, this should be string, not unknown
-        expect(practitioner.error.toString()).not.toBeNull()
+        throw Error(`Expected Practitioner to be successful, but got error: ${practitioner.error.toString()}`)
     }
 
     expect(mock.isDone()).toBe(true)
@@ -84,7 +84,7 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
 
     if ('error' in documentReference) {
         // Verify union types, this should be string, not unknown
-        expect(documentReference.error.toString()).not.toBeNull()
+        throw Error(`Expected DocumentReference to be successful, but got error: ${documentReference.error.toString()}`)
     }
 
     expect(mock.isDone()).toBe(true)
@@ -110,7 +110,7 @@ test('SmartClient.update - /DocumentReference should PUT and parse DocumentRefer
 
     if ('error' in documentReference) {
         // Verify union types, this should be string, not unknown
-        expect(documentReference.error.toString()).not.toBeNull()
+        throw Error(`Expected DocumentReference to be successful, but got error: ${documentReference.error.toString()}`)
     }
 
     expect(mock.isDone()).toBe(true)

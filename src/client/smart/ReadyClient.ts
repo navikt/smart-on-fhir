@@ -207,7 +207,7 @@ export class ReadyClient {
                 }
             }
 
-            const doRequest = () => getFhir(this._session, resource)
+            const doRequest = (): Promise<Response> => getFhir(this._session, resource)
             const response = await this.fetchWithRefresh(
                 () => (config?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
                 span,

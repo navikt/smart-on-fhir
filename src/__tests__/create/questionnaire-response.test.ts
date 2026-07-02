@@ -53,7 +53,9 @@ test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base
 
     if ('error' in questionnaireResponse) {
         // Verify union types, this should be string, not unknown
-        expect(questionnaireResponse.error.toString()).not.toBeNull()
+        throw Error(
+            `Expected QuestionnaireResponse to be successful, but got error: ${questionnaireResponse.error.toString()}`,
+        )
     }
 
     expect(mock.isDone()).toBe(true)

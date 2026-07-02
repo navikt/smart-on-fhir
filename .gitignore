@@ -20,4 +20,6 @@ vitest-report.json
 *.tsbuildinfo
 
 #idea
-.idea
+.idea/*
+!.idea/OxcSettings.xml
+!.idea/OxfmtSettings.xml
