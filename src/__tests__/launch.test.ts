@@ -182,6 +182,48 @@ test('.callback should redirect with patient ID when enableMultiLaunch=true', as
     expect(tokenResponseNock.isDone()).toBe(true)
     expectHas(callback, 'redirectUrl')
     expect(callback.redirectUrl).toBe('http://app/redirect?patient=c4664cf0-9168-4b6f-8798-93799068552b')
+    expect(callback.intent).toBeNull()
+})
+
+test('.callback should provide intent when provided by EHR during launch', async () => {
+    const storage = createMockedStorage()
+    storage.getFn.mockImplementationOnce(
+        () =>
+            ({
+                fhirServer: FHIR_SERVER,
+                tokenIssuer: AUTH_SERVER,
+                jwksUri: `${AUTH_SERVER}/jwks`,
+                introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+                authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+                tokenEndpoint: `${AUTH_SERVER}/token`,
+                codeVerifier: 'test-code-verifier',
+                state: 'some-value',
+            }) satisfies InitialSession,
+    )
+    const client = createSmartClient(storage, { enableMultiLaunch: true })
+
+    const tokenResponseNock = await mockTokenExchange(
+        {
+            client_id: 'test-client',
+            code: 'køde',
+            code_verifier: 'test-code-verifier',
+            redirect_uri: 'http://app/callback',
+        },
+        {
+            intent: 'test-intent',
+        },
+    )
+
+    const callback = await client.callback({
+        state: 'some-value',
+        code: 'køde',
+    })
+
+    expect(tokenResponseNock.isDone()).toBe(true)
+    expectHas(callback, 'redirectUrl')
+    expectHas(callback, 'intent')
+    expect(callback.redirectUrl).toBe('http://app/redirect?patient=c4664cf0-9168-4b6f-8798-93799068552b')
+    expect(callback.intent).toBe('test-intent')
 })
 
 test('full simulated launch flow, .ready() → .callback() → .ready()', async () => {
