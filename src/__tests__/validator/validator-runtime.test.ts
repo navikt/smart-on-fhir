@@ -1,7 +1,14 @@
 import { expect, test } from 'vitest'
 
 import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
-import type { FhirDocumentReference, FhirEncounter, FhirOrganization, FhirPatient, FhirPractitioner } from '../../zod'
+import type {
+    FhirDocumentReference,
+    FhirEncounter,
+    FhirOrganization,
+    FhirPatient,
+    FhirPractitioner,
+    FhirQuestionnaireResponse,
+} from '../../zod'
 import { expectHas } from '../utils/expect'
 
 test('persisting and restoring should work', () => {
@@ -338,4 +345,79 @@ test('documentReference validation warns when description is missing', () => {
     expectHas(dr, 'tests')
     expect(dr.status).toEqual('PASS')
     expect(dr.tests).toContainEqual({ type: 'WARN', message: 'no description present in documentReference' })
+})
+
+function completeQuestionnaireResponse(): FhirQuestionnaireResponse {
+    return {
+        resourceType: 'QuestionnaireResponse',
+        id: 'unik-document-reference-id',
+        status: 'completed',
+        questionnaire: 'https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1',
+        subject: { reference: 'Patient/2b4b6bd4-0b88-4762-aab5-74776e1f50c4' },
+        encounter: { reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' },
+        author: { reference: 'Practitioner/40426ee8-6293-456c-9b79-2016821673ca' },
+        authored: '2026-02-10T09:30:00+01:00',
+        item: [
+            {
+                linkId: 'hoveddiagnose',
+                text: 'Hoveddiagnose',
+                answer: [
+                    {
+                        valueCoding: {
+                            system: 'urn:oid:2.16.578.1.12.4.1.1.7110',
+                            code: 'M54.5',
+                            display: 'Korsryggsmerter',
+                        },
+                    },
+                ],
+            },
+        ],
+    }
+}
+
+test('questionnaireResponse validation passes for a complete response', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.questionnaireResponse(completeQuestionnaireResponse())
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('GOOD')
+    expect(qr.tests).toContainEqual({
+        type: 'INFO',
+        message: 'questionnaire references the canonical Nav Questionnaire',
+    })
+})
+
+test('questionnaireResponse validation fails when questionnaire is not the canonical Nav url', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.questionnaireResponse({
+        ...completeQuestionnaireResponse(),
+        questionnaire: 'https://example.com/some/other/Questionnaire',
+    } satisfies FhirQuestionnaireResponse)
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('FAIL')
+    expect(qr.tests).toContainEqual({
+        type: 'ERROR',
+        message:
+            'questionnaire should reference https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1',
+    })
+})
+
+test('questionnaireResponse validation fails when encounter reference is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    const { encounter: _encounter, ...withoutEncounter } = completeQuestionnaireResponse()
+    runtime.questionnaireResponse(withoutEncounter satisfies FhirQuestionnaireResponse)
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('FAIL')
+    expect(qr.tests).toContainEqual({ type: 'ERROR', message: 'encounter is missing' })
 })

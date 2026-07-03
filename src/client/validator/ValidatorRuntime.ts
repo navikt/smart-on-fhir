@@ -42,6 +42,11 @@ export class ValidatorRuntime {
         ) as Record<ValidationType, Validation>
     }
 
+    private update(validation: ValidatorBuilder): void {
+        const result = validation.toValidation()
+        this.validations[result.type] = result
+    }
+
     smartConfiguration(sc: SmartConfiguration & Loosely): void {
         const outcomes = new ValidatorBuilder('SMART_CONFIGURATION')
 
@@ -346,7 +351,45 @@ export class ValidatorRuntime {
         }
     }
 
-    questionnaireResponse(qr: FhirQuestionnaireResponse & Loosely): void {}
+    questionnaireResponse(qr: FhirQuestionnaireResponse & Loosely): void {
+        const outcomes = new ValidatorBuilder('QUESTIONNAIRE_RESPONSE')
+
+        try {
+            // Questionnaire references the publicly published Questionnaire definition via canonical URL,
+            // so the EHR can look up the structure of the item fields.
+            const canonicalQuestionnaire = 'https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1'
+            outcomes.whenValueExists(qr.questionnaire, 'questionnaire', 'required').thenCheck<string>({
+                test: (value) => value === canonicalQuestionnaire,
+                yeah: { type: 'INFO', message: 'questionnaire references the canonical Nav Questionnaire' },
+                nah: { type: 'ERROR', message: `questionnaire should reference ${canonicalQuestionnaire}` },
+            })
+
+            // Subject is a reference to the patient the sykmelding is for.
+            outcomes.whenValueExists(qr.subject, 'subject', 'required').thenCheck<{ reference?: string }>({
+                test: (value) => !!value.reference,
+                yeah: { type: 'INFO', message: 'subject reference present in questionnaireResponse' },
+                nah: { type: 'ERROR', message: 'subject reference is missing in questionnaireResponse' },
+            })
+
+            // Encounter ties the response to the active consultation.
+            outcomes.whenValueExists(qr.encounter, 'encounter', 'required').thenCheck<{ reference?: string }>({
+                test: (value) => !!value.reference,
+                yeah: { type: 'INFO', message: 'encounter reference present in questionnaireResponse' },
+                nah: { type: 'ERROR', message: 'encounter reference is missing in questionnaireResponse' },
+            })
+
+            // Author is a reference to the sykmelder who filled out the sykmelding.
+            outcomes.whenValueExists(qr.author, 'author', 'required').thenCheck<{ reference?: string }>({
+                test: (value) => !!value.reference,
+                yeah: { type: 'INFO', message: 'author reference present in questionnaireResponse' },
+                nah: { type: 'ERROR', message: 'author reference is missing in questionnaireResponse' },
+            })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('QUESTIONNAIRE_RESPONSE validation failed, ignoring', { cause: e }))
+        }
+    }
 
     report(): Validation[] {
         return Object.values(this.validations)
@@ -379,11 +422,6 @@ export class ValidatorRuntime {
                 this.validations[validation] = state[validation]
             }
         }
-    }
-
-    private update(validation: ValidatorBuilder): void {
-        const result = validation.toValidation()
-        this.validations[result.type] = result
     }
 }
 
