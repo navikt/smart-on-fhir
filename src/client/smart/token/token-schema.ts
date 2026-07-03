@@ -19,7 +19,7 @@ export type TokenRefreshResponse = z.infer<typeof TokenRefreshResponseSchema>
 export const TokenRefreshResponseSchema = z.object({
     // OIDC:
     access_token: z.string(),
-    refresh_token: z.string(),
+    refresh_token: z.string().optional(),
 })
 
 export type IdToken = z.infer<typeof IdTokenSchema>

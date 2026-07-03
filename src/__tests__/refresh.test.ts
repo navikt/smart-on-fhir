@@ -88,6 +88,49 @@ test('.ready - should refresh token when expiry is long ago', async () => {
     expectIs(ready, ReadyClient)
 })
 
+test('.ready - should refresh with original token refresh does not supply new', async () => {
+    const [client] = await createLaunchableOpenSmartClient(
+        {
+            ...validSession,
+            accessToken: await createTestAccessToken(-60 * 10), // 10 minutes ago
+        },
+        { autoRefresh: true },
+    )
+
+    nock(AUTH_SERVER)
+        .post('/token', {
+            client_id: 'test-client',
+            refresh_token: 'valid-refresh-token',
+            grant_type: 'refresh_token',
+        })
+        .reply(200, {
+            access_token: await createTestAccessToken(-60 * 2), // Also expired
+            id_token: await createTestIdToken({
+                fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
+            }),
+        })
+
+    const ready = await client.ready()
+
+    expectIs(ready, ReadyClient)
+
+    nock(AUTH_SERVER)
+        .post('/token', {
+            // The original refresh token from the initial validSession
+            refresh_token: 'valid-refresh-token',
+            client_id: 'test-client',
+            grant_type: 'refresh_token',
+        })
+        .reply(200, {
+            access_token: await createTestAccessToken(-60 * 2), // Also expired
+            id_token: await createTestIdToken({
+                fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
+            }),
+        })
+
+    expectIs(await client.ready(), ReadyClient)
+})
+
 test('SmartClient.request - Should refresh token when server says 401', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession, {
         autoRefresh: true,

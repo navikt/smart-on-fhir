@@ -342,7 +342,16 @@ export class SmartClient {
             const refreshedSessionValues: CompleteSession = {
                 ...session,
                 accessToken: refreshResponse.access_token,
-                refreshToken: refreshResponse.refresh_token,
+            }
+
+            /**
+             * As per the SMART on FHIR spec, the refresh token may or may not be returned during a refresh. If it is returned,
+             * we update the session with the new refresh token. If it is not returned, we keep the existing refresh token.
+             *
+             * See: https://build.fhir.org/ig/HL7/smart-app-launch/app-launch.html#response-7
+             */
+            if (refreshResponse.refresh_token) {
+                refreshedSessionValues.refreshToken = refreshResponse.refresh_token
             }
 
             await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
