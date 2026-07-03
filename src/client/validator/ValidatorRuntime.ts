@@ -1,16 +1,14 @@
 // oxlint-disable typescript/no-explicit-any - This type of validation requires actual any
 
+import { decodeJwt } from 'jose'
+
 import { logger } from '../smart/lib/logger'
-import type { TokenRefreshResponse, TokenResponse } from '../smart/token/token-schema'
+import { IdTokenSchema, type TokenRefreshResponse, type TokenResponse } from '../smart/token/token-schema'
 import type { SmartConfiguration } from '../smart/well-known/smart-configuration-schema'
 
-import {
-    activeValidations,
-    type Validation,
-    type ValidationOverallOutcome,
-    type ValidationTestLevel,
-    type ValidationType,
-} from './validations'
+import { now } from './utils'
+import { activeValidations, type Validation, type ValidationType } from './validations'
+import { ValidatorBuilder } from './ValidatorBuilder'
 
 /**
  * The validator runtime is used as an internal mechanism to validate the operations and
@@ -37,41 +35,101 @@ export class ValidatorRuntime {
     }
 
     smartConfiguration(sc: SmartConfiguration & Loosely): void {
-        const outcomes = new ValidatorBuilder('SMART_CONFIGURATION')
+        try {
+            const outcomes = new ValidatorBuilder('SMART_CONFIGURATION')
 
-        outcomes.whenValueExists(sc.grant_types_supported, 'grant_types_supported', 'required').thenCheck<string[]>({
-            test: (value) => value.includes('refresh_token'),
-            yeah: { type: 'INFO', message: 'refresh_token is supported' },
-            nah: { type: 'WARN', message: 'refresh_token is not supported' },
-        })
+            outcomes
+                .whenValueExists(sc.grant_types_supported, 'grant_types_supported', 'required')
+                .thenCheck<string[]>({
+                    test: (value) => value.includes('refresh_token'),
+                    yeah: { type: 'INFO', message: 'refresh_token is supported' },
+                    nah: { type: 'WARN', message: 'refresh_token is not supported' },
+                })
 
-        const expectedClientCredentialsTypes = ['private_key_jwt', 'client_secret_post', 'client_secret_basic']
-        outcomes
-            .whenValueExists(
-                sc.token_endpoint_auth_methods_supported,
-                'token_endpoint_auth_methods_supported',
-                'required',
-            )
-            .thenCheck<string[]>({
-                test: (value) => expectedClientCredentialsTypes.some((method) => value.includes(method)),
-                yeah: {
-                    type: 'INFO',
-                    message: `token_endpoint_auth_methods_supported supports at least one of ${expectedClientCredentialsTypes.join(', ')}`,
-                },
-                nah: {
-                    type: 'ERROR',
-                    message: `token_endpoint_auth_methods_supported is missing support for at least one of ${expectedClientCredentialsTypes.join(', ')}`,
-                },
-            })
+            const expectedClientCredentialsTypes = ['private_key_jwt', 'client_secret_post', 'client_secret_basic']
+            outcomes
+                .whenValueExists(
+                    sc.token_endpoint_auth_methods_supported,
+                    'token_endpoint_auth_methods_supported',
+                    'required',
+                )
+                .thenCheck<string[]>({
+                    test: (value) => expectedClientCredentialsTypes.some((method) => value.includes(method)),
+                    yeah: {
+                        type: 'INFO',
+                        message: `token_endpoint_auth_methods_supported supports at least one of ${expectedClientCredentialsTypes.join(', ')}`,
+                    },
+                    nah: {
+                        type: 'ERROR',
+                        message: `token_endpoint_auth_methods_supported is missing support for at least one of ${expectedClientCredentialsTypes.join(', ')}`,
+                    },
+                })
 
-        this.update(outcomes)
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('SMART_CONFIGURATION validation failed, ignoring', { cause: e }))
+        }
     }
 
-    // oxlint-disable-next-line no-unused-vars
-    tokenResponse(tokenResponse: TokenResponse & Loosely): void {}
+    tokenResponse(tr: TokenResponse & Loosely): void {
+        try {
+            const outcomes = new ValidatorBuilder('TOKEN_RESPONSE')
 
-    // oxlint-disable-next-line no-unused-vars
-    tokenRefreshResponse(tokenResponse: TokenRefreshResponse & Loosely): void {}
+            outcomes.check({
+                test: tr['practitioner'] != null,
+                yeah: { type: 'WARN', message: 'practitioner should not be part of the token response' },
+            })
+
+            this.update(outcomes)
+
+            /**
+             * Token response has id_token, we'll chain it automatically
+             */
+            this.idToken(tr.id_token)
+        } catch (e) {
+            logger.warn(new Error('TOKEN_RESPONSE validation failed, ignoring', { cause: e }))
+        }
+    }
+
+    tokenRefreshResponse(tr: TokenRefreshResponse & Loosely): void {
+        try {
+            const outcomes = new ValidatorBuilder('TOKEN_REFRESH_RESPONSE')
+
+            outcomes.check({
+                test: tr['encounter'] != null,
+                yeah: { type: 'WARN', message: 'encounter should not be part of the token refresh response' },
+            })
+
+            outcomes.check({
+                test: tr['patient'] != null,
+                yeah: { type: 'WARN', message: 'patient should not be part of the token refresh response' },
+            })
+
+            outcomes.check({
+                test: tr['practitioner'] != null,
+                yeah: { type: 'WARN', message: 'practitioner should not be part of the token refresh response' },
+            })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('TOKEN_REFRESH_RESPONSE validation failed, ignoring', { cause: e }))
+        }
+    }
+
+    private idToken(idToken: string): void {
+        try {
+            const outcomes = new ValidatorBuilder('ID_TOKEN')
+            const decoded = decodeJwt(idToken)
+            const parsed = IdTokenSchema.loose().parse(decoded)
+
+            outcomes.check({
+                test: parsed.fhirUser.startsWith('Practitioner/'),
+                nah: { type: 'ERROR', message: 'fhirUser should be a Practitioner resource' },
+            })
+        } catch (e) {
+            logger.warn(new Error('ID_TOKEN validation failed, ignoring', { cause: e }))
+        }
+    }
 
     /* TODO:
     encounter(encounter: FhirEncounter & Loosely): void {}
@@ -122,79 +180,6 @@ export class ValidatorRuntime {
         this.validations[result.type] = result
     }
 }
-
-/**
- * Used to build a set of tests for a ValidationType, has utilities for working with uncertain
- * datastructures and nullability.
- */
-class ValidatorBuilder {
-    private readonly type: ValidationType
-    private readonly outcomes: { type: 'INFO' | 'WARN' | 'ERROR'; message: string }[] = []
-
-    constructor(type: ValidationType) {
-        this.type = type
-    }
-
-    whenValueExists(
-        value: any,
-        what: string,
-        required: 'required' | 'ignore',
-    ): {
-        thenCheck: <AssumedType>(check: {
-            test: (value: AssumedType) => boolean
-            yeah: { type: string; message: string }
-            nah: { type: string; message: string }
-        }) => void
-    } {
-        if (value == null) {
-            const noop = (): void => void 0
-            if (required == 'ignore') return { thenCheck: () => noop }
-
-            this.outcomes.push({ type: 'ERROR', message: `${what} is missing` })
-            return { thenCheck: () => noop }
-        }
-
-        return {
-            thenCheck: (check) => {
-                const result = check.test(value)
-                if (result) {
-                    this.outcomes.push({
-                        type: check.yeah.type as 'INFO' | 'WARN' | 'ERROR',
-                        message: check.yeah.message,
-                    })
-                } else {
-                    this.outcomes.push({
-                        type: check.nah.type as 'INFO' | 'WARN' | 'ERROR',
-                        message: check.nah.message,
-                    })
-                }
-            },
-        }
-    }
-
-    check(check: {
-        test: boolean
-        yeah: { type: ValidationTestLevel; message: string }
-        nah: { type: ValidationTestLevel; message: string }
-    }): void {
-        if (check.test) {
-            this.outcomes.push({ type: check.yeah.type, message: check.yeah.message })
-        } else {
-            this.outcomes.push({ type: check.nah.type, message: check.nah.message })
-        }
-    }
-
-    toValidation(): Validation {
-        const anyError = this.outcomes.some((o) => o.type === 'ERROR')
-        const anyWarn = this.outcomes.some((o) => o.type === 'WARN')
-
-        const status: ValidationOverallOutcome = anyError ? 'FAIL' : anyWarn ? 'PASS' : 'GOOD'
-
-        return { type: this.type, at: now(), status: status, tests: this.outcomes }
-    }
-}
-
-const now = (): string => new Date().toISOString()
 
 export type Loosely = {
     [key: string]: any
