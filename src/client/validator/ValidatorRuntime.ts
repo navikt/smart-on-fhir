@@ -195,7 +195,25 @@ export class ValidatorRuntime {
         }
     }
 
-    practitioner(practitioner: FhirPractitioner & Loosely): void {}
+    practitioner(practitioner: FhirPractitioner & Loosely): void {
+        const outcomes = new ValidatorBuilder('PRACTITIONER')
+
+        try {
+            // Identifier/hpr-nummer is used as the identifier for the practitioner (sykmelder).
+            const hprSystem = 'urn:oid:2.16.578.1.12.4.1.4.4'
+            outcomes
+                .whenValueExists(practitioner.identifier, 'identifier', 'required')
+                .thenCheck<{ system?: string; value?: string }[]>({
+                    test: (value) => value.some((i) => i.system === hprSystem && !!i.value),
+                    yeah: { type: 'INFO', message: 'hpr-nummer identifier present in practitioner' },
+                    nah: { type: 'ERROR', message: `hpr-nummer identifier (${hprSystem}) is missing in practitioner` },
+                })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('PRACTITIONER validation failed, ignoring', { cause: e }))
+        }
+    }
 
     patient(patient: FhirPatient & Loosely): void {}
 
