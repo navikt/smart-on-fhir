@@ -134,6 +134,8 @@ export class ValidatorRuntime {
                 test: parsed.fhirUser.startsWith('Practitioner/'),
                 nah: { type: 'ERROR', message: 'fhirUser should be a Practitioner resource' },
             })
+
+            this.update(outcomes)
         } catch (e) {
             logger.warn(new Error('ID_TOKEN validation failed, ignoring', { cause: e }))
         }
@@ -287,20 +289,21 @@ export class ValidatorRuntime {
         return Object.values(this.validations)
     }
 
-    export(): Record<ValidationType, Validation> {
-        return this.validations
+    export(): string {
+        return JSON.stringify(this.validations)
     }
 
-    restore(persisted: unknown): void {
+    restore(persisted: string | undefined | null): void {
         // Nothing to restore
         if (persisted == null) return
 
-        if (typeof persisted !== 'object' || Object.keys(persisted).length !== activeValidations.length) {
+        const parsed = JSON.parse(persisted)
+        if (typeof parsed !== 'object' || Object.keys(parsed).length !== activeValidations.length) {
             logger.warn('Invalid persisted validator runtime state, ignoring')
             return
         }
 
-        const state = persisted as Record<ValidationType, Validation>
+        const state = parsed as Record<ValidationType, Validation>
         for (const validation of activeValidations) {
             if (this.validations[validation].status === 'UNVALIDATED') {
                 // Always overwrite when current is unvalidated
