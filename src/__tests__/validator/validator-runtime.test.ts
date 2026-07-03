@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
-import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
+import type { FhirEncounter, FhirOrganization, FhirPatient, FhirPractitioner } from '../../zod'
 import { expectHas } from '../utils/expect'
 
 test('sanity test validator runtime', () => {
@@ -183,4 +183,65 @@ test('patient validation fails when identifier has neither fødselsnummer nor d-
         message:
             'fødselsnummer (urn:oid:2.16.578.1.12.4.1.4.1) or d-nummer (urn:oid:2.16.578.1.12.4.1.4.2) identifier is missing in patient',
     })
+})
+
+test('organization validation passes when organisasjonsnummer and phone are present', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.101', value: '123456789' }],
+        telecom: [{ system: 'phone', value: '12345678' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('GOOD')
+    expect(organization.tests).toContainEqual({
+        type: 'INFO',
+        message: 'organisasjonsnummer identifier present in organization',
+    })
+    expect(organization.tests).toContainEqual({ type: 'INFO', message: 'phone telecom present in organization' })
+})
+
+test('organization validation fails when organisasjonsnummer identifier is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:some-other-system', value: '123456789' }],
+        telecom: [{ system: 'phone', value: '12345678' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('FAIL')
+    expect(organization.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'organisasjonsnummer (urn:oid:2.16.578.1.12.4.1.4.101) identifier is missing in organization',
+    })
+})
+
+test('organization validation fails when phone telecom is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.101', value: '123456789' }],
+        telecom: [{ system: 'email', value: 'post@legekontoret.no' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('FAIL')
+    expect(organization.tests).toContainEqual({ type: 'ERROR', message: 'phone telecom is missing in organization' })
 })

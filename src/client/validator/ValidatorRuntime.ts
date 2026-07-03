@@ -246,7 +246,38 @@ export class ValidatorRuntime {
         }
     }
 
-    organization(organization: FhirOrganization & Loosely): void {}
+    organization(organization: FhirOrganization & Loosely): void {
+        const outcomes = new ValidatorBuilder('ORGANIZATION')
+
+        try {
+            // Identifier/organisasjonsnummer (ENH) is used as the identifier for the organization
+            // the practitioner is affiliated with (e.g. fastlegekontor).
+            const enhSystem = 'urn:oid:2.16.578.1.12.4.1.4.101'
+            outcomes
+                .whenValueExists(organization.identifier, 'identifier', 'required')
+                .thenCheck<{ system?: string; value?: string }[]>({
+                    test: (value) => value.some((i) => i.system === enhSystem && !!i.value),
+                    yeah: { type: 'INFO', message: 'organisasjonsnummer identifier present in organization' },
+                    nah: {
+                        type: 'ERROR',
+                        message: `organisasjonsnummer (${enhSystem}) identifier is missing in organization`,
+                    },
+                })
+
+            // Telecom/phone is used by Nav caseworkers to contact the practitioner during follow-up.
+            outcomes
+                .whenValueExists(organization.telecom, 'telecom', 'required')
+                .thenCheck<{ system?: string; value?: string }[]>({
+                    test: (value) => value.some((t) => t.system === 'phone' && !!t.value),
+                    yeah: { type: 'INFO', message: 'phone telecom present in organization' },
+                    nah: { type: 'ERROR', message: 'phone telecom is missing in organization' },
+                })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('ORGANIZATION validation failed, ignoring', { cause: e }))
+        }
+    }
 
     documentReference(dr: FhirDocumentReference & Loosely): void {}
 
