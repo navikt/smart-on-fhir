@@ -1,7 +1,15 @@
-// oxlint-disable typescript/no-explicit-any - This type of validation requires actual any
+// oxlint-disable typescript/no-explicit-any no-unused-vars - This type of validation requires actual any
 
 import { decodeJwt } from 'jose'
 
+import type {
+    FhirDocumentReference,
+    FhirEncounter,
+    FhirOrganization,
+    FhirPatient,
+    FhirPractitioner,
+    FhirQuestionnaireResponse,
+} from '../../zod'
 import { logger } from '../smart/lib/logger'
 import { IdTokenSchema, type TokenRefreshResponse, type TokenResponse } from '../smart/token/token-schema'
 import type { SmartConfiguration } from '../smart/well-known/smart-configuration-schema'
@@ -35,9 +43,9 @@ export class ValidatorRuntime {
     }
 
     smartConfiguration(sc: SmartConfiguration & Loosely): void {
-        try {
-            const outcomes = new ValidatorBuilder('SMART_CONFIGURATION')
+        const outcomes = new ValidatorBuilder('SMART_CONFIGURATION')
 
+        try {
             outcomes
                 .whenValueExists(sc.grant_types_supported, 'grant_types_supported', 'required')
                 .thenCheck<string[]>({
@@ -72,9 +80,9 @@ export class ValidatorRuntime {
     }
 
     tokenResponse(tr: TokenResponse & Loosely): void {
-        try {
-            const outcomes = new ValidatorBuilder('TOKEN_RESPONSE')
+        const outcomes = new ValidatorBuilder('TOKEN_RESPONSE')
 
+        try {
             outcomes.check({
                 test: tr['practitioner'] != null,
                 yeah: { type: 'WARN', message: 'practitioner should not be part of the token response' },
@@ -92,9 +100,9 @@ export class ValidatorRuntime {
     }
 
     tokenRefreshResponse(tr: TokenRefreshResponse & Loosely): void {
-        try {
-            const outcomes = new ValidatorBuilder('TOKEN_REFRESH_RESPONSE')
+        const outcomes = new ValidatorBuilder('TOKEN_REFRESH_RESPONSE')
 
+        try {
             outcomes.check({
                 test: tr['encounter'] != null,
                 yeah: { type: 'WARN', message: 'encounter should not be part of the token refresh response' },
@@ -131,8 +139,61 @@ export class ValidatorRuntime {
         }
     }
 
-    /* TODO:
-    encounter(encounter: FhirEncounter & Loosely): void {}
+    encounter(encounter: FhirEncounter & Loosely): void {
+        const outcomes = new ValidatorBuilder('ENCOUNTER')
+
+        try {
+            // Subject is used to identify the patient for the consultation.
+            outcomes.whenValueExists(encounter.subject, 'subject', 'required').thenCheck<{ reference?: string }>({
+                test: (value) => value.reference != null,
+                yeah: { type: 'INFO', message: 'subject reference present in encounter' },
+                nah: { type: 'ERROR', message: 'subject is missing a reference' },
+            })
+
+            // Participant/individual is used to identify the practitioner (sykmelder) for the consultation.
+            outcomes
+                .whenValueExists(encounter.participant, 'participant', 'required')
+                .thenCheck<{ individual?: { reference?: string } }[]>({
+                    test: (value) => value.some((p) => p.individual?.reference != null),
+                    yeah: { type: 'INFO', message: 'participant individual reference present in encounter' },
+                    nah: { type: 'ERROR', message: 'participant is missing an individual reference' },
+                })
+
+            // ServiceProvider is used to identify the practitioner's organization for the consultation.
+            outcomes
+                .whenValueExists(encounter.serviceProvider, 'serviceProvider', 'required')
+                .thenCheck<{ reference?: string }>({
+                    test: (value) => value.reference != null,
+                    yeah: { type: 'INFO', message: 'serviceProvider reference present in encounter' },
+                    nah: { type: 'ERROR', message: 'serviceProvider is missing a reference' },
+                })
+
+            // Diagnosis is used to pre-fill the diagnosis in the app, but is explicitly not required.
+            outcomes.check({
+                test: encounter.diagnosis == null || encounter.diagnosis.length === 0,
+                yeah: { type: 'WARN', message: 'no diagnosis list present in encounter' },
+                nah: { type: 'INFO', message: `diagnosis list (${encounter.diagnosis?.length}) present in encounter` },
+            })
+
+            // Type/coding kontakttype is used to determine physical (1) or phone/video (6 | 7) consultation.
+            // Not present in the FhirEncounter schema, so read loosely.
+            const kontakttypeSystem = 'urn:oid:2.16.578.1.12.4.1.1.8432'
+            const hasKontakttype =
+                Array.isArray(encounter.type) &&
+                encounter.type.some(
+                    (t: any) => Array.isArray(t?.coding) && t.coding.some((c: any) => c?.system === kontakttypeSystem),
+                )
+            outcomes.check({
+                test: hasKontakttype,
+                yeah: { type: 'INFO', message: 'type kontakttype coding present in encounter' },
+                nah: { type: 'WARN', message: 'no type kontakttype coding present in encounter' },
+            })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('ENCOUNTER validation failed, ignoring', { cause: e }))
+        }
+    }
 
     practitioner(practitioner: FhirPractitioner & Loosely): void {}
 
@@ -141,7 +202,8 @@ export class ValidatorRuntime {
     organization(organization: FhirOrganization & Loosely): void {}
 
     documentReference(dr: FhirDocumentReference & Loosely): void {}
-    */
+
+    questionnaireResponse(qr: FhirQuestionnaireResponse & Loosely): void {}
 
     report(): Validation[] {
         return Object.values(this.validations)

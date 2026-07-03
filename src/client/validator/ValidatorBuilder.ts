@@ -9,7 +9,7 @@ import type { Validation, ValidationOverallOutcome, ValidationTestLevel, Validat
  */
 export class ValidatorBuilder {
     private readonly type: ValidationType
-    private readonly outcomes: { type: 'INFO' | 'WARN' | 'ERROR'; message: string }[] = []
+    private readonly outcomes: { type: ValidationTestLevel; message: string }[] = []
 
     constructor(type: ValidationType) {
         this.type = type
@@ -22,8 +22,8 @@ export class ValidatorBuilder {
     ): {
         thenCheck: <AssumedType>(check: {
             test: (value: AssumedType) => boolean
-            yeah: { type: string; message: string }
-            nah: { type: string; message: string }
+            yeah: { type: ValidationTestLevel; message: string }
+            nah: { type: ValidationTestLevel; message: string }
         }) => void
     } {
         if (value == null) {
@@ -38,15 +38,9 @@ export class ValidatorBuilder {
             thenCheck: (check) => {
                 const result = check.test(value)
                 if (result) {
-                    this.outcomes.push({
-                        type: check.yeah.type as 'INFO' | 'WARN' | 'ERROR',
-                        message: check.yeah.message,
-                    })
+                    this.outcomes.push({ type: check.yeah.type, message: check.yeah.message })
                 } else {
-                    this.outcomes.push({
-                        type: check.nah.type as 'INFO' | 'WARN' | 'ERROR',
-                        message: check.nah.message,
-                    })
+                    this.outcomes.push({ type: check.nah.type, message: check.nah.message })
                 }
             },
         }
