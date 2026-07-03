@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
-import type { FhirEncounter, FhirOrganization, FhirPatient, FhirPractitioner } from '../../zod'
+import type { FhirDocumentReference, FhirEncounter, FhirOrganization, FhirPatient, FhirPractitioner } from '../../zod'
 import { expectHas } from '../utils/expect'
 
 test('persisting and restoring should work', () => {
@@ -243,4 +243,99 @@ test('organization validation fails when phone telecom is missing', () => {
     expectHas(organization, 'tests')
     expect(organization.status).toEqual('FAIL')
     expect(organization.tests).toContainEqual({ type: 'ERROR', message: 'phone telecom is missing in organization' })
+})
+
+function completeDocumentReference(): FhirDocumentReference {
+    return {
+        resourceType: 'DocumentReference',
+        id: 'unik-document-reference-id',
+        status: 'current',
+        meta: { lastUpdated: '2026-06-01T00:00:00.000+00:00' },
+        description: '100% Sykmelding fra 01.06.2024 til 07.06.2024',
+        type: {
+            coding: [
+                { system: 'urn:oid:2.16.578.1.12.4.1.1.9602', code: 'J01-2', display: 'Sykmeldinger og trygdesaker' },
+            ],
+        },
+        content: [
+            {
+                attachment: {
+                    title: 'Tittel generert av Nav',
+                    language: 'NO-nb',
+                    contentType: 'application/pdf',
+                    data: 'base64 PDF',
+                },
+            },
+        ],
+        subject: { reference: 'Patient/2b4b6bd4-0b88-4762-aab5-74776e1f50c4' },
+        author: [{ reference: 'Practitioner/40426ee8-6293-456c-9b79-2016821673ca' }],
+        context: {
+            encounter: [{ reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' }],
+        },
+    }
+}
+
+test('documentReference validation passes for a complete document reference', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.documentReference(completeDocumentReference())
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('GOOD')
+    expect(dr.tests).toContainEqual({
+        type: 'INFO',
+        message: 'context.encounter reference present in documentReference',
+    })
+    expect(dr.tests).toContainEqual({ type: 'INFO', message: 'type coding J01-2 present in documentReference' })
+})
+
+test('documentReference validation fails when context.encounter reference is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.documentReference({
+        ...completeDocumentReference(),
+        context: { encounter: [] },
+    } satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('FAIL')
+    expect(dr.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'context.encounter reference is missing in documentReference',
+    })
+})
+
+test('documentReference validation fails when type code is not J01-2', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.documentReference({
+        ...completeDocumentReference(),
+        type: { coding: [{ system: 'urn:oid:2.16.578.1.12.4.1.1.9602', code: 'X99-9', display: 'Annet' }] },
+    } satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('FAIL')
+    expect(dr.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'type coding J01-2 (urn:oid:2.16.578.1.12.4.1.1.9602) is missing in documentReference',
+    })
+})
+
+test('documentReference validation warns when description is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    const { description: _description, ...withoutDescription } = completeDocumentReference()
+    runtime.documentReference(withoutDescription satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('PASS')
+    expect(dr.tests).toContainEqual({ type: 'WARN', message: 'no description present in documentReference' })
 })
