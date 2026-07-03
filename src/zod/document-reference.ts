@@ -23,12 +23,19 @@ export const FhirDocumentReferenceSchema = z.object({
     author: z.array(z.object({ reference: z.string() })),
     content: z.array(
         z.object({
-            attachment: z.object({
-                title: z.string(),
-                language: z.string(),
-                contentType: z.union([z.literal('application/pdf'), z.literal('application/fhir+json')]),
-                data: z.string(),
-            }),
+            attachment: z.union([
+                // Inlined values
+                z.object({
+                    title: z.string(),
+                    language: z.string(),
+                    contentType: z.union([z.literal('application/pdf'), z.literal('application/fhir+json')]),
+                    data: z.string(),
+                }),
+                // Reference to other resources, e.g. Binary/<uuid>
+                z.object({
+                    url: z.string(),
+                }),
+            ]),
         }),
     ),
     context: z.object({
