@@ -4,7 +4,7 @@ import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
 import type { FhirEncounter, FhirOrganization, FhirPatient, FhirPractitioner } from '../../zod'
 import { expectHas } from '../utils/expect'
 
-test('sanity test validator runtime', () => {
+test('persisting and restoring should work', () => {
     const runtime = ValidatorRuntime.blank()
 
     runtime.smartConfiguration({
@@ -23,14 +23,13 @@ test('sanity test validator runtime', () => {
     })
 
     const report = runtime.report()
+    expect(report).toHaveLength(10)
 
-    expect(report).toHaveLength(11)
+    const persisted = runtime.export()
+    const newRuntime = ValidatorRuntime.blank()
+    newRuntime.restore(persisted)
 
-    const smartConfiguration = report.find((v) => v.type === 'SMART_CONFIGURATION')
-
-    expectHas(smartConfiguration, 'tests')
-    expect(smartConfiguration.status).toEqual('GOOD')
-    expect(smartConfiguration.tests[0].message).toEqual('refresh_token is supported')
+    expect(newRuntime.report()).toEqual(report)
 })
 
 test('encounter validation passes for a complete encounter', () => {

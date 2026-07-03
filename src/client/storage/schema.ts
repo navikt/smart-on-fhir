@@ -20,7 +20,7 @@ export const InitialSessionSchema = z.object({
     /**
      * Used to persist and rehydrate the session-wide validator runtime
      */
-    validator: z.unknown().optional(),
+    validator: z.string().optional(),
 })
 
 export type CompleteSession = z.infer<typeof CompleteSessionSchema>

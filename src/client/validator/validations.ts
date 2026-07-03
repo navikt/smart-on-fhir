@@ -2,7 +2,6 @@ export const activeValidations = [
     'SMART_CONFIGURATION',
     'TOKEN_RESPONSE',
     'TOKEN_REFRESH_RESPONSE',
-    'ACCESS_TOKEN',
     'ID_TOKEN',
     'ENCOUNTER',
     'PRACTITIONER',

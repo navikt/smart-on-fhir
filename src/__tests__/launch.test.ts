@@ -35,7 +35,7 @@ test('.launch - should fetch well-known and create a launch URL', async () => {
         fhirServer: FHIR_SERVER,
         codeVerifier: expect.any(String),
         state: expect.any(String),
-        validator: expect.any(Object),
+        validator: expect.any(String),
     } satisfies InitialSession)
 
     /**
