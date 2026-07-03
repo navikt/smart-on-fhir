@@ -22,9 +22,6 @@ import type { SmartConfigurationErrors } from './well-known/smart-configuration-
  * The smart client is used to handle the launch of the Smart on FHIR application. It requires at the very least:
  * - A asynchronous storage implementation that implements the `SmartStorage` interface, for example Valkey.
  * - A FHIR server to launch towards, where the application is registered.
- *
- * Note: It's the responsibility of the application using this library to limit which issuers are allowed to be launched.
- *       This may part of this applications configuration in the future.
  */
 export class SmartClient {
     /**

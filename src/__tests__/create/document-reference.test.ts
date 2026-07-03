@@ -95,8 +95,8 @@ test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base
     expectHas(documentReference, 'resourceType')
 
     expect(documentReference.resourceType).toBe('DocumentReference')
-    expect(documentReference.content[0].attachment.contentType).toEqual('application/pdf')
-    expect(documentReference.content[1].attachment.contentType).toEqual('application/fhir+json')
+    expect(documentReference.content[0].attachment).containSubset({ contentType: 'application/pdf' })
+    expect(documentReference.content[1].attachment).containSubset({ contentType: 'application/fhir+json' })
 })
 
 const validSession: CompleteSession = {
