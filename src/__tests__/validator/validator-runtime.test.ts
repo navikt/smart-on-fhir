@@ -23,7 +23,7 @@ test('sanity test validator runtime', () => {
 
     const report = runtime.report()
 
-    expect(report).toHaveLength(10)
+    expect(report).toHaveLength(11)
 
     const smartConfiguration = report.find((v) => v.type === 'SMART_CONFIGURATION')
 
