@@ -13,6 +13,7 @@ export const TokenResponseSchema = z.object({
     // SMART:
     patient: FhirId,
     encounter: FhirId,
+    intent: z.string().optional(),
 })
 
 export type TokenRefreshResponse = z.infer<typeof TokenRefreshResponseSchema>

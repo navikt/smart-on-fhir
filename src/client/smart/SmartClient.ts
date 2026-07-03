@@ -259,7 +259,7 @@ export class SmartClient {
             await spanAsync('save-complete-session', () => this._storage.set(this.sessionId, completeSessionValues))
 
             if (!this.options.multiLaunch) {
-                return { redirectUrl: this._clientConfig.redirectUrl }
+                return { redirectUrl: this._clientConfig.redirectUrl, intent: tokenResponse.intent ?? null }
             }
 
             /**
@@ -272,7 +272,7 @@ export class SmartClient {
 
             const url = new URL(this._clientConfig.redirectUrl)
             url.searchParams.set('patient', completeSessionValues.patient)
-            return { redirectUrl: url.toString() }
+            return { redirectUrl: url.toString(), intent: tokenResponse.intent ?? null }
         })
     }
 
@@ -513,4 +513,10 @@ export type Launch = {
  */
 export type Callback = {
     redirectUrl: string
+    /**
+     * Optional intent value from the launch context. If provided by the EHR-system,
+     * this can be used as a hint to decide which part of the application should be
+     * launched.
+     */
+    intent: string | null
 }
