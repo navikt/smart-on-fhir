@@ -215,7 +215,36 @@ export class ValidatorRuntime {
         }
     }
 
-    patient(patient: FhirPatient & Loosely): void {}
+    patient(patient: FhirPatient & Loosely): void {
+        const outcomes = new ValidatorBuilder('PATIENT')
+
+        try {
+            // Identifier/fødselsnummer or d-nummer is necessary to identify the patient.
+            const fnrSystem = 'urn:oid:2.16.578.1.12.4.1.4.1'
+            const dnrSystem = 'urn:oid:2.16.578.1.12.4.1.4.2'
+            outcomes
+                .whenValueExists(patient.identifier, 'identifier', 'required')
+                .thenCheck<{ system?: string; value?: string }[]>({
+                    test: (value) => value.some((i) => (i.system === fnrSystem || i.system === dnrSystem) && !!i.value),
+                    yeah: { type: 'INFO', message: 'fødselsnummer or d-nummer identifier present in patient' },
+                    nah: {
+                        type: 'ERROR',
+                        message: `fødselsnummer (${fnrSystem}) or d-nummer (${dnrSystem}) identifier is missing in patient`,
+                    },
+                })
+
+            // Name is shown in the app so the practitioner can confirm the correct patient.
+            outcomes.whenValueExists(patient.name, 'name', 'required').thenCheck<{ family?: string }[]>({
+                test: (value) => value.some((n) => !!n.family),
+                yeah: { type: 'INFO', message: 'name present in patient' },
+                nah: { type: 'ERROR', message: 'name is missing in patient' },
+            })
+
+            this.update(outcomes)
+        } catch (e) {
+            logger.warn(new Error('PATIENT validation failed, ignoring', { cause: e }))
+        }
+    }
 
     organization(organization: FhirOrganization & Loosely): void {}
 

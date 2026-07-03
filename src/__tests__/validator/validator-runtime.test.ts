@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 
 import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
-import type { FhirEncounter, FhirPractitioner } from '../../zod'
+import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 import { expectHas } from '../utils/expect'
 
 test('sanity test validator runtime', () => {
@@ -108,5 +108,79 @@ test('practitioner validation fails when hpr-nummer identifier is missing', () =
     expect(practitioner.tests).toContainEqual({
         type: 'ERROR',
         message: 'hpr-nummer identifier (urn:oid:2.16.578.1.12.4.1.4.4) is missing in practitioner',
+    })
+})
+
+test('patient validation passes when identifier and name are present', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.1', value: '12345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('GOOD')
+    expect(patient.tests).toContainEqual({
+        type: 'INFO',
+        message: 'fødselsnummer or d-nummer identifier present in patient',
+    })
+    expect(patient.tests).toContainEqual({ type: 'INFO', message: 'name present in patient' })
+})
+
+test('patient validation accepts d-nummer as identifier', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.2', value: '52345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('GOOD')
+})
+
+test('patient validation fails when identifier is missing', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('FAIL')
+    expect(patient.tests).toContainEqual({ type: 'ERROR', message: 'identifier is missing' })
+})
+
+test('patient validation fails when identifier has neither fødselsnummer nor d-nummer', () => {
+    const runtime = ValidatorRuntime.blank()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:some-other-system', value: '12345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('FAIL')
+    expect(patient.tests).toContainEqual({
+        type: 'ERROR',
+        message:
+            'fødselsnummer (urn:oid:2.16.578.1.12.4.1.4.1) or d-nummer (urn:oid:2.16.578.1.12.4.1.4.2) identifier is missing in patient',
     })
 })
