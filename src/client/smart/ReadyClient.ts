@@ -240,6 +240,8 @@ export class ReadyClient {
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
 
+            this.registerValidation(parsed.data as ResponseFor<Path>)
+
             if (config?.cache != null) {
                 span.setAttribute(OtelTaxonomy.ResourceCacheUpdated, true)
                 await setCachedResource(
@@ -353,6 +355,26 @@ export class ReadyClient {
 
         // We refreshed! Let's try the resource again
         return fetcher()
+    }
+
+    private registerValidation<Path extends KnownPaths>(data: ResponseFor<Path>): void {
+        switch (data.resourceType) {
+            case 'Encounter':
+                return this._client.validator.encounter(data)
+            case 'Patient':
+                return this._client.validator.patient(data)
+            case 'Organization':
+                return this._client.validator.organization(data)
+            case 'DocumentReference':
+                return this._client.validator.documentReference(data)
+            case 'Practitioner':
+                return this._client.validator.practitioner(data)
+            case 'QuestionnaireResponse':
+                return this._client.validator.questionnaireResponse(data)
+            case 'Bundle':
+                // Meh
+                break
+        }
     }
 }
 
