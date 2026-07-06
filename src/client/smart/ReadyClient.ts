@@ -137,6 +137,8 @@ export class ReadyClient {
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
 
+            this.registerValidation(parsed.data as ResponseForCreate<Path>)
+
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
 
             return parsed.data as ResponseForCreate<Path>
@@ -177,6 +179,8 @@ export class ReadyClient {
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
+
+            this.registerValidation(parsed.data as ResponseForCreate<Path>)
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-succeeded')
 
@@ -373,6 +377,11 @@ export class ReadyClient {
                 return this._client.validator.questionnaireResponse(data)
             case 'Bundle':
                 // Meh
+                break
+            default:
+                logger.warn(
+                    `No validator registered for resource type ${(data as { resourceType?: string }).resourceType ?? 'unknown'}`,
+                )
                 break
         }
     }
