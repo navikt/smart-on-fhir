@@ -330,7 +330,12 @@ export class SmartClient {
             try {
                 const currentIssuer = this.getKnownFhirServer(session.fhirServer)
 
-                return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer')
+                return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer', async () => {
+                    const session = await this.getCompleteSession()
+                    if ('error' in session) return
+
+                    await this._storage.set(this.sessionId, { ...session, validator: this.validator.export() })
+                })
             } catch (error) {
                 failSpan(
                     span,
