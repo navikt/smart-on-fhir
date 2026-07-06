@@ -21,7 +21,7 @@ export const FhirQuestionnaireResponseAnswerSchema = z.object({
 export type FhirQuestionnaireResponseItem = z.infer<typeof FhirQuestionnaireResponseItemSchema>
 export const FhirQuestionnaireResponseItemSchema = z.object({
     linkId: z.string(),
-    text: z.string(),
+    text: z.string().optional(),
     answer: z.array(FhirQuestionnaireResponseAnswerSchema).optional(),
     get item() {
         return z.array(FhirQuestionnaireResponseItemSchema).optional()
