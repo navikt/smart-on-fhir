@@ -51,13 +51,22 @@ export class ReadyClient {
 
     public readonly issuerName: string
 
-    constructor(client: SmartClient, session: CompleteSession, issuerName: string) {
+    private readonly persistValidation?: () => Promise<void>
+
+    constructor(
+        client: SmartClient,
+        session: CompleteSession,
+        issuerName: string,
+        persistValidation?: () => Promise<void>,
+    ) {
         this.issuerName = issuerName
 
         this._client = client
         this._session = session
         this._idToken = IdTokenSchema.loose().parse(decodeJwt(session.idToken))
         this._cache = client.options.cache
+
+        this.persistValidation = persistValidation
     }
 
     public get patient(): ValueAccessor<FhirPatient, 'Patient'> {
@@ -137,7 +146,7 @@ export class ReadyClient {
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
 
-            this.registerValidation(parsed.data as ResponseForCreate<Path>)
+            void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
 
@@ -180,7 +189,7 @@ export class ReadyClient {
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
             }
 
-            this.registerValidation(parsed.data as ResponseForCreate<Path>)
+            void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-succeeded')
 
@@ -244,7 +253,7 @@ export class ReadyClient {
 
             span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
 
-            this.registerValidation(parsed.data as ResponseFor<Path>)
+            void this.registerResourceValidation(parsed.data as ResponseFor<Path>)
 
             if (config?.cache != null) {
                 span.setAttribute(OtelTaxonomy.ResourceCacheUpdated, true)
@@ -361,29 +370,39 @@ export class ReadyClient {
         return fetcher()
     }
 
-    private registerValidation<Path extends KnownPaths>(data: ResponseFor<Path>): void {
-        switch (data.resourceType) {
-            case 'Encounter':
-                return this._client.validator.encounter(data)
-            case 'Patient':
-                return this._client.validator.patient(data)
-            case 'Organization':
-                return this._client.validator.organization(data)
-            case 'DocumentReference':
-                return this._client.validator.documentReference(data)
-            case 'Practitioner':
-                return this._client.validator.practitioner(data)
-            case 'QuestionnaireResponse':
-                return this._client.validator.questionnaireResponse(data)
-            case 'Bundle':
-                // Meh
-                break
-            default:
-                logger.warn(
-                    `No validator registered for resource type ${(data as { resourceType?: string }).resourceType ?? 'unknown'}`,
-                )
-                break
-        }
+    private async registerResourceValidation<Path extends KnownPaths>(data: ResponseFor<Path>): Promise<void> {
+        return spanAsync(`validate.${data.resourceType}`, async (span) => {
+            switch (data.resourceType) {
+                case 'Encounter':
+                    this._client.validator.encounter(data)
+                    break
+                case 'Patient':
+                    this._client.validator.patient(data)
+                    break
+                case 'Organization':
+                    this._client.validator.organization(data)
+                    break
+                case 'DocumentReference':
+                    this._client.validator.documentReference(data)
+                    break
+                case 'Practitioner':
+                    this._client.validator.practitioner(data)
+                    break
+                case 'QuestionnaireResponse':
+                    this._client.validator.questionnaireResponse(data)
+                    break
+                case 'Bundle':
+                    // Meh
+                    break
+                default:
+                    const type = (data as { resourceType?: string }).resourceType ?? 'unknown'
+                    failSpan(span, `No validator registered for resource type ${type}`)
+                    logger.warn(`No validator registered for resource type ${type}`)
+                    break
+            }
+
+            await spanAsync(`validate.persist-validation`, async () => this.persistValidation?.())
+        })
     }
 }
 
