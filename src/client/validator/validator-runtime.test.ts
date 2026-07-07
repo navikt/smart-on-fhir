@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { ValidatorRuntime } from '../../client/validator/ValidatorRuntime'
+import { expectHas } from '../../__tests__/utils/expect'
 import type {
     FhirDocumentReference,
     FhirEncounter,
@@ -9,7 +9,8 @@ import type {
     FhirPractitioner,
     FhirQuestionnaireResponse,
 } from '../../zod'
-import { expectHas } from '../utils/expect'
+
+import { ValidatorRuntime } from './validator-runtime'
 
 test('persisting and restoring should work', () => {
     const runtime = ValidatorRuntime.blank()

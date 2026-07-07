@@ -16,7 +16,7 @@ import type { SmartConfiguration } from '../smart/well-known/smart-configuration
 
 import { now } from './utils'
 import { activeValidations, type Validation, type ValidationType } from './validations'
-import { ValidatorBuilder } from './ValidatorBuilder'
+import { ValidatorBuilder } from './validator-builder'
 
 /**
  * The validator runtime is used as an internal mechanism to validate the operations and

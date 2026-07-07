@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { inferResourceType } from '../../client/smart/lib/utils'
+import { inferResourceType } from './utils'
 
 test.each([
     { path: '/Patient/123', expected: 'Patient' },

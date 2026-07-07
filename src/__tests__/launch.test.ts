@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../client'
 import { safeSmartStorage } from '../client/storage'
@@ -60,7 +60,15 @@ test('.launch - should gracefully handle well-known not responding correctly', a
     const storage = createMockedStorage()
     const client = createSmartClient(storage)
 
-    fhirNock().get('/.well-known/smart-configuration').reply(500, { hey_crashy: true })
+    fhirNock()
+        .get('/.well-known/smart-configuration')
+        // Because of the retry mechanism, fail 5 times
+        .times(5)
+        .reply(500, { hey_crashy: true })
+
+    // Make exponential backoff run fast
+    vi.useFakeTimers().setTimerTickMode('nextTimerAsync')
+
     const result = await client.launch({
         launch: 'test-launch',
         iss: FHIR_SERVER,
@@ -68,6 +76,8 @@ test('.launch - should gracefully handle well-known not responding correctly', a
 
     expectHas(result, 'error')
     expect(result.error).toEqual('WELL_KNOWN_INVALID_RESPONSE')
+
+    vi.useRealTimers()
 })
 
 test('.launch - should gracefully handle well-known responding with invalid payload', async () => {

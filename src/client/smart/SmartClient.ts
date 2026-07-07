@@ -5,7 +5,7 @@ import type { SafeSmartStorage, SmartStorage } from '../storage'
 import { safeSmartStorage } from '../storage'
 import type { CompleteSession, InitialSession } from '../storage/schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
-import { ValidatorRuntime } from '../validator/ValidatorRuntime'
+import { ValidatorRuntime } from '../validator/validator-runtime'
 
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
 import { logger } from './lib/logger'
