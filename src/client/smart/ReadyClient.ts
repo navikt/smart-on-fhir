@@ -382,11 +382,11 @@ export class ReadyClient {
                 case 'Organization':
                     this._client.validator.organization(data)
                     break
-                case 'DocumentReference':
-                    this._client.validator.documentReference(data)
-                    break
                 case 'Practitioner':
                     this._client.validator.practitioner(data)
+                    break
+                case 'DocumentReference':
+                    this._client.validator.documentReference(data)
                     break
                 case 'QuestionnaireResponse':
                     this._client.validator.questionnaireResponse(data)
