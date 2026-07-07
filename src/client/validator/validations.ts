@@ -13,14 +13,12 @@ export const activeValidations = [
 
 export type ValidationType = (typeof activeValidations)[number]
 
-export type ValidationOverallOutcome = 'GOOD' | 'PASS' | 'FAIL'
+export type ValidationLevel = 'OK' | 'WARNING' | 'ERROR'
 
-export type ValidationTestLevel = 'INFO' | 'WARN' | 'ERROR'
-
-export type ValidationTest = { type: ValidationTestLevel; message: string }
+export type ValidationTest = { type: ValidationLevel; message: string }
 
 export type ValidationOutcome = {
-    status: ValidationOverallOutcome
+    status: ValidationLevel
     tests: ValidationTest[]
 }
 

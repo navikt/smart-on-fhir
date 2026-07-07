@@ -1,7 +1,7 @@
 // oxlint-disable typescript/no-explicit-any - This type of validation requires actual any
 
 import { now } from './utils'
-import type { Validation, ValidationOverallOutcome, ValidationTestLevel, ValidationType } from './validations'
+import type { Validation, ValidationLevel, ValidationType } from './validations'
 
 /**
  * Used to build a set of tests for a ValidationType, has utilities for working with uncertain
@@ -9,7 +9,7 @@ import type { Validation, ValidationOverallOutcome, ValidationTestLevel, Validat
  */
 export class ValidatorBuilder {
     private readonly type: ValidationType
-    private readonly outcomes: { type: ValidationTestLevel; message: string }[] = []
+    private readonly outcomes: { type: ValidationLevel; message: string }[] = []
 
     constructor(type: ValidationType) {
         this.type = type
@@ -22,8 +22,8 @@ export class ValidatorBuilder {
     ): {
         thenCheck: <AssumedType>(check: {
             test: (value: AssumedType) => boolean
-            yeah: { type: ValidationTestLevel; message: string }
-            nah: { type: ValidationTestLevel; message: string }
+            yeah: { type: ValidationLevel; message: string }
+            nah: { type: ValidationLevel; message: string }
         }) => void
     } {
         if (value == null) {
@@ -48,8 +48,8 @@ export class ValidatorBuilder {
 
     check(check: {
         test: boolean
-        yeah?: { type: ValidationTestLevel; message: string }
-        nah?: { type: ValidationTestLevel; message: string }
+        yeah?: { type: ValidationLevel; message: string }
+        nah?: { type: ValidationLevel; message: string }
     }): void {
         if (check.test && check.yeah) {
             this.outcomes.push({ type: check.yeah.type, message: check.yeah.message })
@@ -60,9 +60,9 @@ export class ValidatorBuilder {
 
     toValidation(): Validation {
         const anyError = this.outcomes.some((o) => o.type === 'ERROR')
-        const anyWarn = this.outcomes.some((o) => o.type === 'WARN')
+        const anyWarn = this.outcomes.some((o) => o.type === 'WARNING')
 
-        const status: ValidationOverallOutcome = anyError ? 'FAIL' : anyWarn ? 'PASS' : 'GOOD'
+        const status: ValidationLevel = anyError ? 'ERROR' : anyWarn ? 'WARNING' : 'OK'
 
         return { type: this.type, at: now(), status: status, tests: this.outcomes }
     }
