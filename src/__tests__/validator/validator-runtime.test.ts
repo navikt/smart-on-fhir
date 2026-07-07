@@ -56,7 +56,7 @@ test('encounter validation passes for a complete encounter', () => {
     const encounter = runtime.report().find((v) => v.type === 'ENCOUNTER')
 
     expectHas(encounter, 'tests')
-    expect(encounter.status).toEqual('GOOD')
+    expect(encounter.status).toEqual('OK')
 })
 
 test('encounter validation fails when subject and participant are missing', () => {
@@ -72,7 +72,7 @@ test('encounter validation fails when subject and participant are missing', () =
     const encounter = runtime.report().find((v) => v.type === 'ENCOUNTER')
 
     expectHas(encounter, 'tests')
-    expect(encounter.status).toEqual('FAIL')
+    expect(encounter.status).toEqual('ERROR')
     expect(encounter.tests).toContainEqual({ type: 'ERROR', message: 'subject is missing' })
     expect(encounter.tests).toContainEqual({ type: 'ERROR', message: 'participant is missing' })
 })
@@ -90,9 +90,9 @@ test('practitioner validation passes when hpr-nummer identifier is present', () 
     const practitioner = runtime.report().find((v) => v.type === 'PRACTITIONER')
 
     expectHas(practitioner, 'tests')
-    expect(practitioner.status).toEqual('GOOD')
+    expect(practitioner.status).toEqual('OK')
     expect(practitioner.tests).toContainEqual({
-        type: 'INFO',
+        type: 'OK',
         message: 'hpr-nummer identifier present in practitioner',
     })
 })
@@ -110,7 +110,7 @@ test('practitioner validation fails when hpr-nummer identifier is missing', () =
     const practitioner = runtime.report().find((v) => v.type === 'PRACTITIONER')
 
     expectHas(practitioner, 'tests')
-    expect(practitioner.status).toEqual('FAIL')
+    expect(practitioner.status).toEqual('ERROR')
     expect(practitioner.tests).toContainEqual({
         type: 'ERROR',
         message: 'hpr-nummer identifier (urn:oid:2.16.578.1.12.4.1.4.4) is missing in practitioner',
@@ -130,12 +130,12 @@ test('patient validation passes when identifier and name are present', () => {
     const patient = runtime.report().find((v) => v.type === 'PATIENT')
 
     expectHas(patient, 'tests')
-    expect(patient.status).toEqual('GOOD')
+    expect(patient.status).toEqual('OK')
     expect(patient.tests).toContainEqual({
-        type: 'INFO',
+        type: 'OK',
         message: 'fødselsnummer or d-nummer identifier present in patient',
     })
-    expect(patient.tests).toContainEqual({ type: 'INFO', message: 'name present in patient' })
+    expect(patient.tests).toContainEqual({ type: 'OK', message: 'name present in patient' })
 })
 
 test('patient validation accepts d-nummer as identifier', () => {
@@ -151,7 +151,7 @@ test('patient validation accepts d-nummer as identifier', () => {
     const patient = runtime.report().find((v) => v.type === 'PATIENT')
 
     expectHas(patient, 'tests')
-    expect(patient.status).toEqual('GOOD')
+    expect(patient.status).toEqual('OK')
 })
 
 test('patient validation fails when identifier is missing', () => {
@@ -166,7 +166,7 @@ test('patient validation fails when identifier is missing', () => {
     const patient = runtime.report().find((v) => v.type === 'PATIENT')
 
     expectHas(patient, 'tests')
-    expect(patient.status).toEqual('FAIL')
+    expect(patient.status).toEqual('ERROR')
     expect(patient.tests).toContainEqual({ type: 'ERROR', message: 'identifier is missing' })
 })
 
@@ -183,7 +183,7 @@ test('patient validation fails when identifier has neither fødselsnummer nor d-
     const patient = runtime.report().find((v) => v.type === 'PATIENT')
 
     expectHas(patient, 'tests')
-    expect(patient.status).toEqual('FAIL')
+    expect(patient.status).toEqual('ERROR')
     expect(patient.tests).toContainEqual({
         type: 'ERROR',
         message:
@@ -205,12 +205,12 @@ test('organization validation passes when organisasjonsnummer and phone are pres
     const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
 
     expectHas(organization, 'tests')
-    expect(organization.status).toEqual('GOOD')
+    expect(organization.status).toEqual('OK')
     expect(organization.tests).toContainEqual({
-        type: 'INFO',
+        type: 'OK',
         message: 'organisasjonsnummer identifier present in organization',
     })
-    expect(organization.tests).toContainEqual({ type: 'INFO', message: 'phone telecom present in organization' })
+    expect(organization.tests).toContainEqual({ type: 'OK', message: 'phone telecom present in organization' })
 })
 
 test('organization validation fails when organisasjonsnummer identifier is missing', () => {
@@ -227,7 +227,7 @@ test('organization validation fails when organisasjonsnummer identifier is missi
     const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
 
     expectHas(organization, 'tests')
-    expect(organization.status).toEqual('FAIL')
+    expect(organization.status).toEqual('ERROR')
     expect(organization.tests).toContainEqual({
         type: 'ERROR',
         message: 'organisasjonsnummer (urn:oid:2.16.578.1.12.4.1.4.101) identifier is missing in organization',
@@ -248,7 +248,7 @@ test('organization validation fails when phone telecom is missing', () => {
     const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
 
     expectHas(organization, 'tests')
-    expect(organization.status).toEqual('FAIL')
+    expect(organization.status).toEqual('ERROR')
     expect(organization.tests).toContainEqual({ type: 'ERROR', message: 'phone telecom is missing in organization' })
 })
 
@@ -290,12 +290,12 @@ test('documentReference validation passes for a complete document reference', ()
     const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
 
     expectHas(dr, 'tests')
-    expect(dr.status).toEqual('GOOD')
+    expect(dr.status).toEqual('OK')
     expect(dr.tests).toContainEqual({
-        type: 'INFO',
+        type: 'OK',
         message: 'context.encounter reference present in documentReference',
     })
-    expect(dr.tests).toContainEqual({ type: 'INFO', message: 'type coding J01-2 present in documentReference' })
+    expect(dr.tests).toContainEqual({ type: 'OK', message: 'type coding J01-2 present in documentReference' })
 })
 
 test('documentReference validation fails when context.encounter reference is missing', () => {
@@ -309,7 +309,7 @@ test('documentReference validation fails when context.encounter reference is mis
     const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
 
     expectHas(dr, 'tests')
-    expect(dr.status).toEqual('FAIL')
+    expect(dr.status).toEqual('ERROR')
     expect(dr.tests).toContainEqual({
         type: 'ERROR',
         message: 'context.encounter reference is missing in documentReference',
@@ -327,7 +327,7 @@ test('documentReference validation fails when type code is not J01-2', () => {
     const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
 
     expectHas(dr, 'tests')
-    expect(dr.status).toEqual('FAIL')
+    expect(dr.status).toEqual('ERROR')
     expect(dr.tests).toContainEqual({
         type: 'ERROR',
         message: 'type coding J01-2 (urn:oid:2.16.578.1.12.4.1.1.9602) is missing in documentReference',
@@ -343,8 +343,8 @@ test('documentReference validation warns when description is missing', () => {
     const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
 
     expectHas(dr, 'tests')
-    expect(dr.status).toEqual('PASS')
-    expect(dr.tests).toContainEqual({ type: 'WARN', message: 'no description present in documentReference' })
+    expect(dr.status).toEqual('WARNING')
+    expect(dr.tests).toContainEqual({ type: 'WARNING', message: 'no description present in documentReference' })
 })
 
 function completeQuestionnaireResponse(): FhirQuestionnaireResponse {
@@ -383,9 +383,9 @@ test('questionnaireResponse validation passes for a complete response', () => {
     const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
 
     expectHas(qr, 'tests')
-    expect(qr.status).toEqual('GOOD')
+    expect(qr.status).toEqual('OK')
     expect(qr.tests).toContainEqual({
-        type: 'INFO',
+        type: 'OK',
         message: 'questionnaire references the canonical Nav Questionnaire',
     })
 })
@@ -401,7 +401,7 @@ test('questionnaireResponse validation fails when questionnaire is not the canon
     const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
 
     expectHas(qr, 'tests')
-    expect(qr.status).toEqual('FAIL')
+    expect(qr.status).toEqual('ERROR')
     expect(qr.tests).toContainEqual({
         type: 'ERROR',
         message:
@@ -418,6 +418,6 @@ test('questionnaireResponse validation fails when encounter reference is missing
     const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
 
     expectHas(qr, 'tests')
-    expect(qr.status).toEqual('FAIL')
+    expect(qr.status).toEqual('ERROR')
     expect(qr.tests).toContainEqual({ type: 'ERROR', message: 'encounter is missing' })
 })

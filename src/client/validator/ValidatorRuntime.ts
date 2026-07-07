@@ -55,8 +55,8 @@ export class ValidatorRuntime {
                 .whenValueExists(sc.grant_types_supported, 'grant_types_supported', 'required')
                 .thenCheck<string[]>({
                     test: (value) => value.includes('refresh_token'),
-                    yeah: { type: 'INFO', message: 'refresh_token is supported' },
-                    nah: { type: 'WARN', message: 'refresh_token is not supported' },
+                    yeah: { type: 'OK', message: 'refresh_token is supported' },
+                    nah: { type: 'WARNING', message: 'refresh_token is not supported' },
                 })
 
             const expectedClientCredentialsTypes = ['private_key_jwt', 'client_secret_post', 'client_secret_basic']
@@ -69,7 +69,7 @@ export class ValidatorRuntime {
                 .thenCheck<string[]>({
                     test: (value) => expectedClientCredentialsTypes.some((method) => value.includes(method)),
                     yeah: {
-                        type: 'INFO',
+                        type: 'OK',
                         message: `token_endpoint_auth_methods_supported supports at least one of ${expectedClientCredentialsTypes.join(', ')}`,
                     },
                     nah: {
@@ -90,7 +90,7 @@ export class ValidatorRuntime {
         try {
             outcomes.check({
                 test: tr['practitioner'] != null,
-                yeah: { type: 'WARN', message: 'practitioner should not be part of the token response' },
+                yeah: { type: 'WARNING', message: 'practitioner should not be part of the token response' },
             })
 
             this.update(outcomes)
@@ -110,17 +110,17 @@ export class ValidatorRuntime {
         try {
             outcomes.check({
                 test: tr['encounter'] != null,
-                yeah: { type: 'WARN', message: 'encounter should not be part of the token refresh response' },
+                yeah: { type: 'WARNING', message: 'encounter should not be part of the token refresh response' },
             })
 
             outcomes.check({
                 test: tr['patient'] != null,
-                yeah: { type: 'WARN', message: 'patient should not be part of the token refresh response' },
+                yeah: { type: 'WARNING', message: 'patient should not be part of the token refresh response' },
             })
 
             outcomes.check({
                 test: tr['practitioner'] != null,
-                yeah: { type: 'WARN', message: 'practitioner should not be part of the token refresh response' },
+                yeah: { type: 'WARNING', message: 'practitioner should not be part of the token refresh response' },
             })
 
             this.update(outcomes)
@@ -153,7 +153,7 @@ export class ValidatorRuntime {
             // Subject is used to identify the patient for the consultation.
             outcomes.whenValueExists(encounter.subject, 'subject', 'required').thenCheck<{ reference?: string }>({
                 test: (value) => value.reference != null,
-                yeah: { type: 'INFO', message: 'subject reference present in encounter' },
+                yeah: { type: 'OK', message: 'subject reference present in encounter' },
                 nah: { type: 'ERROR', message: 'subject is missing a reference' },
             })
 
@@ -162,7 +162,7 @@ export class ValidatorRuntime {
                 .whenValueExists(encounter.participant, 'participant', 'required')
                 .thenCheck<{ individual?: { reference?: string } }[]>({
                     test: (value) => value.some((p) => p.individual?.reference != null),
-                    yeah: { type: 'INFO', message: 'participant individual reference present in encounter' },
+                    yeah: { type: 'OK', message: 'participant individual reference present in encounter' },
                     nah: { type: 'ERROR', message: 'participant is missing an individual reference' },
                 })
 
@@ -171,15 +171,15 @@ export class ValidatorRuntime {
                 .whenValueExists(encounter.serviceProvider, 'serviceProvider', 'required')
                 .thenCheck<{ reference?: string }>({
                     test: (value) => value.reference != null,
-                    yeah: { type: 'INFO', message: 'serviceProvider reference present in encounter' },
+                    yeah: { type: 'OK', message: 'serviceProvider reference present in encounter' },
                     nah: { type: 'ERROR', message: 'serviceProvider is missing a reference' },
                 })
 
             // Diagnosis is used to pre-fill the diagnosis in the app, but is explicitly not required.
             outcomes.check({
                 test: encounter.diagnosis == null || encounter.diagnosis.length === 0,
-                yeah: { type: 'WARN', message: 'no diagnosis list present in encounter' },
-                nah: { type: 'INFO', message: `diagnosis list (${encounter.diagnosis?.length}) present in encounter` },
+                yeah: { type: 'WARNING', message: 'no diagnosis list present in encounter' },
+                nah: { type: 'OK', message: `diagnosis list (${encounter.diagnosis?.length}) present in encounter` },
             })
 
             // Type/coding kontakttype is used to determine physical (1) or phone/video (6 | 7) consultation.
@@ -192,8 +192,8 @@ export class ValidatorRuntime {
                 )
             outcomes.check({
                 test: hasKontakttype,
-                yeah: { type: 'INFO', message: 'type kontakttype coding present in encounter' },
-                nah: { type: 'WARN', message: 'no type kontakttype coding present in encounter' },
+                yeah: { type: 'OK', message: 'type kontakttype coding present in encounter' },
+                nah: { type: 'WARNING', message: 'no type kontakttype coding present in encounter' },
             })
 
             this.update(outcomes)
@@ -212,7 +212,7 @@ export class ValidatorRuntime {
                 .whenValueExists(practitioner.identifier, 'identifier', 'required')
                 .thenCheck<{ system?: string; value?: string }[]>({
                     test: (value) => value.some((i) => i.system === hprSystem && !!i.value),
-                    yeah: { type: 'INFO', message: 'hpr-nummer identifier present in practitioner' },
+                    yeah: { type: 'OK', message: 'hpr-nummer identifier present in practitioner' },
                     nah: { type: 'ERROR', message: `hpr-nummer identifier (${hprSystem}) is missing in practitioner` },
                 })
 
@@ -233,7 +233,7 @@ export class ValidatorRuntime {
                 .whenValueExists(patient.identifier, 'identifier', 'required')
                 .thenCheck<{ system?: string; value?: string }[]>({
                     test: (value) => value.some((i) => (i.system === fnrSystem || i.system === dnrSystem) && !!i.value),
-                    yeah: { type: 'INFO', message: 'fødselsnummer or d-nummer identifier present in patient' },
+                    yeah: { type: 'OK', message: 'fødselsnummer or d-nummer identifier present in patient' },
                     nah: {
                         type: 'ERROR',
                         message: `fødselsnummer (${fnrSystem}) or d-nummer (${dnrSystem}) identifier is missing in patient`,
@@ -243,7 +243,7 @@ export class ValidatorRuntime {
             // Name is shown in the app so the practitioner can confirm the correct patient.
             outcomes.whenValueExists(patient.name, 'name', 'required').thenCheck<{ family?: string }[]>({
                 test: (value) => value.some((n) => !!n.family),
-                yeah: { type: 'INFO', message: 'name present in patient' },
+                yeah: { type: 'OK', message: 'name present in patient' },
                 nah: { type: 'ERROR', message: 'name is missing in patient' },
             })
 
@@ -264,7 +264,7 @@ export class ValidatorRuntime {
                 .whenValueExists(organization.identifier, 'identifier', 'required')
                 .thenCheck<{ system?: string; value?: string }[]>({
                     test: (value) => value.some((i) => i.system === enhSystem && !!i.value),
-                    yeah: { type: 'INFO', message: 'organisasjonsnummer identifier present in organization' },
+                    yeah: { type: 'OK', message: 'organisasjonsnummer identifier present in organization' },
                     nah: {
                         type: 'ERROR',
                         message: `organisasjonsnummer (${enhSystem}) identifier is missing in organization`,
@@ -276,7 +276,7 @@ export class ValidatorRuntime {
                 .whenValueExists(organization.telecom, 'telecom', 'required')
                 .thenCheck<{ system?: string; value?: string }[]>({
                     test: (value) => value.some((t) => t.system === 'phone' && !!t.value),
-                    yeah: { type: 'INFO', message: 'phone telecom present in organization' },
+                    yeah: { type: 'OK', message: 'phone telecom present in organization' },
                     nah: { type: 'ERROR', message: 'phone telecom is missing in organization' },
                 })
 
@@ -296,7 +296,7 @@ export class ValidatorRuntime {
                 .whenValueExists(dr.context?.encounter, 'context.encounter', 'required')
                 .thenCheck<{ reference?: string }[]>({
                     test: (value) => value.some((e) => !!e.reference),
-                    yeah: { type: 'INFO', message: 'context.encounter reference present in documentReference' },
+                    yeah: { type: 'OK', message: 'context.encounter reference present in documentReference' },
                     nah: { type: 'ERROR', message: 'context.encounter reference is missing in documentReference' },
                 })
 
@@ -308,7 +308,7 @@ export class ValidatorRuntime {
                 .whenValueExists(dr.type?.coding, 'type.coding', 'required')
                 .thenCheck<{ system?: string; code?: string }[]>({
                     test: (value) => value.some((c) => c.system === dokumenttypeSystem && c.code === sykmeldingCode),
-                    yeah: { type: 'INFO', message: 'type coding J01-2 present in documentReference' },
+                    yeah: { type: 'OK', message: 'type coding J01-2 present in documentReference' },
                     nah: {
                         type: 'ERROR',
                         message: `type coding J01-2 (${dokumenttypeSystem}) is missing in documentReference`,
@@ -318,14 +318,14 @@ export class ValidatorRuntime {
             // Subject is a reference to the patient the sykmelding is for.
             outcomes.whenValueExists(dr.subject, 'subject', 'required').thenCheck<{ reference?: string }>({
                 test: (value) => !!value.reference,
-                yeah: { type: 'INFO', message: 'subject reference present in documentReference' },
+                yeah: { type: 'OK', message: 'subject reference present in documentReference' },
                 nah: { type: 'ERROR', message: 'subject reference is missing in documentReference' },
             })
 
             // Author is a reference to the Practitioner who submitted the sykmelding.
             outcomes.whenValueExists(dr.author, 'author', 'required').thenCheck<{ reference?: string }[]>({
                 test: (value) => value.some((a) => !!a.reference),
-                yeah: { type: 'INFO', message: 'author reference present in documentReference' },
+                yeah: { type: 'OK', message: 'author reference present in documentReference' },
                 nah: { type: 'ERROR', message: 'author reference is missing in documentReference' },
             })
 
@@ -334,15 +334,15 @@ export class ValidatorRuntime {
                 .whenValueExists(dr.content, 'content', 'required')
                 .thenCheck<{ attachment?: { data?: string } }[]>({
                     test: (value) => value.some((c) => !!c.attachment?.data),
-                    yeah: { type: 'INFO', message: 'content attachment data present in documentReference' },
+                    yeah: { type: 'OK', message: 'content attachment data present in documentReference' },
                     nah: { type: 'ERROR', message: 'content attachment data is missing in documentReference' },
                 })
 
             // Description is a human-readable description of the document, generated by Nav.
             outcomes.check({
                 test: dr.description != null && dr.description !== '',
-                yeah: { type: 'INFO', message: 'description present in documentReference' },
-                nah: { type: 'WARN', message: 'no description present in documentReference' },
+                yeah: { type: 'OK', message: 'description present in documentReference' },
+                nah: { type: 'WARNING', message: 'no description present in documentReference' },
             })
 
             this.update(outcomes)
@@ -360,28 +360,28 @@ export class ValidatorRuntime {
             const canonicalQuestionnaire = 'https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1'
             outcomes.whenValueExists(qr.questionnaire, 'questionnaire', 'required').thenCheck<string>({
                 test: (value) => value === canonicalQuestionnaire,
-                yeah: { type: 'INFO', message: 'questionnaire references the canonical Nav Questionnaire' },
+                yeah: { type: 'OK', message: 'questionnaire references the canonical Nav Questionnaire' },
                 nah: { type: 'ERROR', message: `questionnaire should reference ${canonicalQuestionnaire}` },
             })
 
             // Subject is a reference to the patient the sykmelding is for.
             outcomes.whenValueExists(qr.subject, 'subject', 'required').thenCheck<{ reference?: string }>({
                 test: (value) => !!value.reference,
-                yeah: { type: 'INFO', message: 'subject reference present in questionnaireResponse' },
+                yeah: { type: 'OK', message: 'subject reference present in questionnaireResponse' },
                 nah: { type: 'ERROR', message: 'subject reference is missing in questionnaireResponse' },
             })
 
             // Encounter ties the response to the active consultation.
             outcomes.whenValueExists(qr.encounter, 'encounter', 'required').thenCheck<{ reference?: string }>({
                 test: (value) => !!value.reference,
-                yeah: { type: 'INFO', message: 'encounter reference present in questionnaireResponse' },
+                yeah: { type: 'OK', message: 'encounter reference present in questionnaireResponse' },
                 nah: { type: 'ERROR', message: 'encounter reference is missing in questionnaireResponse' },
             })
 
             // Author is a reference to the sykmelder who filled out the sykmelding.
             outcomes.whenValueExists(qr.author, 'author', 'required').thenCheck<{ reference?: string }>({
                 test: (value) => !!value.reference,
-                yeah: { type: 'INFO', message: 'author reference present in questionnaireResponse' },
+                yeah: { type: 'OK', message: 'author reference present in questionnaireResponse' },
                 nah: { type: 'ERROR', message: 'author reference is missing in questionnaireResponse' },
             })
 
