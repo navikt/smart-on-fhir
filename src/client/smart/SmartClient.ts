@@ -8,6 +8,7 @@ import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/sto
 import { ValidatorRuntime } from '../validator/ValidatorRuntime'
 
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
+import { logger } from './lib/logger'
 import { failSpan, OtelTaxonomy, spanAsync } from './lib/otel'
 import { assertGoodSessionId, assertNotBrowser, removeTrailingSlash, verifyUrlIsHttps } from './lib/utils'
 import { ReadyClient } from './ReadyClient'
@@ -332,9 +333,17 @@ export class SmartClient {
 
                 return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer', async () => {
                     const session = await this.getCompleteSession()
-                    if ('error' in session) return
+                    if ('error' in session) {
+                        logger.warn(`Unable to persist validator state, session loading said: ${session.error})`)
+                        return
+                    }
 
-                    await this._storage.set(this.sessionId, { ...session, validator: this.validator.export() })
+                    const updatedSession = { ...session, validator: this.validator.export() }
+
+                    await this._storage.set(this.sessionId, updatedSession)
+                    if (this.activePatient) {
+                        await this._storage.set(`${this.sessionId}:${this.activePatient}`, updatedSession)
+                    }
                 })
             } catch (error) {
                 failSpan(
