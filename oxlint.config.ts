@@ -1,21 +1,10 @@
+import tsm from '@navikt/tsm-oxlint'
 import { defineConfig } from 'oxlint'
 
 export default defineConfig({
-    plugins: ['oxc', 'typescript', 'unicorn', 'vitest', 'import'],
+    extends: [tsm],
+    plugins: ['vitest'],
     options: { typeAware: true, typeCheck: true },
-    rules: {
-        'no-console': 'warn',
-        'no-unused-expressions': 'warn',
-        'no-array-constructor': 'warn',
-        'typescript/no-explicit-any': 'warn',
-        'typescript/no-require-imports': 'warn',
-        'typescript/ban-ts-comment': ['warn', { 'ts-expect-error': 'allow-with-description' }],
-        'typescript/no-non-null-assertion': 'warn',
-        'typescript/no-unsafe-function-type': 'warn',
-        'typescript/no-empty-object-type': 'warn',
-        'typescript/no-unnecessary-type-constraint': 'warn',
-        'typescript/explicit-function-return-type': ['warn', { allowExpressions: true }],
-    },
     ignorePatterns: ['docs/.vitepress/**'],
     overrides: [
         {

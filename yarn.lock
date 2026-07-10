@@ -650,6 +650,7 @@ __metadata:
   dependencies:
     "@navikt/pino-logger": "npm:^5.0.0"
     "@navikt/tsm-oxfmt": "npm:^0.0.8"
+    "@navikt/tsm-oxlint": "npm:^0.0.4"
     "@opentelemetry/api": "npm:^1.9.1"
     "@opentelemetry/core": "npm:^2.9.0"
     "@types/node": "npm:24.13.2"
@@ -686,6 +687,15 @@ __metadata:
   peerDependencies:
     oxfmt: ">= 0"
   checksum: 10c0/7813cc74d149c93dd5881aeac653f3dfa73ea97d8efe2d3cb702f93a147a35d9c5075488ce83ad1da192ce66c40e494526046d016a4506ce647d11a6c9b74615
+  languageName: node
+  linkType: hard
+
+"@navikt/tsm-oxlint@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@navikt/tsm-oxlint@npm:0.0.4::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Ftsm-oxlint%2F0.0.4%2F1e78181a9ad31a9313f95fb7188098de742da86c"
+  peerDependencies:
+    oxlint: ">= 1"
+  checksum: 10c0/ca1f5c3c68cc919c7c5da68f0222c1e06a95c8ed96544d115eb73c09f5e05bb42e7fc4ff89c619ac55ea33d2df3efe5208cb9135e2fcf15b0921f260f377f459
   languageName: node
   linkType: hard
 
