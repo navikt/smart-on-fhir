@@ -66,7 +66,7 @@
         "oxlint-tsgolint": "^0.24.0",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
-        "tsdown": "^0.22.3",
+        "tsdown": "^0.22.14",
         "typescript": "^6.0.3",
         "vitepress": "^1.6.4",
         "vitepress-plugin-npm-commands": "^0.10.0",
