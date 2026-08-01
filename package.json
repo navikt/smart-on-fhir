@@ -63,7 +63,7 @@
         "nock": "^14.0.16",
         "oxfmt": "^0.58.0",
         "oxlint": "^1.73.0",
-        "oxlint-tsgolint": "^0.24.0",
+        "oxlint-tsgolint": "^7.0.2001",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
         "tsdown": "^0.22.3",
