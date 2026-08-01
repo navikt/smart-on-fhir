@@ -671,7 +671,7 @@ __metadata:
     typescript: "npm:^6.0.3"
     vitepress: "npm:^1.6.4"
     vitepress-plugin-npm-commands: "npm:^0.10.0"
-    vitepress-plugin-tabs: "npm:^0.9.0"
+    vitepress-plugin-tabs: "npm:^0.9.1"
     vitest: "npm:^4.1.10"
     vue: "npm:^3.5.39"
     zod: "npm:^4.4.3"
@@ -4701,13 +4701,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitepress-plugin-tabs@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "vitepress-plugin-tabs@npm:0.9.0"
+"vitepress-plugin-tabs@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "vitepress-plugin-tabs@npm:0.9.1"
   peerDependencies:
     vitepress: ^1.0.0 || ^2.0.0-alpha.17
     vue: ^3.5.0
-  checksum: 10c0/48ea71cf34200e69c43e3edd1c54485126c7b1c82d8d08b31311b68e1c962efb5e1bfe821e3805fccee431635f6f535a641644b2ec6524a1698e013720e2685b
+  checksum: 10c0/820287becbbb707eacdb603ff7116c2f8776763045168fae21cfe8e77e679fb950fcfa1aff174461ea5e636fdd3a65ed2d5a0b14058f1fa613d09d966b04e982
   languageName: node
   linkType: hard
 
