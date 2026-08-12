@@ -15,6 +15,6 @@ export const FhirOrganizationSchema = z.object({
     resourceType: z.literal('Organization'),
     id: z.string(),
     identifier: z.array(GeneralIdentifierSchema),
-    name: z.string(),
+    name: z.string().nullish(),
     telecom: z.array(z.object({ system: TelecomSystemSchema, value: z.string() })),
 })
