@@ -8,6 +8,15 @@ export const FhirEncounterDiagnosisSchema = z.object({
     rank: z.number().optional(),
 })
 
+/**
+ * TODO add/change:
+ * - "class": {
+ *   "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+ *   "code": "AMB (physical) | VR (virtual)
+ * }
+ *
+ * This is required. When that is done update syk-inn/docs/fhir/encounter.md
+ */
 export type FhirEncounter = z.infer<typeof FhirEncounterSchema>
 export const FhirEncounterSchema = z.object({
     resourceType: z.literal('Encounter'),

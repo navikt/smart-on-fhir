@@ -2,6 +2,10 @@ import * as z from 'zod'
 
 import { GeneralIdentifierSchema, NameSchema } from './common'
 
+/**
+ * TODO add/change:
+ * - identifier must be of type "urn:oid:2.16.578.1.12.4.1.4.1" for fødselsnummer or "urn:oid:2.16.578.1.12.4.1.4.2" for d-nummer
+ */
 export type FhirPatient = z.infer<typeof FhirPatientSchema>
 export const FhirPatientSchema = z.object({
     resourceType: z.literal('Patient'),

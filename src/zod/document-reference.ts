@@ -1,5 +1,9 @@
 import * as z from 'zod'
 
+/**
+ * TODO remove:
+ * - description.optional() - its not optional
+ */
 export type FhirDocumentReference = z.infer<typeof FhirDocumentReferenceSchema>
 export const FhirDocumentReferenceSchema = z.object({
     resourceType: z.literal('DocumentReference'),

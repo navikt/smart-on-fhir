@@ -20,6 +20,15 @@ export function createFhirSeachSetBundleSchema<T>(ResourceSchema: z.ZodType<T>) 
     })
 }
 
+/**
+ * TODO add/change:
+ * - entry.fullUrl
+ * - entry.request.method
+ * - entry.request.url
+ *
+ * TODO remove:
+ * - entry.request.method.POST (only PUT applicable)
+ */
 export type FhirBatchBundle = z.infer<typeof FhirBatchBundleSchema>
 export const FhirBatchBundleSchema = z.object({
     resourceType: z.literal('Bundle'),

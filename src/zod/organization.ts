@@ -10,6 +10,13 @@ const TelecomSystemSchema = z.enum(['phone', 'fax', 'email', 'pager', 'url', 'sm
     },
 })
 
+/**
+ * TODO add/change:
+ * - "meta": {
+ *   "profile": ["http://hl7.no/fhir/StructureDefinition/no-basis-Organization"]
+ * }
+ * and make it optional
+ */
 export type FhirOrganization = z.infer<typeof FhirOrganizationSchema>
 export const FhirOrganizationSchema = z.object({
     resourceType: z.literal('Organization'),
