@@ -54,7 +54,7 @@
     },
     "devDependencies": {
         "@navikt/tsm-oxfmt": "^0.0.9",
-        "@navikt/tsm-oxlint": "^0.0.5",
+        "@navikt/tsm-oxlint": "^0.0.7",
         "@types/node": "24.13.3",
         "@vitest/coverage-v8": "4.1.10",
         "husky": "^9.1.7",
