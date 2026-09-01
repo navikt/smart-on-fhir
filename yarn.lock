@@ -558,18 +558,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@navikt/pino-logger@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@navikt/pino-logger@npm:5.0.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F5.0.0%2F5f799d5d37d66c8a80f8dcf0131ddb41466dc4f3"
+"@navikt/pino-logger@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@navikt/pino-logger@npm:5.0.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Fpino-logger%2F5.0.1%2F819f7f398e4378c014dd39f704c26f691a0915a1"
   dependencies:
-    "@opentelemetry/api": "npm:^1.9.0"
-    pino-socket: "npm:7.4.0"
+    "@opentelemetry/api": "npm:^1.9.1"
+    pino-socket: "npm:8.0.0"
   peerDependencies:
     pino: 8 || 9 || 10
   dependenciesMeta:
     pino-socket:
       optional: true
-  checksum: 10c0/aaa6cff7f62bcabbfd3d067b5d14d6fff7881c5292b2d122ff36004057c636c0cdefee29e7c4d192aa0b4008e8a504f47d54af4a73284bf9c2f4917a80231e5f
+  checksum: 10c0/0336f83b22f4c89418326236f19855c2ecc3305af96205296d3a695ab21085ed2761cb783ad61e0e1c51eb676b1bd2743da1f8ed891ae3e16e27b65ae67c4233
   languageName: node
   linkType: hard
 
@@ -577,7 +577,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@navikt/smart-on-fhir@workspace:."
   dependencies:
-    "@navikt/pino-logger": "npm:^5.0.0"
+    "@navikt/pino-logger": "npm:^5.0.1"
     "@navikt/tsm-oxfmt": "npm:^0.0.9"
     "@navikt/tsm-oxlint": "npm:^0.0.5"
     "@opentelemetry/api": "npm:^1.9.1"
@@ -652,7 +652,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api@npm:^1.9.0, @opentelemetry/api@npm:^1.9.1":
+"@opentelemetry/api@npm:^1.9.1":
   version: 1.9.1
   resolution: "@opentelemetry/api@npm:1.9.1"
   checksum: 10c0/c608485fc8b5a91e1f7e05e843b45b509307456b31cd2ad365933d90813e40ebfedf179f1451c762037e82d7c76aa8500e95d2da3609f640a1206cde5322cd14
@@ -2396,10 +2396,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abbrev@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "abbrev@npm:2.0.0"
-  checksum: 10c0/f742a5a107473946f426c691c08daba61a1d15942616f300b5d32fd735be88fef5cba24201757b6c407fd564555fb48c751cfa33519b2605c8a7aadd22baf372
+"abbrev@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "abbrev@npm:4.0.0"
+  checksum: 10c0/b4cc16935235e80702fc90192e349e32f8ef0ed151ef506aa78c81a7c455ec18375c4125414b99f84b2e055199d66383e787675f0bcd87da7a4dbd59f9eac1d5
   languageName: node
   linkType: hard
 
@@ -3335,14 +3335,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nopt@npm:^7.0.0":
-  version: 7.2.1
-  resolution: "nopt@npm:7.2.1"
+"nopt@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "nopt@npm:9.0.0"
   dependencies:
-    abbrev: "npm:^2.0.0"
+    abbrev: "npm:^4.0.0"
   bin:
     nopt: bin/nopt.js
-  checksum: 10c0/a069c7c736767121242037a22a788863accfa932ab285a1eb569eb8cd534b09d17206f68c37f096ae785647435e0c5a5a0a67b42ec743e481a455e5ae6a6df81
+  checksum: 10c0/1822eb6f9b020ef6f7a7516d7b64a8036e09666ea55ac40416c36e4b2b343122c3cff0e2f085675f53de1d2db99a2a89a60ccea1d120bcd6a5347bf6ceb4a7fd
   languageName: node
   linkType: hard
 
@@ -3763,18 +3763,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-socket@npm:7.4.0":
-  version: 7.4.0
-  resolution: "pino-socket@npm:7.4.0"
+"pino-socket@npm:8.0.0":
+  version: 8.0.0
+  resolution: "pino-socket@npm:8.0.0"
   dependencies:
     backoff: "npm:^2.5.0"
-    nopt: "npm:^7.0.0"
+    nopt: "npm:^9.0.0"
     pump: "npm:^3.0.0"
     split2: "npm:^4.0.0"
     through2: "npm:^4.0.2"
   bin:
     pino-socket: psock.js
-  checksum: 10c0/1a3f38ae69c71efd225a5df8bfb6fc0cbe70c0e625221bbec7a7786a4804b9ab61a3e37dfa3a18abc4d03f28e70a32f12744c923e0426951e35dfec19dcdb872
+  checksum: 10c0/2a18fa27eb8a7ce312c82f95f8aa84b34f68a22c529efd35fb74e7b608f761f4f828719dac8f630502a61b3a7728d0b2e370430fce026c0ef18b900855686a3e
   languageName: node
   linkType: hard
 
