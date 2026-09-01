@@ -578,7 +578,7 @@ __metadata:
   resolution: "@navikt/smart-on-fhir@workspace:."
   dependencies:
     "@navikt/pino-logger": "npm:^5.0.0"
-    "@navikt/tsm-oxfmt": "npm:^0.0.9"
+    "@navikt/tsm-oxfmt": "npm:^0.0.11"
     "@navikt/tsm-oxlint": "npm:^0.0.5"
     "@opentelemetry/api": "npm:^1.9.1"
     "@opentelemetry/core": "npm:^2.10.0"
@@ -610,12 +610,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@navikt/tsm-oxfmt@npm:^0.0.9":
-  version: 0.0.9
-  resolution: "@navikt/tsm-oxfmt@npm:0.0.9::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Ftsm-oxfmt%2F0.0.9%2Fb885535041b9cb1bd9878e0c23e5a1bead7d9deb"
+"@navikt/tsm-oxfmt@npm:^0.0.11":
+  version: 0.0.11
+  resolution: "@navikt/tsm-oxfmt@npm:0.0.11::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40navikt%2Ftsm-oxfmt%2F0.0.11%2Fa2bf16339e1e11242ff2361e8effc75431a0309b"
   peerDependencies:
     oxfmt: ">= 0"
-  checksum: 10c0/e4cb127915e8a16c6e76bf7a9fd3f3c91c3a10a480227ec37ca2fdc4e3b8d231f0ab0d3502f9e51ca3e76f13fd450a4b141b44c672b76a794aa896ae436cd759
+  checksum: 10c0/5a848aba8a73058a4e7f91f2f824dd70856ed330a66282a4f9130b25e8a8b3d067276c150fd2693158fedcfc22e7ceb320ac283adea4169f8707f285631d49c3
   languageName: node
   linkType: hard
 
