@@ -62,7 +62,7 @@
         "lint-staged": "^17.3.0",
         "nock": "^14.0.17",
         "oxfmt": "^0.63.0",
-        "oxlint": "^1.78.0",
+        "oxlint": "^1.80.0",
         "oxlint-tsgolint": "^7.0.2001",
         "pino": "^10.3.1",
         "pinst": "^3.0.0",
