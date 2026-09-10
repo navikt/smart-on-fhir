@@ -157,7 +157,7 @@ export async function validateToken(session: CompleteSession): Promise<ValidToke
 
                 const verified = await jwtVerify(session.accessToken, getJwkSet(session.jwksUri), {
                     issuer: session.tokenIssuer,
-                    algorithms: ['RS256'],
+                    algorithms: ['RS256', 'ES384', 'ES256'],
                 })
 
                 return {
