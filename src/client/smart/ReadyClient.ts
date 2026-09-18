@@ -134,7 +134,14 @@ export class ReadyClient {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
 
-                return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                switch (response.status) {
+                    case 404: // not implemented for writes
+                    case 405: // the server does not support this verb on this resource
+                    case 501: // not implemented
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                    default:
+                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                }
             }
 
             const result = await response.json()
@@ -177,7 +184,14 @@ export class ReadyClient {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
 
-                return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                switch (response.status) {
+                    case 404: // not implemented for writes
+                    case 405: // the server does not support this verb on this resource
+                    case 501: // not implemented
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                    default:
+                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                }
             }
 
             const result = await response.json()
@@ -227,16 +241,16 @@ export class ReadyClient {
                 span,
             )
 
-            if (response.status === 404) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                if (!config?.expectNotFound) {
-                    logger.warn(`Resource (${resource}) was not found on FHIR server`)
-                }
-                return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: null }
-            }
-
             if (!response.ok) {
                 const [responseError, operationOutcome] = await responseToFormattedError(response)
+
+                if (response.status === 404) {
+                    span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
+                    if (!config?.expectNotFound) {
+                        logger.warn(`Resource (${resource}) was not found on FHIR server`)
+                    }
+                    return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: operationOutcome }
+                }
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
                 failSpan(span, `Request to get ${resource} failed`, responseError)
