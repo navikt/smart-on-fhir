@@ -63,6 +63,10 @@ export const OtelTaxonomy = {
     SessionExpired: 'session.expired',
     SessionError: 'session.error',
     SessionRefreshed: 'session.refreshed',
+    SessionTokenExpiresInSeconds: 'session.token.expires-in-seconds',
+    SessionTokenAlreadyExpired: 'session.token.already-expired',
+    SessionRefreshedTokenExpiresInSeconds: 'session.refreshed.token.expires-in-seconds',
+    SessionRefreshedNewRefreshToken: 'session.refreshed.new-refresh-token',
     SessionMulti: 'session.multi-launch',
     SessionMultiFallback: 'session.multi-launch.hit-fallback',
 }

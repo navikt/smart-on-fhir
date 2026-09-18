@@ -26,7 +26,7 @@ import { logger } from './lib/logger'
 import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
 import { inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
-import { validateToken } from './token/token'
+import { tokenExpiresIn, validateToken } from './token/token'
 import { type IdToken, IdTokenSchema } from './token/token-schema'
 import type {
     ClaimErrors,
@@ -353,6 +353,12 @@ export class ReadyClient {
         if (!this._client.options.autoRefresh) return response
         if (response.status !== 401) return response
 
+        const expiresInSeconds = tokenExpiresIn(this._session.accessToken)
+        span.setAttributes({
+            [OtelTaxonomy.SessionTokenExpiresInSeconds]: expiresInSeconds,
+            [OtelTaxonomy.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
+        })
+
         const refresh = await this._client.refresh(this._session)
         if ('error' in refresh) {
             failSpan(span, `Failed to refresh session: ${refresh.error}`)
@@ -367,6 +373,7 @@ export class ReadyClient {
         }
 
         // We refreshed! Let's try the resource again
+        span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
         return fetcher()
     }
 

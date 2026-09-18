@@ -389,6 +389,13 @@ export class SmartClient {
                 refreshedSessionValues.refreshToken = refreshResponse.refresh_token
             }
 
+            span.setAttributes({
+                [OtelTaxonomy.SessionRefreshedNewRefreshToken]: Boolean(refreshResponse.refresh_token),
+                [OtelTaxonomy.SessionRefreshedTokenExpiresInSeconds]: tokenExpiresIn(
+                    refreshedSessionValues.accessToken,
+                ),
+            })
+
             await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
             if (this.activePatient) {
                 await spanAsync('refresh-multi-session', () =>
@@ -451,7 +458,13 @@ export class SmartClient {
             if ('error' in session) return session
 
             // Pre-emptively refresh the token if it is about to expire within 5 minutes
-            if (tokenExpiresIn(session.accessToken) < 60 * 5) {
+            const expiresInSeconds = tokenExpiresIn(session.accessToken)
+            span.setAttributes({
+                [OtelTaxonomy.SessionTokenExpiresInSeconds]: expiresInSeconds,
+                [OtelTaxonomy.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
+            })
+
+            if (expiresInSeconds < 60 * 5) {
                 span.setAttribute(OtelTaxonomy.SessionExpired, true)
 
                 const refreshResult = await this.refresh(session)
