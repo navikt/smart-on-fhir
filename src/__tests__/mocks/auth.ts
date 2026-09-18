@@ -1,6 +1,6 @@
 import nock, { type Scope } from 'nock'
 
-import { createTestIdToken } from '../utils/token'
+import { createTestAccessToken, createTestIdToken } from '../utils/token'
 
 import { AUTH_SERVER } from './common'
 
@@ -105,7 +105,7 @@ export async function mockTokenRefresh(expectedBody: TokenRefreshValues): Promis
             grant_type: 'refresh_token',
         })
         .reply(200, {
-            access_token: 'test-access-token',
+            access_token: await createTestAccessToken(3600),
             id_token: await createTestIdToken({
                 fhirUser: 'Practitioner/71503542-c4f5-4f11-a5a5-6633c139d0d4',
             }),
