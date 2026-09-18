@@ -241,16 +241,16 @@ export class ReadyClient {
                 span,
             )
 
-            if (response.status === 404) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                if (!config?.expectNotFound) {
-                    logger.warn(`Resource (${resource}) was not found on FHIR server`)
-                }
-                return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: null }
-            }
-
             if (!response.ok) {
                 const [responseError, operationOutcome] = await responseToFormattedError(response)
+
+                if (response.status === 404) {
+                    span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
+                    if (!config?.expectNotFound) {
+                        logger.warn(`Resource (${resource}) was not found on FHIR server`)
+                    }
+                    return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: operationOutcome }
+                }
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
                 failSpan(span, `Request to get ${resource} failed`, responseError)
