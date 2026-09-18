@@ -18,7 +18,7 @@ export type SmartClientReadyErrors =
       }
 
 export type ResourceCreateErrors = {
-    error: 'CREATE_FAILED_NON_OK_RESPONSE' | 'CREATE_FAILED_INVALID_RESPONSE'
+    error: 'CREATE_FAILED_NON_OK_RESPONSE' | 'CREATE_FAILED_INVALID_RESPONSE' | 'CREATE_FAILED_NOT_SUPPORTED'
     operationOutcome?: OperationOutcome | null
 }
 
