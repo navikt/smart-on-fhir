@@ -26,11 +26,13 @@ export const FhirBatchBundleSchema = z.object({
     type: z.union([z.literal('batch'), z.literal('transaction')]),
     entry: z.array(
         z.object({
-            method: z.union([z.literal('GET'), z.literal('POST'), z.literal('PUT')]),
-            url: z.string(),
-            resource: z
-                .union([FhirDocumentReferenceSchema.partial(), FhirQuestionnaireResponseSchema.partial()])
-                .optional(),
+            request: z.object({
+                method: z.union([z.literal('GET'), z.literal('POST'), z.literal('PUT')]),
+                url: z.string(),
+                resource: z
+                    .union([FhirDocumentReferenceSchema.partial(), FhirQuestionnaireResponseSchema.partial()])
+                    .optional(),
+            }),
         }),
     ),
 })

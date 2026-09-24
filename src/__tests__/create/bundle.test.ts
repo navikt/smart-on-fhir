@@ -13,14 +13,18 @@ test('SmartClient.batch - /Bundle with transaction', async () => {
 
     const testResources: FhirBatchBundle['entry'] = [
         {
-            method: 'PUT',
-            url: 'DocumentReference/0c3710bb-d3fb-4532-a88c-2615c298284f',
-            resource: { resourceType: 'DocumentReference' },
+            request: {
+                method: 'PUT',
+                url: 'DocumentReference/0c3710bb-d3fb-4532-a88c-2615c298284f',
+                resource: { resourceType: 'DocumentReference' },
+            },
         },
         {
-            method: 'PUT',
-            url: 'QuestionnaireResponse/0c3710bb-d3fb-4532-a88c-2615c298284f',
-            resource: { resourceType: 'QuestionnaireResponse' },
+            request: {
+                method: 'PUT',
+                url: 'QuestionnaireResponse/0c3710bb-d3fb-4532-a88c-2615c298284f',
+                resource: { resourceType: 'QuestionnaireResponse' },
+            },
         },
     ]
 
@@ -34,7 +38,7 @@ test('SmartClient.batch - /Bundle with transaction', async () => {
             resourceType: 'Bundle',
             type: 'batch-response',
             entry: testResources.map((entry) => ({
-                response: { status: '200', location: entry.url },
+                response: { status: '200', location: entry.request.url },
             })),
         },
     )
@@ -49,15 +53,10 @@ test('SmartClient.batch - /Bundle with resources', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const testResources: FhirBatchBundle['entry'] = [
-        {
-            method: 'GET',
-            url: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285',
-        },
-        {
-            method: 'GET',
-            url: 'Practitioner/3234e8fb-f059-400b-8f2f-02c77cd70648',
-        },
+        { request: { method: 'GET', url: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285' } },
+        { request: { method: 'GET', url: 'Practitioner/3234e8fb-f059-400b-8f2f-02c77cd70648' } },
     ]
+
     const mock = mockBatchBundle(
         {
             resourceType: 'Bundle',
