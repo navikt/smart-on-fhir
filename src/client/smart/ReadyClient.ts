@@ -282,8 +282,11 @@ export class ReadyClient {
         })
     }
 
-    public async batch(resources: FhirBatchBundle['entry']): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
-        return spanAsync('transaction', async (span) => {
+    public async batch(
+        type: 'batch' | 'transaction',
+        resources: FhirBatchBundle['entry'],
+    ): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
+        return spanAsync(`batch.${type}`, async (span) => {
             span.setAttributes({
                 [OtelTaxonomy.FhirResource]: 'Bundle(transaction)',
                 [OtelTaxonomy.FhirServer]: this._session.fhirServer,
@@ -294,7 +297,7 @@ export class ReadyClient {
                     bundleFhir(this._session, {
                         payload: {
                             resourceType: 'Bundle',
-                            type: 'batch',
+                            type: type,
                             entry: resources,
                         },
                     }),

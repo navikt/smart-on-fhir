@@ -8,7 +8,7 @@ import { createLaunchedOpenReadyClient } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
 import { createTestIdToken } from '../utils/token'
 
-test('SmartClient.create - /Bundle', async () => {
+test('SmartClient.batch - /Bundle with transaction', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validSession)
 
     const testResources: FhirBatchBundle['entry'] = [
@@ -27,7 +27,7 @@ test('SmartClient.create - /Bundle', async () => {
     const mock = mockBatchBundle(
         {
             resourceType: 'Bundle',
-            type: 'batch',
+            type: 'transaction',
             entry: testResources,
         },
         {
@@ -38,11 +38,56 @@ test('SmartClient.create - /Bundle', async () => {
             })),
         },
     )
-    const batchResponse = await ready.batch(testResources)
+    const batchResponse = await ready.batch('transaction', testResources)
 
     expect(mock.isDone()).toBe(true)
     expectHas(batchResponse, 'resourceType')
     expect(batchResponse.entry.map((it) => it.response.status)).toEqual(['200', '200'])
+})
+
+test('SmartClient.batch - /Bundle with resources', async () => {
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
+
+    const testResources: FhirBatchBundle['entry'] = [
+        {
+            method: 'GET',
+            url: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285',
+        },
+        {
+            method: 'GET',
+            url: 'Practitioner/3234e8fb-f059-400b-8f2f-02c77cd70648',
+        },
+    ]
+    const mock = mockBatchBundle(
+        {
+            resourceType: 'Bundle',
+            type: 'batch',
+            entry: testResources,
+        },
+        {
+            resourceType: 'Bundle',
+            type: 'batch-response',
+            entry: [
+                {
+                    resource: { resourceType: 'Patient' },
+                    response: { status: '200', location: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285' },
+                },
+                {
+                    resource: { resourceType: 'Practitioner' },
+                    response: { status: '200', location: 'Practitioner/3234e8fb-f059-400b-8f2f-02c77cd70648' },
+                },
+            ],
+        },
+    )
+    const batchResponse = await ready.batch('batch', testResources)
+
+    expect(mock.isDone()).toBe(true)
+    expectHas(batchResponse, 'resourceType')
+    expect(batchResponse.entry.map((it) => it.response.status)).toEqual(['200', '200'])
+    expect(batchResponse.entry.map((it) => it.resource)).toEqual([
+        { resourceType: 'Patient' },
+        { resourceType: 'Practitioner' },
+    ])
 })
 
 const validSession: CompleteSession = {

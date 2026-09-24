@@ -20,24 +20,17 @@ export function createFhirSeachSetBundleSchema<T>(ResourceSchema: z.ZodType<T>) 
     })
 }
 
-/**
- * TODO add/change:
- * - entry.fullUrl
- * - entry.request.method
- * - entry.request.url
- *
- * TODO remove:
- * - entry.request.method.POST (only PUT applicable)
- */
 export type FhirBatchBundle = z.infer<typeof FhirBatchBundleSchema>
 export const FhirBatchBundleSchema = z.object({
     resourceType: z.literal('Bundle'),
-    type: z.union([z.literal('batch')]),
+    type: z.union([z.literal('batch'), z.literal('transaction')]),
     entry: z.array(
         z.object({
-            method: z.union([z.literal('POST'), z.literal('PUT')]),
+            method: z.union([z.literal('GET'), z.literal('POST'), z.literal('PUT')]),
             url: z.string(),
-            resource: z.union([FhirDocumentReferenceSchema.partial(), FhirQuestionnaireResponseSchema.partial()]),
+            resource: z
+                .union([FhirDocumentReferenceSchema.partial(), FhirQuestionnaireResponseSchema.partial()])
+                .optional(),
         }),
     ),
 })
@@ -48,6 +41,7 @@ export const FhirBatchResponseBundleSchema = z.object({
     type: z.union([z.literal('batch-response')]),
     entry: z.array(
         z.object({
+            resource: z.unknown().optional(),
             response: z.object({
                 status: z.string(),
                 location: z.string().optional(),
