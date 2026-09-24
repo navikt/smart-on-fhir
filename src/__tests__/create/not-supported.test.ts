@@ -1,6 +1,7 @@
 import nock from 'nock'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
+import { logger } from '../../client/smart/lib/logger'
 import type { CompleteSession } from '../../client/storage/schema'
 import type { FhirDocumentReference } from '../../zod'
 import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
@@ -69,4 +70,32 @@ test('SmartClient.update - 500 on PUT keeps CREATE_FAILED_NON_OK_RESPONSE', asyn
     const result = await ready.update('DocumentReference', { id: 'sykmelding-1', payload })
 
     expect(result).toMatchObject({ error: 'CREATE_FAILED_NON_OK_RESPONSE' })
+})
+
+test('SmartClient.create - 501 on POST logs an error (server misconfiguration, contact issuer)', async () => {
+    const errorSpy = vi.spyOn(logger, 'error')
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
+
+    nock(FHIR_SERVER).post('/DocumentReference').reply(501, {})
+
+    const result = await ready.create('DocumentReference', { payload })
+
+    expect(result).toMatchObject({ error: 'CREATE_FAILED_NOT_SUPPORTED' })
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('501'))
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(FHIR_SERVER))
+    errorSpy.mockRestore()
+})
+
+test('SmartClient.update - 501 on PUT logs an error (server misconfiguration, contact issuer)', async () => {
+    const errorSpy = vi.spyOn(logger, 'error')
+    const [ready] = await createLaunchedOpenReadyClient(validSession)
+
+    nock(FHIR_SERVER).put('/DocumentReference/sykmelding-1').reply(501, {})
+
+    const result = await ready.update('DocumentReference', { id: 'sykmelding-1', payload })
+
+    expect(result).toMatchObject({ error: 'CREATE_FAILED_NOT_SUPPORTED' })
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('501'))
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining(FHIR_SERVER))
+    errorSpy.mockRestore()
 })
