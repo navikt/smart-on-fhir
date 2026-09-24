@@ -288,7 +288,7 @@ export class ReadyClient {
     ): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
         return spanAsync(`batch.${type}`, async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirResource]: 'Bundle(transaction)',
+                [OtelTaxonomy.FhirResource]: `Bundle(${type})`,
                 [OtelTaxonomy.FhirServer]: this._session.fhirServer,
             })
 
@@ -308,7 +308,7 @@ export class ReadyClient {
                 const [responseError, operationOutcome] = await responseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed')
-                failSpan(span, `Request for transaction Bundle failed`, responseError)
+                failSpan(span, `Request for ${type} Bundle failed`, responseError)
 
                 return { error: 'BATCH_FAILED_NON_OK_RESPONSE', operationOutcome } satisfies ResourceBatchErrors
             }
@@ -316,7 +316,7 @@ export class ReadyClient {
             const result = await response.json()
             const parsed = FhirBatchResponseBundleSchema.loose().safeParse(result)
             if (!parsed.success) {
-                failSpan(span, `Failed to parse transaction Bundle response`, parsed.error)
+                failSpan(span, `Failed to parse ${type} Bundle response`, parsed.error)
                 return { error: 'BATCH_FAILED_INVALID_RESPONSE', operationOutcome: null } satisfies ResourceBatchErrors
             }
 
@@ -327,12 +327,12 @@ export class ReadyClient {
                 return parsed.data
             } else if (failed.length === parsed.data.entry.length) {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-all-failed')
-                failSpan(span, `All entries in transaction Bundle failed`)
+                failSpan(span, `All entries in ${type} Bundle failed`)
 
                 return { error: 'BATCH_FAILED_ALL_FAILED', result: parsed.data } satisfies ResourceBatchErrors
             } else {
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-some-ok')
-                failSpan(span, `Some entries in transaction Bundle failed`)
+                failSpan(span, `Some entries in ${type} Bundle failed`)
 
                 return { error: 'BATCH_FAILED_SOME_OK', result: parsed.data } satisfies ResourceBatchErrors
             }
