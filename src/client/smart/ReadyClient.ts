@@ -135,9 +135,13 @@ export class ReadyClient {
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
 
                 switch (response.status) {
+                    case 501: // not implemented, should never hit
+                        logger.error(
+                            `Server responded 501 to create ${resourceType}. This EHR (${this._session.fhirServer}) is seriously misconfigured, contact the issuer.`,
+                        )
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
                     case 404: // not implemented for writes
                     case 405: // the server does not support this verb on this resource
-                    case 501: // not implemented
                         return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
                     default:
                         return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
@@ -185,9 +189,13 @@ export class ReadyClient {
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
 
                 switch (response.status) {
-                    case 404: // not implemented for writes
+                    case 501: // not implemented, should never hit
+                        logger.error(
+                            `Server responded 501 to update ${resourceType}. This EHR (${this._session.fhirServer}) is seriously misconfigured, contact the issuer.`,
+                        )
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                    case 404: // not implemented for updates
                     case 405: // the server does not support this verb on this resource
-                    case 501: // not implemented
                         return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
                     default:
                         return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
