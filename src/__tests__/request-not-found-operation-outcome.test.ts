@@ -1,30 +1,9 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../client/storage/schema'
-
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { createLaunchedOpenReadyClient } from './utils/client-open'
+import { FHIR_SERVER } from './mocks/common'
+import { createLaunchedOpenReadyClient, validExampleSession } from './utils/client-open'
 import { expectHas } from './utils/expect'
-import { createTestIdToken } from './utils/token'
-
-const validSession: CompleteSession = {
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
 
 const operationOutcome = {
     resourceType: 'OperationOutcome',
@@ -42,7 +21,7 @@ const operationOutcome = {
 }
 
 test('SmartClient.request - 404 preserves the OperationOutcome instead of discarding it', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
 
     const mock = nock(FHIR_SERVER)
         .get('/QuestionnaireResponse/sykmelding-1')

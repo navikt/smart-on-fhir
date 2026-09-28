@@ -1,36 +1,12 @@
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../client/storage/schema'
-
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
 import { mockEncounter, mockPatient, mockPractitioner, mockPractitionerWithOperationOutcome } from './mocks/resources'
-import { createLaunchedOpenReadyClient } from './utils/client-open'
+import { justOpenReadyClient } from './utils/client-open'
 import { expectHas } from './utils/expect'
-import { createTestIdToken } from './utils/token'
-
-const validSession: CompleteSession = {
-    // Initial
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    // Completed
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
 
 test('SmartClient should be properly initiated with Patient, Encounter and User', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     expect(ready.patient.type).toEqual('Patient')
     expect(ready.patient.reference).toEqual('Patient/valid-patient-id')
@@ -44,7 +20,7 @@ test('SmartClient should be properly initiated with Patient, Encounter and User'
 })
 
 test('SmartClient.request - /Practitioner should fetch and parse Practitioner resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     const mock = mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
 
@@ -61,7 +37,7 @@ test('SmartClient.request - /Practitioner should fetch and parse Practitioner re
 })
 
 test('SmartClient.request - Should handle FHIR errors (OperationOutcome)', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     const mock = mockPractitionerWithOperationOutcome('ac768edb-d56a-4304-8574-f866c6af4e7e')
     const practitioner = await ready.request(ready.user.fhirUser)
@@ -72,7 +48,7 @@ test('SmartClient.request - Should handle FHIR errors (OperationOutcome)', async
 })
 
 test('SmartClient.create - /DocumentReference should POST and parse DocumentReference resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     const mock = mockCreateDocumentReference({
         resourceType: 'DocumentReference',
@@ -93,7 +69,7 @@ test('SmartClient.create - /DocumentReference should POST and parse DocumentRefe
 })
 
 test('SmartClient.update - /DocumentReference should PUT and parse DocumentReference resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     const mock = mockUpdateDocumentReference({
         expectedId: 'my-id',
@@ -119,7 +95,7 @@ test('SmartClient.update - /DocumentReference should PUT and parse DocumentRefer
 })
 
 test('shorthand for .request Practitioner should fetch and parse Practitioner resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
     const practitioner = await ready.user.request()
@@ -129,7 +105,7 @@ test('shorthand for .request Practitioner should fetch and parse Practitioner re
 })
 
 test('shorthand for .request Encounter should fetch and parse Encounter resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     mockEncounter('valid-encounter-id')
     const encounter = await ready.encounter.request()
@@ -139,7 +115,7 @@ test('shorthand for .request Encounter should fetch and parse Encounter resource
 })
 
 test('shorthand for .request Patient should fetch and parse Patient resource', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     mockPatient('valid-patient-id')
     const encounter = await ready.patient.request()

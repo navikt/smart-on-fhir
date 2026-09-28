@@ -1,15 +1,12 @@
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../../client/storage/schema'
 import type { FhirBatchBundle } from '../../zod'
-import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
 import { mockBatchBundle } from '../mocks/create-resources'
-import { createLaunchedOpenReadyClient } from '../utils/client-open'
+import { createLaunchedOpenReadyClient, validExampleSession } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
-import { createTestIdToken } from '../utils/token'
 
 test('SmartClient.batch - /Bundle with transaction', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
 
     const testResources: FhirBatchBundle['entry'] = [
         {
@@ -50,7 +47,7 @@ test('SmartClient.batch - /Bundle with transaction', async () => {
 })
 
 test('SmartClient.batch - /Bundle with resources', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
 
     const testResources: FhirBatchBundle['entry'] = [
         { request: { method: 'GET', url: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285' } },
@@ -88,23 +85,3 @@ test('SmartClient.batch - /Bundle with resources', async () => {
         { resourceType: 'Practitioner' },
     ])
 })
-
-const validSession: CompleteSession = {
-    // Initial
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    // Completed
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}

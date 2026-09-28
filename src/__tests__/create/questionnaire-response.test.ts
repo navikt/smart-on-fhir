@@ -1,15 +1,12 @@
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../../client/storage/schema'
 import type { FhirQuestionnaireResponse } from '../../zod'
-import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
 import { mockUpdateQuestionnaireResponse } from '../mocks/create-resources'
-import { createLaunchedOpenReadyClient } from '../utils/client-open'
+import { createLaunchedOpenReadyClient, validExampleSession } from '../utils/client-open'
 import { expectHas } from '../utils/expect'
-import { createTestIdToken } from '../utils/token'
 
 test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
 
     const questionnaireResponsePayload: Omit<FhirQuestionnaireResponse, 'id'> = {
         resourceType: 'QuestionnaireResponse',
@@ -64,23 +61,3 @@ test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base
     expect(questionnaireResponse.resourceType).toBe('QuestionnaireResponse')
     expect(questionnaireResponse.item[0].text).toEqual('I hvilken periode er du sykmeldt fra?')
 })
-
-const validSession: CompleteSession = {
-    // Initial
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    // Completed
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
