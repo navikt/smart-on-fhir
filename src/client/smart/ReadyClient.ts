@@ -23,6 +23,7 @@ import type { Validation } from '../validator/validations'
 
 import { responseToFormattedError } from './lib/error'
 import { logger } from './lib/logger'
+import { multi } from './lib/multi'
 import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
 import { inferResourceType } from './lib/utils'
 import type { SmartClient } from './SmartClient'
@@ -364,6 +365,8 @@ export class ReadyClient {
     public getValidationReport(): Validation[] {
         return this._client.validator.report()
     }
+
+    public multi = multi
 
     private async fetchWithRefresh(fetcher: () => Promise<Response>, span: Span): Promise<Response> {
         const response = await fetcher()
