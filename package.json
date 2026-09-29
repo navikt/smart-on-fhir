@@ -38,6 +38,10 @@
         "./zod": {
             "types": "./dist/zod/index.d.mts",
             "import": "./dist/zod/index.mjs"
+        },
+        "./test": {
+            "types": "./dist/test/index.d.mts",
+            "import": "./dist/test/index.mjs"
         }
     },
     "dependencies": {
