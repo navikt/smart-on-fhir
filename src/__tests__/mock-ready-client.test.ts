@@ -26,7 +26,6 @@ function client(): MockReadyClient {
     })
 }
 
-// Application functions can require the concrete ReadyClient class without changing their signatures.
 async function loadPatient(ready: ReadyClient) {
     return ready.patient.request()
 }
@@ -40,6 +39,8 @@ test('typed resource replies work through accessors and direct requests', async 
     expect(ready.user.fhirUser).toBe('Practitioner/practitioner-1')
     expect(ready.issuerName).toBe('Demo EHR')
     expect(ready).toBeInstanceOf(ReadyClient)
+    expect(concreteClient.encounter.reference).toBe('Encounter/encounter-1')
+    expect(concreteClient.user.fhirUser).toBe('Practitioner/practitioner-1')
     expect(await loadPatient(concreteClient)).toEqual(patient)
     expect(await ready.request('Patient/patient-1', { cache: { ttl: 60 } })).toEqual(patient)
     ready.assertAllUsed()
@@ -59,7 +60,11 @@ test('missing resources and multi return the normal client error results', async
     ready.on('Patient').get('patient-1').reply(patient)
     ready.on('Practitioner').get('practitioner-1').replyNotFound()
 
-    const result = await ready.multi({ patient: ready.patient.request(), practitioner: ready.user.request() })
+    const concreteClient: ReadyClient = ready
+    const result = await concreteClient.multi({
+        patient: concreteClient.patient.request(),
+        practitioner: concreteClient.user.request(),
+    })
     expect(result.ok).toBe(false)
     if (result.ok) throw new Error('Expected a failed multi result')
     expect(result.failedResource).toEqual(['practitioner'])

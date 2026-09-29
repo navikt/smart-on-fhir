@@ -1,29 +1,9 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import type { CompleteSession } from '../../client/storage/schema'
 import type { FhirDocumentReference } from '../../zod'
-import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
-import { createLaunchedOpenReadyClient } from '../utils/client-open'
-import { createTestIdToken } from '../utils/token'
-
-const validSession: CompleteSession = {
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    accessToken: 'valid-access-token',
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
+import { FHIR_SERVER } from '../mocks/common'
+import { justOpenReadyClient } from '../utils/client-open'
 
 const payload: FhirDocumentReference = {
     resourceType: 'DocumentReference',
@@ -31,7 +11,7 @@ const payload: FhirDocumentReference = {
 
 for (const status of [404, 405, 501]) {
     test(`SmartClient.create - ${status} on POST is reported as CREATE_FAILED_NOT_SUPPORTED`, async () => {
-        const [ready] = await createLaunchedOpenReadyClient(validSession)
+        const [ready] = await justOpenReadyClient()
 
         nock(FHIR_SERVER).post('/DocumentReference').reply(status, {})
 
@@ -41,7 +21,7 @@ for (const status of [404, 405, 501]) {
     })
 
     test(`SmartClient.update - ${status} on PUT is reported as CREATE_FAILED_NOT_SUPPORTED`, async () => {
-        const [ready] = await createLaunchedOpenReadyClient(validSession)
+        const [ready] = await justOpenReadyClient()
 
         nock(FHIR_SERVER).put('/DocumentReference/sykmelding-1').reply(status, {})
 
@@ -52,7 +32,7 @@ for (const status of [404, 405, 501]) {
 }
 
 test('SmartClient.create - 500 on POST keeps CREATE_FAILED_NON_OK_RESPONSE', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     nock(FHIR_SERVER).post('/DocumentReference').reply(500, {})
 
@@ -62,7 +42,7 @@ test('SmartClient.create - 500 on POST keeps CREATE_FAILED_NON_OK_RESPONSE', asy
 })
 
 test('SmartClient.update - 500 on PUT keeps CREATE_FAILED_NON_OK_RESPONSE', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validSession)
+    const [ready] = await justOpenReadyClient()
 
     nock(FHIR_SERVER).put('/DocumentReference/sykmelding-1').reply(500, {})
 
