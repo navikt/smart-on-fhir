@@ -25,8 +25,8 @@ export async function postFhir(
         body: JSON.stringify(payload),
         headers: {
             Authorization: `Bearer ${server.accessToken}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            Accept: 'application/fhir+json,application/json',
+            'Content-Type': 'application/json+fhir',
         },
     })
 }
@@ -43,8 +43,8 @@ export async function bundleFhir(server: AuthenticatedServer, { payload }: Bundl
         body: JSON.stringify(payload),
         headers: {
             Authorization: `Bearer ${server.accessToken}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            Accept: 'application/fhir+json,application/json',
+            'Content-Type': 'application/json+fhir',
         },
     })
 }
@@ -66,8 +66,8 @@ export async function putFhir(
         body: JSON.stringify(payload),
         headers: {
             Authorization: `Bearer ${server.accessToken}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            Accept: 'application/fhir+json,application/json',
+            'Content-Type': 'application/json+fhir',
         },
     })
 }
