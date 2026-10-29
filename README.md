@@ -24,8 +24,8 @@ The optional `@navikt/smart-on-fhir/test` entry point provides an in-memory `Moc
 needs no session, server, network interceptor, or test-runner integration:
 
 ```ts
-import { MockReadyClient } from '@navikt/smart-on-fhir/test'
 import type { ReadyClient } from '@navikt/smart-on-fhir/client'
+import { MockReadyClient } from '@navikt/smart-on-fhir/test'
 
 const ready = new MockReadyClient({
   patientId: 'patient-1',
