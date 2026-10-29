@@ -580,8 +580,8 @@ __metadata:
     "@navikt/pino-logger": "npm:^5.0.1"
     "@navikt/tsm-oxfmt": "npm:^0.0.11"
     "@navikt/tsm-oxlint": "npm:^0.0.7"
-    "@opentelemetry/api": "npm:^1.10.0"
-    "@opentelemetry/core": "npm:^3.0.0"
+    "@opentelemetry/api": "npm:^1.9.1"
+    "@opentelemetry/core": "npm:^2.12.0"
     "@types/node": "npm:24.19.2"
     "@vitest/coverage-v8": "npm:5.0.5"
     husky: "npm:^9.1.7"
@@ -653,21 +653,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api@npm:^1.10.0, @opentelemetry/api@npm:^1.9.1":
+"@opentelemetry/api@npm:^1.9.1":
   version: 1.10.0
   resolution: "@opentelemetry/api@npm:1.10.0"
   checksum: 10c0/c666f89d882e2e3ea3780b4e419de3ba7e00a80bf334269c3c8507a5e2b4e453e2bc8368f6230f894d789b206c14dde313ea6f51fa7bc629f0eff8480b5d356b
   languageName: node
   linkType: hard
 
-"@opentelemetry/core@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@opentelemetry/core@npm:3.0.0"
+"@opentelemetry/core@npm:^2.12.0":
+  version: 2.12.0
+  resolution: "@opentelemetry/core@npm:2.12.0"
   dependencies:
     "@opentelemetry/semantic-conventions": "npm:^1.29.0"
   peerDependencies:
-    "@opentelemetry/api": ">=1.10.0 <1.11.0"
-  checksum: 10c0/339512e305d73e1625e6a90ad180f2e2c703080e8a7bf55e8506ccfd457ec22e92a061189d7756e4ff442051965fbaf9fde55cfe677ee531fe224edbfff5bf92
+    "@opentelemetry/api": ">=1.0.0 <1.10.0"
+  checksum: 10c0/e0d0338d314ca827b4395acf8c7eb8f88a58fd63f1effc6068ba4dd8e3443e02e5796333ae6723fb926a7e6c18dd6d2102f5cc7e531b185618562dadbf6cad71
   languageName: node
   linkType: hard
 
