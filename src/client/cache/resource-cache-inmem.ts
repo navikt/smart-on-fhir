@@ -1,6 +1,6 @@
 import QuickLRU from 'quick-lru'
 
-import type { KnownPaths, ResponseFor } from '../fhir/resources/resource-map'
+import type { KnownPaths, ResponseFor } from '../fhir/resources/request-resource-map'
 import { removeTrailingSlash } from '../smart/lib/utils'
 
 import type { CacheItem, CacheValueItem } from './resource-cache'

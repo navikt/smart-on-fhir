@@ -263,7 +263,7 @@ export class SmartClient {
 
             this.validator.tokenResponse(tokenResponse)
 
-            const completeSessionValues: CompleteSession = {
+            const completeSessionValues: Record<keyof CompleteSession, string> = {
                 ...initialSession,
                 idToken: tokenResponse.id_token,
                 accessToken: tokenResponse.access_token,
@@ -323,7 +323,7 @@ export class SmartClient {
                 failSpan(
                     span,
                     `Tried .ready() with active session, but FHIR server was not known`,
-                    new Error(`FHIR server ${session.fhirServer} was not a known fhir server!`),
+                    new Error(`FHIR server ${session.fhirServer} was not a known FHIR server!`),
                 )
                 return { error: 'UNKNOWN_ISSUER', validate: async () => false }
             }
