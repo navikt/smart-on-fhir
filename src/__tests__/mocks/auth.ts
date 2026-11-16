@@ -1,4 +1,4 @@
-import nock, { type Scope } from 'nock'
+import nock from 'nock'
 
 import { createTestAccessToken, createTestIdToken } from '../utils/token'
 
@@ -19,7 +19,7 @@ export async function mockTokenExchange(
     expectedBody: TokenExchangeValues,
     values?: Record<string, unknown>,
     authHeader?: string,
-): Promise<Scope> {
+): Promise<nock.Scope> {
     const postInterceptor = nock(AUTH_SERVER).post('/token', {
         ...expectedBody,
         grant_type: 'authorization_code',
@@ -63,7 +63,7 @@ type PrivateKeyJwtTokenExchangeValues = {
  */
 export async function mockPrivateKeyJwtTokenExchange(
     expectedBody: PrivateKeyJwtTokenExchangeValues,
-): Promise<{ scope: Scope; getClientAssertion: () => string | undefined }> {
+): Promise<{ scope: nock.Scope; getClientAssertion: () => string | undefined }> {
     let clientAssertion: string | undefined
 
     const scope = nock(AUTH_SERVER)
@@ -98,7 +98,7 @@ type TokenRefreshValues = {
     refresh_token: string
 }
 
-export async function mockTokenRefresh(expectedBody: TokenRefreshValues): Promise<Scope> {
+export async function mockTokenRefresh(expectedBody: TokenRefreshValues): Promise<nock.Scope> {
     return nock(AUTH_SERVER)
         .post('/token', {
             ...expectedBody,

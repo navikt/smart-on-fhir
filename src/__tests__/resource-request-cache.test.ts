@@ -50,9 +50,11 @@ describe('Inmemory Cache', () => {
 
         // Move 1s past TTL
         vi.advanceTimersByTime(2 * 1000)
-        await expect(async () => ready.request(ready.user.fhirUser, cacheConfig)).rejects.toThrow(
-            'Nock: No match for request',
-        )
+        const fails = await ready.request(ready.user.fhirUser, cacheConfig)
+
+        // Fails because there are no mocks because we are 1s past TTL
+        expectHas(fails, 'error')
+        expect(fails.error).toBe('REQUEST_FAILED_NON_OK_RESPONSE')
     })
 
     test('SmartClient.user.request - /Practitioner should fetch and cache Practitioner resource', async () => {
@@ -118,9 +120,11 @@ describe('ResourceCache Cache', () => {
 
         // Move 1s past TTL
         vi.advanceTimersByTime(2 * 1000)
-        await expect(async () => ready.request(ready.user.fhirUser, cacheConfig)).rejects.toThrow(
-            'Nock: No match for request',
-        )
+        const fails = await ready.request(ready.user.fhirUser, cacheConfig)
+
+        // Fails because there are no mocks because we are 1s past TTL
+        expectHas(fails, 'error')
+        expect(fails.error).toBe('REQUEST_FAILED_NON_OK_RESPONSE')
     })
 })
 

@@ -1,10 +1,10 @@
-import nock, { type Scope } from 'nock'
+import nock from 'nock'
 
 import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../zod'
 
 import { FHIR_SERVER } from './common'
 
-export function mockPractitioner(id: string): Scope {
+export function mockPractitioner(id: string): nock.Scope {
     return nock(FHIR_SERVER)
         .get(`/Practitioner/${id}`)
         .reply(200, {
@@ -15,7 +15,7 @@ export function mockPractitioner(id: string): Scope {
         } satisfies FhirPractitioner)
 }
 
-export function mockPractitionerWithOperationOutcome(id: string): Scope {
+export function mockPractitionerWithOperationOutcome(id: string): nock.Scope {
     return nock(FHIR_SERVER)
         .get(`/Practitioner/${id}`)
         .reply(
@@ -40,7 +40,7 @@ export function mockPractitionerWithOperationOutcome(id: string): Scope {
         )
 }
 
-export function mockEncounter(id: string): Scope {
+export function mockEncounter(id: string): nock.Scope {
     return nock(FHIR_SERVER)
         .get(`/Encounter/${id}`)
         .reply(200, {
@@ -72,7 +72,7 @@ export function mockEncounter(id: string): Scope {
         } satisfies FhirEncounter)
 }
 
-export function mockPatient(id: string): Scope {
+export function mockPatient(id: string): nock.Scope {
     return nock(FHIR_SERVER)
         .get(`/Patient/${id}`)
         .reply(200, {

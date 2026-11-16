@@ -1,4 +1,4 @@
-import nock, { type RequestBodyMatcher, type Scope } from 'nock'
+import nock from 'nock'
 
 import type { PayloadForCreate, ResponseForCreate } from '../../client/fhir/resources/create-resource-map'
 import type { FhirBatchBundle, FhirBatchResponseBundle, FhirDocumentReference } from '../../zod'
@@ -44,15 +44,15 @@ const createdDocumentReference: FhirDocumentReference = {
 export function mockCreateDocumentReference(
     expectedPayload: PayloadForCreate<'DocumentReference'>,
     onSuccess: FhirDocumentReference = createdDocumentReference,
-): Scope {
+): nock.Scope {
     return nock(FHIR_SERVER)
-        .post(`/DocumentReference`, expectedPayload as RequestBodyMatcher)
+        .post(`/DocumentReference`, expectedPayload as nock.RequestBodyMatcher)
         .reply(200, onSuccess)
 }
 
-export function mockBatchBundle(expectedPayload: FhirBatchBundle, onSuccess: FhirBatchResponseBundle): Scope {
+export function mockBatchBundle(expectedPayload: FhirBatchBundle, onSuccess: FhirBatchResponseBundle): nock.Scope {
     return nock(FHIR_SERVER)
-        .post(`/Bundle`, expectedPayload as RequestBodyMatcher)
+        .post(`/Bundle`, expectedPayload as nock.RequestBodyMatcher)
         .reply(200, onSuccess)
 }
 
@@ -64,9 +64,9 @@ export function mockUpdateDocumentReference({
     expectedId: string
     expectedPayload: PayloadForCreate<'DocumentReference'>
     onSuccess?: ResponseForCreate<'DocumentReference'>
-}): Scope {
+}): nock.Scope {
     return nock(FHIR_SERVER)
-        .put(`/DocumentReference/${expectedId}`, expectedPayload as RequestBodyMatcher)
+        .put(`/DocumentReference/${expectedId}`, expectedPayload as nock.RequestBodyMatcher)
         .reply(200, onSuccess)
 }
 
@@ -78,8 +78,8 @@ export function mockUpdateQuestionnaireResponse({
     expectedId: string
     expectedPayload: PayloadForCreate<'QuestionnaireResponse'>
     onSuccess: ResponseForCreate<'QuestionnaireResponse'>
-}): Scope {
+}): nock.Scope {
     return nock(FHIR_SERVER)
-        .put(`/QuestionnaireResponse/${expectedId}`, expectedPayload as RequestBodyMatcher)
+        .put(`/QuestionnaireResponse/${expectedId}`, expectedPayload as nock.RequestBodyMatcher)
         .reply(200, onSuccess)
 }

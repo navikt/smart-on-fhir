@@ -1,15 +1,15 @@
-import nock, { type Scope } from 'nock'
+import nock from 'nock'
 
 import type { SmartConfiguration } from '../../client/smart/well-known/smart-configuration-schema'
 import { createKeys } from '../utils/jwt'
 
 import { AUTH_SERVER, FHIR_SERVER } from './common'
 
-export function fhirNock(): Scope {
+export function fhirNock(): nock.Scope {
     return nock(FHIR_SERVER)
 }
 
-export function mockSmartConfiguration(): Scope {
+export function mockSmartConfiguration(): nock.Scope {
     return nock(FHIR_SERVER)
         .get('/.well-known/smart-configuration')
         .reply(200, {
@@ -21,7 +21,7 @@ export function mockSmartConfiguration(): Scope {
         } satisfies SmartConfiguration)
 }
 
-export function mockJwks(): Scope {
+export function mockJwks(): nock.Scope {
     return nock(AUTH_SERVER)
         .get('/jwks')
         .reply(200, () => createKeys())
