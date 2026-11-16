@@ -585,7 +585,7 @@ __metadata:
     "@types/node": "npm:24.19.2"
     "@vitest/coverage-v8": "npm:5.0.5"
     husky: "npm:^9.1.7"
-    jose: "npm:^6.2.13"
+    jose: "npm:^6.2.17"
     knip: "npm:^6.43.0"
     lint-staged: "npm:^17.6.0"
     nock: "npm:14.0.17"
@@ -2775,10 +2775,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^6.2.12, jose@npm:^6.2.13":
+"jose@npm:^6.2.12":
   version: 6.2.13
   resolution: "jose@npm:6.2.13"
   checksum: 10c0/a7a175057fd42e129200026320d535deba5c869e764bdb130d4aecb7cc2a22c07eab2bf9fc848188b45b89d95f8e0ba4ce01a8259a4fa45c84bec34f66f2918e
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.17":
+  version: 6.2.17
+  resolution: "jose@npm:6.2.17"
+  checksum: 10c0/1a00d44656e38664c54a8b2d903b6c947b3fc4275f7ede2462f74e50ce320359ea324deba15652dcc158c14ed99135a2382a4c5718be350923a9e583bea727db
   languageName: node
   linkType: hard
 
