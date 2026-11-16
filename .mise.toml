@@ -1,2 +1,2 @@
 [tools]
-node = { version = "24", postinstall = "corepack enable" }
+node = { version = "26", postinstall = "corepack enable" }

@@ -42,6 +42,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: navikt/tsm-workflows/actions/yarn@main
         with:
+          node: 26
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn tsc
       - run: yarn test
@@ -59,6 +60,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: navikt/tsm-workflows/actions/yarn@main
         with:
+          node: 26
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
 
@@ -74,6 +76,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: navikt/tsm-workflows/actions/yarn@main
         with:
+          node: 26
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
       - name: Publish package
@@ -99,6 +102,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: navikt/tsm-workflows/actions/yarn@main
         with:
+          node: 26
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - run: yarn build
       - name: Set beta version
