@@ -6,7 +6,7 @@ import { AUTH_SERVER, FHIR_SERVER } from '../mocks/common'
 
 import { expectIs } from './expect'
 import { createTestStorage } from './storage'
-import { createTestIdToken } from './token'
+import { createTestAccessToken, createTestIdToken } from './token'
 
 export const TEST_SESSION_ID = 'test-session'
 
@@ -81,7 +81,7 @@ export const validExampleSession: CompleteSession = {
     codeVerifier: 'valid-code-verifier',
     state: 'valid-state',
     // Completed
-    accessToken: 'valid-access-token',
+    accessToken: await createTestAccessToken(3600),
     idToken: await createTestIdToken({
         fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
     }),

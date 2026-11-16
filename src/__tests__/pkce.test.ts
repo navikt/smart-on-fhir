@@ -2,7 +2,6 @@ import { calculatePKCECodeChallenge } from 'openid-client'
 import { expect, test } from 'vitest'
 
 import { ReadyClient, SmartClient } from '../client'
-import type { CompleteSession, InitialSession } from '../client/storage/schema'
 
 import { mockTokenExchange } from './mocks/auth'
 import { FHIR_SERVER } from './mocks/common'
@@ -40,7 +39,7 @@ test('pkce verification should be correct', async () => {
     expectHas(result, 'redirectUrl')
     const params = searchParamsToObject(result.redirectUrl)
 
-    const { codeVerifier } = (await storage.get(sessionId)) as InitialSession
+    const { codeVerifier } = (await storage.get(sessionId)) as Record<string, string>
     const expectedCodeChallenge = await calculatePKCECodeChallenge(codeVerifier)
     expect(params.code_challenge).toBe(expectedCodeChallenge)
 
@@ -65,7 +64,7 @@ test('pkce verification should be correct', async () => {
      * Launch is complete and session is complete
      */
     expectHas(callback, 'redirectUrl')
-    const session = (await storage.get(sessionId)) as CompleteSession
+    const session = (await storage.get(sessionId)) as Record<string, string>
     expect(session).toHaveProperty('accessToken')
     expect(session).toHaveProperty('idToken')
     expect(session).toHaveProperty('patient')

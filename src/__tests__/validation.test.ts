@@ -2,37 +2,15 @@ import { expect, test } from 'vitest'
 import * as z from 'zod'
 
 import { ReadyClient } from '../client'
-import type { CompleteSession } from '../client/storage/schema'
 
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
 import { mockJwks, mockSmartConfiguration } from './mocks/issuer'
-import { createLaunchableOpenSmartClient } from './utils/client-open'
+import { createLaunchableOpenSmartClient, validExampleSession } from './utils/client-open'
 import { expectIs } from './utils/expect'
 import { createOtherToken, createTestAccessToken, createTestIdToken } from './utils/token'
 
-const validSession: CompleteSession = {
-    // Initial
-    fhirServer: FHIR_SERVER,
-    tokenIssuer: AUTH_SERVER,
-    jwksUri: `${AUTH_SERVER}/jwks`,
-    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
-    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
-    tokenEndpoint: `${AUTH_SERVER}/token`,
-    codeVerifier: 'valid-code-verifier',
-    state: 'valid-state',
-    // Completed
-    accessToken: await createTestAccessToken(3600),
-    idToken: await createTestIdToken({
-        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
-    }),
-    refreshToken: 'valid-refresh-token',
-    patient: 'valid-patient-id',
-    encounter: 'valid-encounter-id',
-}
-
 test('.validate - should properly validate token', async () => {
     const [client] = await createLaunchableOpenSmartClient({
-        ...validSession,
+        ...validExampleSession,
         accessToken: await createTestAccessToken(60 * 10), // 10 minutes
     })
 
@@ -48,7 +26,7 @@ test('.validate - should properly validate token', async () => {
 
 test('.validate - should not validate expired token', async () => {
     const [client] = await createLaunchableOpenSmartClient({
-        ...validSession,
+        ...validExampleSession,
         accessToken: await createTestAccessToken(-60), // 1 minute expired
     })
 
@@ -64,7 +42,7 @@ test('.validate - should not validate expired token', async () => {
 
 test('.validate - should not validate garbage', async () => {
     const [client] = await createLaunchableOpenSmartClient({
-        ...validSession,
+        ...validExampleSession,
         accessToken: 'straight.up.garbage',
     })
 
@@ -80,7 +58,7 @@ test('.validate - should not validate garbage', async () => {
 
 test('.getClaim - should handle getting arbitrary claims and validating them with zod', async () => {
     const [client] = await createLaunchableOpenSmartClient({
-        ...validSession,
+        ...validExampleSession,
         idToken: await createTestIdToken({
             'https://helseid.nhn.no': {
                 access_token: await createOtherToken('https://helseid.nhn.no'),
