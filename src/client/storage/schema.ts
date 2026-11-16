@@ -1,4 +1,7 @@
+import { decodeJwt } from 'jose'
 import * as z from 'zod'
+
+import { type IdToken, IdTokenSchema } from '../smart/token/token-schema'
 
 export type InitialSession = z.infer<typeof InitialSessionSchema>
 export const InitialSessionSchema = z.object({
@@ -31,3 +34,7 @@ export const CompleteSessionSchema = InitialSessionSchema.extend({
     patient: z.string(),
     encounter: z.string(),
 })
+
+export function idTokenClaims(session: CompleteSession): IdToken {
+    return IdTokenSchema.loose().parse(decodeJwt(session.idToken))
+}

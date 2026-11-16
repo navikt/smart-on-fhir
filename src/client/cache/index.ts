@@ -6,4 +6,8 @@ import type { ResourceCache } from './resource-cache-custom'
  */
 export type CacheOptions = 'disabled' | 'in-memory' | ResourceCache | Promise<ResourceCache>
 
+export type CacheableResource = {
+    cache?: { ttl: number }
+}
+
 export { getCachedResource, setCachedResource } from './resource-cache'

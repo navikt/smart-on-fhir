@@ -1,4 +1,4 @@
-import type { KnownPaths, ResponseFor } from '../fhir/resources/resource-map'
+import type { KnownPaths, ResponseFor } from '../fhir/resources/request-resource-map'
 import { removeTrailingSlash } from '../smart/lib/utils'
 
 import type { CacheItem } from './resource-cache'
@@ -35,5 +35,8 @@ export async function setCachedResourceCustom<Path extends KnownPaths>(
 ): Promise<void> {
     const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
 
+    /**
+     * TODO: Consider the implications of caching not being scoped to a session.
+     */
     return (await cache).set(key, item.values, cacheOptions.ttl)
 }

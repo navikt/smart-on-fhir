@@ -22,7 +22,7 @@ import {
 /**
  * A map of FHIR paths in a FHIR server and their known corresponding resource types.
  */
-type ResourceMap = {
+type RequestResourceMap = {
     'Condition?': FhirSearchsetBundle<FhirCondition>
     'Encounter/': FhirEncounter
     'Patient/': FhirPatient
@@ -39,14 +39,14 @@ type ResourceMap = {
  * query parameters, such as `/Condition?` or `/Encounter/`. If we ever need to
  * query the FHIR server directly this type will need to be smarter.
  */
-export type KnownPaths = `${keyof ResourceMap}${string}`
+export type KnownPaths = `${keyof RequestResourceMap}${string}`
 
 /**
  * Looks up the correct FHIR type for a given path.
  */
 export type ResponseFor<T extends string> = {
-    [K in keyof ResourceMap]: T extends `${K}${string}` ? ResourceMap[K] : never
-}[keyof ResourceMap]
+    [K in keyof RequestResourceMap]: T extends `${K}${string}` ? RequestResourceMap[K] : never
+}[keyof RequestResourceMap]
 
 /**
  * Converts from a KnownPath to the actual FHIR zod schema for this resource.

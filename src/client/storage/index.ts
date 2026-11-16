@@ -4,7 +4,7 @@ import { type CompleteSession, CompleteSessionSchema, type InitialSession, Initi
 import type { CompleteSessionErrors, InitialSessionErrors } from './storage-errors'
 
 export type SmartStorage = {
-    set: (key: string, values: InitialSession | CompleteSession) => Promise<void>
+    set: (key: string, values: Record<string, string>) => Promise<void>
     get: (key: string) => Promise<unknown>
 }
 
@@ -16,8 +16,8 @@ export type SafeSmartStorage = {
 
 export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStorage>): SafeSmartStorage {
     return {
-        set: async (...args) => {
-            return (await smartStorage).set(...args)
+        set: async (key, values) => {
+            return (await smartStorage).set(key, values)
         },
         getPartial: async (key) => {
             const raw = await (await smartStorage).get(key)
@@ -30,7 +30,7 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
             const initialParsed = InitialSessionSchema.safeParse(raw)
             if (initialParsed.error) {
                 logger.error(
-                    new Error(`SmartSession state for session ${key} is broken`, {
+                    new Error(`SmartSession state (partial) for session ${key} is broken`, {
                         cause: initialParsed.error,
                     }),
                 )
@@ -50,9 +50,10 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
             const completeParsed = CompleteSessionSchema.safeParse(raw)
             if (completeParsed.error) {
                 logger.error(
-                    new Error(`SmartSession state for session ${key} was expected to be complete, but wasn't`, {
-                        cause: completeParsed.error,
-                    }),
+                    new Error(
+                        `SmartSession state (complete) for session ${key} was expected to be complete, but wasn't`,
+                        { cause: completeParsed.error },
+                    ),
                 )
                 return { error: 'BROKEN_SESSION_STATE' }
             }

@@ -1,40 +1,18 @@
-import { decodeJwt } from 'jose'
 import type * as z from 'zod'
 
-import {
-    type FhirEncounter,
-    type FhirPatient,
-    type FhirPractitioner,
-    type FhirBatchBundle,
-    type FhirBatchResponseBundle,
-    FhirBatchResponseBundleSchema,
-} from '../../zod'
-import { type CacheOptions, getCachedResource, setCachedResource } from '../cache'
-import {
-    createResourceToSchema,
-    type KnownCreatePaths,
-    type PayloadForCreate,
-    type ResponseForCreate,
-} from '../fhir/resources/create-resource-map'
-import { bundleFhir, getFhir, postFhir, putFhir } from '../fhir/resources/fetcher'
-import { type KnownPaths, type ResponseFor, resourceToSchema } from '../fhir/resources/resource-map'
-import type { CompleteSession } from '../storage/schema'
+import { type FhirEncounter, type FhirPatient, type FhirPractitioner } from '../../zod'
+import type { CacheableResource } from '../cache'
+import { FhirClient } from '../fhir/FhirClient'
+import { type CompleteSession, idTokenClaims } from '../storage/schema'
 import type { Validation } from '../validator/validations'
 
-import { responseToFormattedError } from './lib/error'
 import { logger } from './lib/logger'
 import { multi } from './lib/multi'
-import { failSpan, OtelTaxonomy, type Span, spanAsync, squelchTracing } from './lib/otel'
-import { inferResourceType } from './lib/utils'
+import { failSpan, OtelTaxonomy, type Span } from './lib/otel'
 import type { SmartClient } from './SmartClient'
 import { tokenExpiresIn, validateToken } from './token/token'
-import { type IdToken, IdTokenSchema } from './token/token-schema'
-import type {
-    ClaimErrors,
-    ResourceBatchErrors,
-    ResourceCreateErrors,
-    ResourceRequestErrors,
-} from './types/client-errors'
+import type { IdToken } from './token/token-schema'
+import type { ClaimErrors, ResourceRequestErrors } from './types/client-errors'
 
 /**
  * **Smart App Launch reference**
@@ -47,28 +25,41 @@ import type {
 export class ReadyClient {
     private readonly _client: SmartClient
     private readonly _session: CompleteSession
-    private readonly _idToken: IdToken
-    private readonly _cache: CacheOptions
+    private readonly _fhirClient: FhirClient
+
+    readonly #idToken: IdToken
 
     public readonly issuerName: string
-
-    private readonly persistValidation?: () => Promise<void>
 
     constructor(
         client: SmartClient,
         session: CompleteSession,
         issuerName: string,
-        persistValidation?: () => Promise<void>,
+        persistValidation: () => Promise<void>,
     ) {
         this.issuerName = issuerName
 
         this._client = client
         this._session = session
-        this._idToken = IdTokenSchema.loose().parse(decodeJwt(session.idToken))
-        this._cache = client.options.cache
 
-        this.persistValidation = persistValidation
+        this._fhirClient = new FhirClient(this._session, this.fetchWithRefresh, {
+            validator: {
+                runtime: this._client.validator,
+                persist: persistValidation,
+            },
+            cache: client.options.cache,
+        })
+
+        this.#idToken = idTokenClaims(this._session)
     }
+
+    public readonly request: FhirClient['request'] = (...args) => this._fhirClient.request(...args)
+
+    public readonly create: FhirClient['create'] = (...args) => this._fhirClient.create(...args)
+
+    public readonly update: FhirClient['update'] = (...args) => this._fhirClient.update(...args)
+
+    public readonly batch: FhirClient['batch'] = (...args) => this._fhirClient.batch(...args)
 
     public get patient(): ValueAccessor<FhirPatient, 'Patient'> {
         return {
@@ -94,13 +85,13 @@ export class ReadyClient {
         fhirUser: `Practitioner/${string}`
         request: (config?: CacheableResource) => Promise<FhirPractitioner | ResourceRequestErrors>
     } {
-        const idToken = this._idToken
+        const fhirUser = this.#idToken.fhirUser
 
         return {
             type: 'Practitioner',
-            id: idToken.fhirUser.split('/')[1],
+            id: fhirUser.split('/')[1],
             get fhirUser(): `Practitioner/${string}` {
-                return idToken.fhirUser as `Practitioner/${string}`
+                return fhirUser as `Practitioner/${string}`
             },
             request: (config) => this.request(this.user.fhirUser, config),
         }
@@ -112,242 +103,6 @@ export class ReadyClient {
         return validationResult.valid
     }
 
-    public async create<Path extends KnownCreatePaths>(
-        resource: Path,
-        params: { payload: PayloadForCreate<Path> },
-    ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
-        const resourceType = inferResourceType(resource)
-
-        return spanAsync(`create.${resourceType}`, async (span) => {
-            span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
-            })
-
-            const response = await this.fetchWithRefresh(
-                () => postFhir(this._session, resource, { payload: params.payload }),
-                span,
-            )
-
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
-
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
-                failSpan(span, `Request to create ${resourceType} failed`, responseError)
-
-                switch (response.status) {
-                    case 501: // not implemented, should never hit
-                        logger.error(
-                            `Server responded 501 to create ${resourceType}. This EHR (${this._session.fhirServer}) is seriously misconfigured, contact the issuer.`,
-                        )
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
-                    case 404: // not implemented for writes
-                    case 405: // the server does not support this verb on this resource
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
-                    default:
-                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
-                }
-            }
-
-            const result = await response.json()
-            const parsed = createResourceToSchema(resource).loose().safeParse(result)
-            if (!parsed.success) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(span, `Failed to parse ${resourceType}`, parsed.error)
-
-                return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
-            }
-
-            void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
-
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
-
-            return parsed.data as ResponseForCreate<Path>
-        })
-    }
-
-    public async update<Path extends KnownCreatePaths>(
-        resource: Path,
-        params: { id: string; payload: PayloadForCreate<Path> },
-    ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
-        const resourceType = inferResourceType(resource)
-
-        return spanAsync(`update.${resourceType}`, async (span) => {
-            span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
-            })
-
-            const response = await this.fetchWithRefresh(
-                () => putFhir(this._session, { id: params.id, path: resource }, { payload: params.payload }),
-                span,
-            )
-
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
-
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
-                failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
-
-                switch (response.status) {
-                    case 501: // not implemented, should never hit
-                        logger.error(
-                            `Server responded 501 to update ${resourceType}. This EHR (${this._session.fhirServer}) is seriously misconfigured, contact the issuer.`,
-                        )
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
-                    case 404: // not implemented for updates
-                    case 405: // the server does not support this verb on this resource
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
-                    default:
-                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
-                }
-            }
-
-            const result = await response.json()
-            const parsed = createResourceToSchema(resource).loose().safeParse(result)
-            if (!parsed.success) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
-                failSpan(span, `Failed to parse ${resourceType} (from PUT/update)`, parsed.error)
-
-                return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
-            }
-
-            void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
-
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-succeeded')
-
-            return parsed.data as ResponseForCreate<Path>
-        })
-    }
-
-    public async request<Path extends KnownPaths>(
-        resource: Path,
-        /**
-         * If set to true, will not mark the OTEL span as failed if the resource is not found.
-         */
-        config?: CacheableResource & { expectNotFound?: true },
-    ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
-        const resourceType = inferResourceType(resource)
-
-        return spanAsync(`request.${resourceType}`, async (span) => {
-            span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
-                [OtelTaxonomy.ResourceCacheEnabled]: config?.cache != null,
-            })
-
-            if (config?.cache != null) {
-                const cached = await getCachedResource<Path>(this._cache, { session: this._session, resource })
-                if (cached) {
-                    span.setAttributes({ [OtelTaxonomy.ResourceCacheHit]: true })
-                    return cached
-                }
-            }
-
-            const doRequest = (): Promise<Response> => getFhir(this._session, resource)
-            const response = await this.fetchWithRefresh(
-                () => (config?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
-                span,
-            )
-
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
-
-                if (response.status === 404) {
-                    span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
-                    if (!config?.expectNotFound) {
-                        logger.warn(`Resource (${resource}) was not found on FHIR server`)
-                    }
-                    return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: operationOutcome }
-                }
-
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
-                failSpan(span, `Request to get ${resource} failed`, responseError)
-
-                return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: operationOutcome }
-            }
-
-            const result = await response.json()
-            const parsed = resourceToSchema(resource).loose().safeParse(result)
-            if (!parsed.success) {
-                failSpan(span, `${resourceType} parse error`, parsed.error)
-                return { error: 'REQUEST_FAILED_INVALID_RESPONSE' }
-            }
-
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
-
-            void this.registerResourceValidation(parsed.data as ResponseFor<Path>)
-
-            if (config?.cache != null) {
-                span.setAttribute(OtelTaxonomy.ResourceCacheUpdated, true)
-                await setCachedResource(
-                    this._cache,
-                    { session: this._session, resource, values: parsed.data as ResponseFor<Path> },
-                    config.cache,
-                )
-            }
-
-            return parsed.data as ResponseFor<Path>
-        })
-    }
-
-    public async batch(
-        type: 'batch' | 'transaction',
-        resources: FhirBatchBundle['entry'],
-    ): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
-        return spanAsync(`batch.${type}`, async (span) => {
-            span.setAttributes({
-                [OtelTaxonomy.FhirResource]: `Bundle(${type})`,
-                [OtelTaxonomy.FhirServer]: this._session.fhirServer,
-            })
-
-            const response = await this.fetchWithRefresh(
-                () =>
-                    bundleFhir(this._session, {
-                        payload: {
-                            resourceType: 'Bundle',
-                            type: type,
-                            entry: resources,
-                        },
-                    }),
-                span,
-            )
-
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
-
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed')
-                failSpan(span, `Request for ${type} Bundle failed`, responseError)
-
-                return { error: 'BATCH_FAILED_NON_OK_RESPONSE', operationOutcome } satisfies ResourceBatchErrors
-            }
-
-            const result = await response.json()
-            const parsed = FhirBatchResponseBundleSchema.loose().safeParse(result)
-            if (!parsed.success) {
-                failSpan(span, `Failed to parse ${type} Bundle response`, parsed.error)
-                return { error: 'BATCH_FAILED_INVALID_RESPONSE', operationOutcome: null } satisfies ResourceBatchErrors
-            }
-
-            const failed = parsed.data.entry.filter((entry) => !entry.response.status.startsWith('2'))
-            if (failed.length === 0) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-succeeded')
-
-                return parsed.data
-            } else if (failed.length === parsed.data.entry.length) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-all-failed')
-                failSpan(span, `All entries in ${type} Bundle failed`)
-
-                return { error: 'BATCH_FAILED_ALL_FAILED', result: parsed.data } satisfies ResourceBatchErrors
-            } else {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-some-ok')
-                failSpan(span, `Some entries in ${type} Bundle failed`)
-
-                return { error: 'BATCH_FAILED_SOME_OK', result: parsed.data } satisfies ResourceBatchErrors
-            }
-        })
-    }
-
     public getClaim(claim: string): ClaimErrors | string | Record<string, unknown>
     public getClaim<ExpectedClaimSchema extends z.ZodType>(
         claim: string,
@@ -357,7 +112,7 @@ export class ReadyClient {
         claim: string,
         schema?: ExpectedClaimSchema,
     ): z.infer<ExpectedClaimSchema> | ClaimErrors | string | Record<string, unknown> {
-        const claimValue = this._idToken[claim] as string | Record<string, unknown> | undefined
+        const claimValue = this.#idToken[claim] as string | Record<string, unknown> | undefined
         if (claimValue == null) {
             return { error: 'CLAIM_NOT_FOUND' }
         }
@@ -376,7 +131,7 @@ export class ReadyClient {
 
     public multi = multi
 
-    private async fetchWithRefresh(fetcher: () => Promise<Response>, span: Span): Promise<Response> {
+    private fetchWithRefresh = async (fetcher: () => Promise<Response>, span: Span): Promise<Response> => {
         const response = await fetcher()
         if (!this._client.options.autoRefresh) return response
         if (response.status !== 401) return response
@@ -404,48 +159,9 @@ export class ReadyClient {
         span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
         return fetcher()
     }
-
-    private async registerResourceValidation<Path extends KnownPaths>(data: ResponseFor<Path>): Promise<void> {
-        return spanAsync(`validate.${data.resourceType}`, async (span) => {
-            switch (data.resourceType) {
-                case 'Encounter':
-                    this._client.validator.encounter(data)
-                    break
-                case 'Patient':
-                    this._client.validator.patient(data)
-                    break
-                case 'Organization':
-                    this._client.validator.organization(data)
-                    break
-                case 'Practitioner':
-                    this._client.validator.practitioner(data)
-                    break
-                case 'DocumentReference':
-                    this._client.validator.documentReference(data)
-                    break
-                case 'QuestionnaireResponse':
-                    this._client.validator.questionnaireResponse(data)
-                    break
-                case 'Bundle':
-                    // Meh
-                    break
-                default:
-                    const type = (data as { resourceType?: string }).resourceType ?? 'unknown'
-                    failSpan(span, `No validator registered for resource type ${type}`)
-                    logger.warn(`No validator registered for resource type ${type}`)
-                    break
-            }
-
-            await spanAsync(`validate.persist-validation`, async () => this.persistValidation?.())
-        })
-    }
 }
 
-type CacheableResource = {
-    cache?: { ttl: number }
-}
-
-type ValueAccessor<Resource, Type extends string = never> = {
+export type ValueAccessor<Resource, Type extends string = never> = {
     id: string
     type: Type
     request: (config?: CacheableResource) => Promise<Resource | ResourceRequestErrors>
