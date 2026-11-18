@@ -1,4 +1,6 @@
-import { spanAsync } from './otel'
+import { createTracing } from './otel'
+
+const { spanAsync } = createTracing('http')
 
 const INITIAL_DELAY = 10
 const DELAY_FACTOR = 5

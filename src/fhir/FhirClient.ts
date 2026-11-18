@@ -1,7 +1,7 @@
 import type { Span } from '@opentelemetry/api'
 
 import { multi } from '#internal-lib/multi'
-import { failSpan, OtelTaxonomy, spanAsync, squelchTracing } from '#internal-lib/otel'
+import { createTracing, failSpan, squelchTracing } from '#internal-lib/otel'
 import { inferResourceType } from '#internal-lib/utils'
 
 import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '../zod'
@@ -10,6 +10,7 @@ import { type CacheableResource, type CacheOptions, getCachedResource, setCached
 import { fhirResponseToFormattedError } from './fhir-errors'
 import { bundleFhir, getFhir, postFhir, putFhir } from './fhir-fetch'
 import { fhirLogger } from './fhir-logger'
+import { FhirOtelAttributes } from './fhir-otel'
 import type { ResourceBatchErrors, ResourceCreateErrors, ResourceRequestErrors } from './fhir-resource-errors'
 import type { AuthenticatedServer, OpenServer } from './fhir-servers'
 import {
@@ -20,6 +21,8 @@ import {
 } from './resources/create-resource-map'
 import { type KnownPaths, resourceToSchema, type ResponseFor } from './resources/request-resource-map'
 import type { FhirValidatorRuntime } from './validation/fhir-validator-runtime'
+
+const { spanAsync } = createTracing('fhir')
 
 /**
  * A client configured with one FHIR server with optional authentication for non-open clients.
@@ -70,8 +73,8 @@ export class FhirClient {
 
         return spanAsync(`create.${resourceType}`, async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this.#server.fhirServer,
+                [FhirOtelAttributes.FhirResource]: resourceType,
+                [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
             const response = await this.#fetcher(
@@ -82,7 +85,7 @@ export class FhirClient {
             if (!response.ok) {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'creation-failed')
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
 
                 switch (response.status) {
@@ -102,7 +105,7 @@ export class FhirClient {
             const result = await response.json()
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'parsing-failed')
                 failSpan(span, `Failed to parse ${resourceType}`, parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
@@ -110,7 +113,7 @@ export class FhirClient {
 
             void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
 
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-succeeded')
+            span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'creation-succeeded')
 
             return parsed.data as ResponseForCreate<Path>
         })
@@ -124,8 +127,8 @@ export class FhirClient {
 
         return spanAsync(`update.${resourceType}`, async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this.#server.fhirServer,
+                [FhirOtelAttributes.FhirResource]: resourceType,
+                [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
             const response = await this.#fetcher(
@@ -136,7 +139,7 @@ export class FhirClient {
             if (!response.ok) {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'update-failed')
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
 
                 switch (response.status) {
@@ -156,7 +159,7 @@ export class FhirClient {
             const result = await response.json()
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'parsing-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'parsing-failed')
                 failSpan(span, `Failed to parse ${resourceType} (from PUT/update)`, parsed.error)
 
                 return { error: 'CREATE_FAILED_INVALID_RESPONSE' }
@@ -164,7 +167,7 @@ export class FhirClient {
 
             void this.registerResourceValidation(parsed.data as ResponseForCreate<Path>)
 
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-succeeded')
+            span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'update-succeeded')
 
             return parsed.data as ResponseForCreate<Path>
         })
@@ -179,17 +182,17 @@ export class FhirClient {
     ): Promise<ResponseFor<Path> | ResourceRequestErrors> {
         const resourceType = inferResourceType(resource)
 
-        return spanAsync(`request.${resourceType}`, async (span) => {
+        return spanAsync(`read.${resourceType}`, async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirResource]: resourceType,
-                [OtelTaxonomy.FhirServer]: this.#server.fhirServer,
-                [OtelTaxonomy.ResourceCacheEnabled]: config?.cache != null,
+                [FhirOtelAttributes.FhirResource]: resourceType,
+                [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
+                [FhirOtelAttributes.ResourceCacheEnabled]: config?.cache != null,
             })
 
             if (config?.cache != null) {
                 const cached = await getCachedResource<Path>(this.#cache, { session: this.#server, resource })
                 if (cached) {
-                    span.setAttributes({ [OtelTaxonomy.ResourceCacheHit]: true })
+                    span.setAttributes({ [FhirOtelAttributes.ResourceCacheHit]: true })
                     return cached
                 }
             }
@@ -204,14 +207,14 @@ export class FhirClient {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 if (response.status === 404) {
-                    span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
+                    span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'not-found')
                     if (!config?.expectNotFound) {
                         fhirLogger.warn(`Resource (${resource}) was not found on FHIR server`)
                     }
                     return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: operationOutcome }
                 }
 
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'request-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'request-failed')
                 failSpan(span, `Request to get ${resource} failed`, responseError)
 
                 return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: operationOutcome }
@@ -224,12 +227,12 @@ export class FhirClient {
                 return { error: 'REQUEST_FAILED_INVALID_RESPONSE' }
             }
 
-            span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'resource-found')
+            span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'resource-found')
 
             void this.registerResourceValidation(parsed.data as ResponseFor<Path>)
 
             if (config?.cache != null) {
-                span.setAttribute(OtelTaxonomy.ResourceCacheUpdated, true)
+                span.setAttribute(FhirOtelAttributes.ResourceCacheUpdated, true)
                 await setCachedResource(
                     this.#cache,
                     { session: this.#server, resource, values: parsed.data as ResponseFor<Path> },
@@ -247,8 +250,8 @@ export class FhirClient {
     ): Promise<FhirBatchResponseBundle | ResourceBatchErrors> {
         return spanAsync(`batch.${type}`, async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirResource]: `Bundle(${type})`,
-                [OtelTaxonomy.FhirServer]: this.#server.fhirServer,
+                [FhirOtelAttributes.FhirResource]: `Bundle(${type})`,
+                [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
             const response = await this.#fetcher(
@@ -266,7 +269,7 @@ export class FhirClient {
             if (!response.ok) {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'batch-failed')
                 failSpan(span, `Request for ${type} Bundle failed`, responseError)
 
                 return { error: 'BATCH_FAILED_NON_OK_RESPONSE', operationOutcome } satisfies ResourceBatchErrors
@@ -281,16 +284,16 @@ export class FhirClient {
 
             const failed = parsed.data.entry.filter((entry) => !entry.response.status.startsWith('2'))
             if (failed.length === 0) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-succeeded')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'batch-succeeded')
 
                 return parsed.data
             } else if (failed.length === parsed.data.entry.length) {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-all-failed')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'batch-failed-all-failed')
                 failSpan(span, `All entries in ${type} Bundle failed`)
 
                 return { error: 'BATCH_FAILED_ALL_FAILED', result: parsed.data } satisfies ResourceBatchErrors
             } else {
-                span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed-some-ok')
+                span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'batch-failed-some-ok')
                 failSpan(span, `Some entries in ${type} Bundle failed`)
 
                 return { error: 'BATCH_FAILED_SOME_OK', result: parsed.data } satisfies ResourceBatchErrors

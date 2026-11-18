@@ -1,7 +1,7 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
 import type { CacheOptions } from '#fhir/cache'
-import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+import { createTracing, failSpan } from '#internal-lib/otel'
 import { removeTrailingSlash } from '#internal-lib/utils'
 
 import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
@@ -12,6 +12,7 @@ import { getSmartConfiguration } from './launch/well-known/smart-configuration'
 import type { SmartConfigurationErrors } from './launch/well-known/smart-configuration-errors'
 import { logger } from './logger'
 import { ReadyClient } from './ReadyClient'
+import { SmartOtelAttributes } from './smart-otel'
 import type { SafeSmartStorage, SmartStorage } from './storage'
 import { safeSmartStorage } from './storage'
 import type { CompleteSession, InitialSession } from './storage/schema'
@@ -19,6 +20,8 @@ import type { CompleteSessionErrors, InitialSessionErrors } from './storage/stor
 import type { CallbackError, SmartClientReadyErrors } from './types/client-errors'
 import type { SmartClientConfiguration, SmartClientOptions } from './types/config'
 import { SmartValidatorRuntime } from './validator/smart-validator-runtime'
+
+const { spanAsync } = createTracing('smart')
 
 /**
  * The smart client is used to handle the launch of the Smart on FHIR application. It requires at the very least:
@@ -154,8 +157,8 @@ export class SmartClient {
     async launch(params: { iss: string; launch: string }): Promise<Launch | SmartConfigurationErrors> {
         return spanAsync('launch', async (span) => {
             span.setAttributes({
-                [OtelTaxonomy.FhirServer]: removeTrailingSlash(params.iss),
-                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+                [SmartOtelAttributes.FhirServer]: removeTrailingSlash(params.iss),
+                [SmartOtelAttributes.SessionMulti]: this.options.multiLaunch,
             })
 
             if (!verifyUrlIsHttps(params.iss, this.options.allowNonHttpsLaunch)) {
@@ -195,7 +198,7 @@ export class SmartClient {
                 validator: this.validator.export(),
             }
 
-            await spanAsync('save-initial-session', async () =>
+            await spanAsync('storage.save-initial-session', async () =>
                 this._storage.set(this.sessionId, initialSessionPayload),
             )
 
@@ -236,12 +239,12 @@ export class SmartClient {
             this.validator.restore(initialSession.validator)
 
             span.setAttributes({
-                [OtelTaxonomy.FhirServer]: initialSession.fhirServer,
-                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+                [SmartOtelAttributes.FhirServer]: initialSession.fhirServer,
+                [SmartOtelAttributes.SessionMulti]: this.options.multiLaunch,
             })
 
             if (initialSession.state !== params.state) {
-                span.setAttribute(OtelTaxonomy.SessionError, 'STATE_MISMATCH')
+                span.setAttribute(SmartOtelAttributes.SessionError, 'STATE_MISMATCH')
 
                 failSpan(
                     span,
@@ -274,7 +277,9 @@ export class SmartClient {
                 validator: this.validator.export(),
             }
 
-            await spanAsync('save-complete-session', () => this._storage.set(this.sessionId, completeSessionValues))
+            await spanAsync('storage.save-complete-session', () =>
+                this._storage.set(this.sessionId, completeSessionValues),
+            )
 
             if (!this.options.multiLaunch) {
                 return { redirectUrl: this._clientConfig.redirectUrl, intent: tokenResponse.intent ?? null }
@@ -284,7 +289,7 @@ export class SmartClient {
              * When multi-launch is enabled, we also store the session under <sessionId>:<patientId> to allow
              * for the state to be retrieved in a activePatient-context later.
              */
-            await spanAsync('save-complete-multi-session', () =>
+            await spanAsync('storage.save-complete-multi-session', () =>
                 this._storage.set(`${this.sessionId}:${tokenResponse.patient}`, completeSessionValues),
             )
 
@@ -315,8 +320,8 @@ export class SmartClient {
             this.validator.restore(session.validator)
 
             span.setAttributes({
-                [OtelTaxonomy.FhirServer]: session.fhirServer,
-                [OtelTaxonomy.SessionMulti]: this.options.multiLaunch,
+                [SmartOtelAttributes.FhirServer]: session.fhirServer,
+                [SmartOtelAttributes.SessionMulti]: this.options.multiLaunch,
             })
 
             const validIssuer = this.validateFhirServer(session.fhirServer)
@@ -364,7 +369,7 @@ export class SmartClient {
      * This will happen automatically during the `ready`-step if the `autoRefresh` option is set to `true`.
      */
     async refresh(session: CompleteSession): Promise<CompleteSession | RefreshTokenErrors> {
-        return spanAsync('refresh', async (span) => {
+        return spanAsync('session.refresh', async (span) => {
             const authMode: FhirAuthMode = this.getKnownFhirServer(session.fhirServer) ?? { type: 'public' }
             const refreshResponse = await refreshToken(session, this._clientConfig, authMode)
             if ('error' in refreshResponse) {
@@ -391,15 +396,17 @@ export class SmartClient {
             }
 
             span.setAttributes({
-                [OtelTaxonomy.SessionRefreshedNewRefreshToken]: Boolean(refreshResponse.refresh_token),
-                [OtelTaxonomy.SessionRefreshedTokenExpiresInSeconds]: tokenExpiresIn(
+                [SmartOtelAttributes.SessionRefreshedNewRefreshToken]: Boolean(refreshResponse.refresh_token),
+                [SmartOtelAttributes.SessionRefreshedTokenExpiresInSeconds]: tokenExpiresIn(
                     refreshedSessionValues.accessToken,
                 ),
             })
 
-            await spanAsync('refresh-session', () => this._storage.set(this.sessionId, refreshedSessionValues))
+            await spanAsync('storage.save-refreshed-session', () =>
+                this._storage.set(this.sessionId, refreshedSessionValues),
+            )
             if (this.activePatient) {
-                await spanAsync('refresh-multi-session', () =>
+                await spanAsync('storage.save-refreshed-multi-session', () =>
                     this._storage.set(`${this.sessionId}:${this.activePatient}`, refreshedSessionValues),
                 )
             }
@@ -409,22 +416,26 @@ export class SmartClient {
     }
 
     private async getCompleteSession(): Promise<CompleteSession | CompleteSessionErrors> {
-        return spanAsync('get-complete', async (span) => {
+        return spanAsync('session.get-complete', async (span) => {
             let session: CompleteSession | CompleteSessionErrors
             if (this.activePatient != null) {
-                const activePatientSession = await spanAsync('get-complete-multi-session', () =>
+                const activePatientSession = await spanAsync('storage.get-complete-multi-session', () =>
                     this._storage.getComplete(`${this.sessionId}:${this.activePatient}`),
                 )
 
                 if ('error' in activePatientSession) {
-                    span.setAttribute(OtelTaxonomy.SessionMultiFallback, true)
-                    session = await spanAsync('get-complete-session', () => this._storage.getComplete(this.sessionId))
+                    span.setAttribute(SmartOtelAttributes.SessionMultiFallback, true)
+                    session = await spanAsync('storage.get-complete-session', () =>
+                        this._storage.getComplete(this.sessionId),
+                    )
                 } else {
-                    span.setAttribute(OtelTaxonomy.SessionMultiFallback, false)
+                    span.setAttribute(SmartOtelAttributes.SessionMultiFallback, false)
                     session = activePatientSession
                 }
             } else {
-                session = await spanAsync('get-complete-session', () => this._storage.getComplete(this.sessionId))
+                session = await spanAsync('storage.get-complete-session', () =>
+                    this._storage.getComplete(this.sessionId),
+                )
             }
 
             if ('error' in session) {
@@ -439,12 +450,12 @@ export class SmartClient {
     }
 
     private async getInitialSession(sessionId: string): Promise<InitialSession | InitialSessionErrors> {
-        return spanAsync('get-partial', async (span) => {
-            const existingSession = await spanAsync('get-complete-multi-session', () =>
+        return spanAsync('session.get-partial', async (span) => {
+            const existingSession = await spanAsync('storage.get-complete-multi-session', () =>
                 this._storage.getPartial(sessionId),
             )
             if ('error' in existingSession) {
-                span.setAttribute(OtelTaxonomy.SessionError, existingSession.error)
+                span.setAttribute(SmartOtelAttributes.SessionError, existingSession.error)
                 failSpan(span, `Session not found for sessionId ${sessionId}, was ${existingSession.error}`)
 
                 return { error: existingSession.error }
@@ -454,25 +465,25 @@ export class SmartClient {
     }
 
     private async getOrRefresh(): Promise<CompleteSession | CompleteSessionErrors | RefreshTokenErrors> {
-        return spanAsync('get-or-refresh', async (span) => {
+        return spanAsync('session.get-or-refresh', async (span) => {
             const session = await this.getCompleteSession()
             if ('error' in session) return session
 
             // Pre-emptively refresh the token if it is about to expire within 5 minutes
             const expiresInSeconds = tokenExpiresIn(session.accessToken)
             span.setAttributes({
-                [OtelTaxonomy.SessionTokenExpiresInSeconds]: expiresInSeconds,
-                [OtelTaxonomy.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
+                [SmartOtelAttributes.SessionTokenExpiresInSeconds]: expiresInSeconds,
+                [SmartOtelAttributes.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
             })
 
             if (expiresInSeconds < 60 * 5) {
-                span.setAttribute(OtelTaxonomy.SessionExpired, true)
+                span.setAttribute(SmartOtelAttributes.SessionExpired, true)
 
                 const refreshResult = await this.refresh(session)
                 if ('error' in refreshResult) {
                     span.setAttributes({
-                        [OtelTaxonomy.SessionError]: refreshResult.error,
-                        [OtelTaxonomy.SessionRefreshed]: false,
+                        [SmartOtelAttributes.SessionError]: refreshResult.error,
+                        [SmartOtelAttributes.SessionRefreshed]: false,
                     })
 
                     failSpan(span, `SmartClient.getSession failed to refresh session: ${refreshResult.error}`)
@@ -481,13 +492,13 @@ export class SmartClient {
                     return session
                 }
 
-                span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
+                span.setAttribute(SmartOtelAttributes.SessionRefreshed, true)
                 return refreshResult
             }
 
             span.setAttributes({
-                [OtelTaxonomy.SessionExpired]: false,
-                [OtelTaxonomy.SessionRefreshed]: false,
+                [SmartOtelAttributes.SessionExpired]: false,
+                [SmartOtelAttributes.SessionRefreshed]: false,
             })
             return session
         })

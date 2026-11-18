@@ -5,12 +5,13 @@ import type { ResourceRequestErrors } from '#fhir/fhir-resource-errors'
 import { FhirClient } from '#fhir/FhirClient'
 import { FhirValidatorRuntime } from '#fhir/validation/fhir-validator-runtime'
 import { multi } from '#internal-lib/multi'
-import { failSpan, OtelTaxonomy, type Span } from '#internal-lib/otel'
+import { failSpan, type Span } from '#internal-lib/otel'
 import { type FhirEncounter, type FhirPatient, type FhirPractitioner } from '#zod'
 
 import { tokenExpiresIn, validateToken } from './launch/token/token'
 import type { IdToken } from './launch/token/token-schema'
 import { logger } from './logger'
+import { SmartOtelAttributes } from './smart-otel'
 import type { SmartClient } from './SmartClient'
 import { type CompleteSession, idTokenClaims } from './storage/schema'
 import type { ClaimErrors } from './types/client-errors'
@@ -142,8 +143,8 @@ export class ReadyClient {
 
         const expiresInSeconds = tokenExpiresIn(this._session.accessToken)
         span.setAttributes({
-            [OtelTaxonomy.SessionTokenExpiresInSeconds]: expiresInSeconds,
-            [OtelTaxonomy.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
+            [SmartOtelAttributes.SessionTokenExpiresInSeconds]: expiresInSeconds,
+            [SmartOtelAttributes.SessionTokenAlreadyExpired]: expiresInSeconds <= 0,
         })
 
         const refresh = await this._client.refresh(this._session)
@@ -151,8 +152,8 @@ export class ReadyClient {
             failSpan(span, `Failed to refresh session: ${refresh.error}`)
 
             span.setAttributes({
-                [OtelTaxonomy.SessionError]: refresh.error,
-                [OtelTaxonomy.SessionRefreshed]: false,
+                [SmartOtelAttributes.SessionError]: refresh.error,
+                [SmartOtelAttributes.SessionRefreshed]: false,
             })
 
             // Couldn't refresh, let the rest of the code handle the 401
@@ -160,7 +161,7 @@ export class ReadyClient {
         }
 
         // We refreshed! Let's try the resource again
-        span.setAttribute(OtelTaxonomy.SessionRefreshed, true)
+        span.setAttribute(SmartOtelAttributes.SessionRefreshed, true)
         return fetcher()
     }
 }
