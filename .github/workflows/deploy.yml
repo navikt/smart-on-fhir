@@ -92,7 +92,7 @@ jobs:
 
   # Full build and release of library artifact with @beta tag
   build_and_release_beta:
-    if: startsWith(github.ref_name, 'beta/')
+    if: startsWith(github.ref_name, 'beta/') || startsWith(github.ref_name, 'refactor/clean-split')
     needs: [test-and-verify]
     permissions:
       packages: write
