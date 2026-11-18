@@ -1,9 +1,9 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import { FHIR_SERVER } from './mocks/common'
-import { createLaunchedOpenReadyClient, validExampleSession } from './utils/client-open'
-import { expectHas } from './utils/expect'
+import { createLaunchedOpenReadyClient, validExampleSession } from '../internal/test-utils/client-open'
+import { expectHas } from '../internal/test-utils/expect'
+import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
 
 const operationOutcome = {
     resourceType: 'OperationOutcome',

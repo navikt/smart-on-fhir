@@ -23,3 +23,5 @@ vitest-report.json
 .idea/*
 !.idea/OxcSettings.xml
 !.idea/OxfmtSettings.xml
+
+graph.svg

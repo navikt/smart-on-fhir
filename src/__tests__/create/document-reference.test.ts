@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
 
+import { createLaunchedOpenReadyClient, validExampleSession } from '../../internal/test-utils/client-open'
+import { expectHas } from '../../internal/test-utils/expect'
+import { mockUpdateDocumentReference } from '../../internal/test-utils/mocks/create-resources'
 import type { FhirDocumentReference, FhirQuestionnaireResponse } from '../../zod'
-import { mockUpdateDocumentReference } from '../mocks/create-resources'
-import { createLaunchedOpenReadyClient, validExampleSession } from '../utils/client-open'
-import { expectHas } from '../utils/expect'
 
 test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validExampleSession)

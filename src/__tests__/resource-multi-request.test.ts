@@ -1,9 +1,9 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import { FHIR_SERVER } from './mocks/common'
-import { mockPatient, mockPractitioner } from './mocks/resources'
-import { justOpenReadyClient } from './utils/client-open'
+import { justOpenReadyClient } from '../internal/test-utils/client-open'
+import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { mockPatient, mockPractitioner } from '../internal/test-utils/mocks/resources'
 
 test('multi should combine successful parallel resource requests', async () => {
     const [ready] = await justOpenReadyClient()

@@ -1,15 +1,14 @@
 import { expect, test, vi } from 'vitest'
 
-import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../client'
-import { safeSmartStorage } from '../client/storage'
-import type { InitialSession } from '../client/storage/schema'
-
-import { mockTokenExchange } from './mocks/auth'
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { fhirNock, mockSmartConfiguration } from './mocks/issuer'
-import { TEST_SESSION_ID } from './utils/client-open'
-import { expectHas, expectIs } from './utils/expect'
-import { createMockedStorage, createTestStorage } from './utils/storage'
+import { TEST_SESSION_ID } from '../internal/test-utils/client-open'
+import { expectHas, expectIs } from '../internal/test-utils/expect'
+import { mockTokenExchange } from '../internal/test-utils/mocks/auth'
+import { AUTH_SERVER, FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { fhirNock, mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
+import { createMockedStorage, createTestStorage } from '../internal/test-utils/storage'
+import { ReadyClient, SmartClient, type SmartClientOptions, type SmartStorage } from '../smart'
+import { safeSmartStorage } from '../smart/storage'
+import type { InitialSession } from '../smart/storage/schema'
 
 test('.launch - should fetch well-known and create a launch URL', async () => {
     const storage = createMockedStorage()

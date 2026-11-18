@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import * as z from 'zod'
 
-import { ReadyClient } from '../client'
+import { ReadyClient } from '../smart'
 import { MockReadyClient } from '../test'
 import type {
     FhirBatchResponseBundle,

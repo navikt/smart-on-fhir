@@ -1,9 +1,14 @@
 import { expect, test } from 'vitest'
 
-import { mockCreateDocumentReference, mockUpdateDocumentReference } from './mocks/create-resources'
-import { mockEncounter, mockPatient, mockPractitioner, mockPractitionerWithOperationOutcome } from './mocks/resources'
-import { justOpenReadyClient } from './utils/client-open'
-import { expectHas } from './utils/expect'
+import { justOpenReadyClient } from '../internal/test-utils/client-open'
+import { expectHas } from '../internal/test-utils/expect'
+import { mockCreateDocumentReference, mockUpdateDocumentReference } from '../internal/test-utils/mocks/create-resources'
+import {
+    mockEncounter,
+    mockPatient,
+    mockPractitioner,
+    mockPractitionerWithOperationOutcome,
+} from '../internal/test-utils/mocks/resources'
 
 test('SmartClient should be properly initiated with Patient, Encounter and User', async () => {
     const [ready] = await justOpenReadyClient()

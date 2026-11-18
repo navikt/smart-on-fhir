@@ -1,17 +1,10 @@
-import { ReadyClient } from '../client'
-import type { Validation } from '../client'
-import type { CacheableResource } from '../client/cache'
-import type {
-    KnownCreatePaths,
-    PayloadForCreate,
-    ResponseForCreate,
-} from '../client/fhir/resources/create-resource-map'
-import type { KnownPaths, ResponseFor } from '../client/fhir/resources/request-resource-map'
-import type {
-    ResourceBatchErrors,
-    ResourceCreateErrors,
-    ResourceRequestErrors,
-} from '../client/smart/types/client-errors'
+import type { ResourceCreateErrors, ResourceRequestErrors } from '../fhir'
+import type { CacheableResource } from '../fhir/cache'
+import type { ResourceBatchErrors } from '../fhir/fhir-resource-errors'
+import type { KnownCreatePaths, PayloadForCreate, ResponseForCreate } from '../fhir/resources/create-resource-map'
+import type { KnownPaths, ResponseFor } from '../fhir/resources/request-resource-map'
+import { ReadyClient } from '../smart'
+import type { SmartValidation } from '../smart'
 import type { FhirBatchBundle, FhirBatchResponseBundle } from '../zod'
 
 import { mockClient, mockSession } from './mock-session'
@@ -36,7 +29,7 @@ export type MockReadyClientOptions = {
     issuerName?: string
     claims?: Record<string, string | Record<string, unknown>>
     valid?: boolean
-    validationReport?: Validation[]
+    validationReport?: SmartValidation[]
 }
 
 export class MockReadyClient extends ReadyClient {
@@ -108,7 +101,7 @@ export class MockReadyClient extends ReadyClient {
         return this.mockOptions.valid ?? true
     }
 
-    getValidationReport(): Validation[] {
+    getValidationReport(): SmartValidation[] {
         return this.mockOptions.validationReport ?? []
     }
 

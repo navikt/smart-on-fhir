@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from 'node:util'
 
-import type { ResourceRequestErrors } from '../client/smart/types/client-errors'
+import type { ResourceRequestErrors } from '../fhir'
 
 type Method = 'GET' | 'POST' | 'PUT'
 

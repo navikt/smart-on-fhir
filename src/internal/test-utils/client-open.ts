@@ -1,0 +1,91 @@
+import type { CacheOptions } from '../../fhir/cache'
+import { ReadyClient, SmartClient, type SmartClientOptions } from '../../smart'
+import { type SafeSmartStorage, safeSmartStorage } from '../../smart/storage'
+import type { CompleteSession } from '../../smart/storage/schema'
+
+import { expectIs } from './expect'
+import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
+import { createTestStorage } from './storage'
+import { createTestAccessToken, createTestIdToken } from './token'
+
+export const TEST_SESSION_ID = 'test-session'
+
+function createOpenTestClient(options?: SmartClientOptions, cache?: CacheOptions): [SmartClient, SafeSmartStorage] {
+    const storage = createTestStorage()
+
+    const client = new SmartClient(
+        TEST_SESSION_ID,
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage, options, cache },
+    )
+
+    return [client, safeSmartStorage(storage)]
+}
+
+export async function createLaunchableOpenSmartClient(
+    session: CompleteSession,
+    options?: SmartClientOptions,
+): Promise<[SmartClient, SafeSmartStorage]> {
+    const [client, storage] = createOpenTestClient(options)
+
+    await storage.set('test-session', session)
+
+    expectIs(client, SmartClient)
+
+    return [client, storage]
+}
+
+export async function createLaunchedOpenReadyClient(
+    session: CompleteSession,
+    options?: SmartClientOptions,
+    cache?: CacheOptions,
+): Promise<[ReadyClient, SafeSmartStorage]> {
+    const [client, storage] = createOpenTestClient(options, cache)
+
+    await storage.set(TEST_SESSION_ID, session)
+    const ready = await client.ready()
+
+    expectIs(ready, ReadyClient)
+
+    return [ready, storage]
+}
+
+export async function justOpenReadyClient(
+    options?: SmartClientOptions,
+    cache?: CacheOptions,
+): Promise<[ReadyClient, SafeSmartStorage]> {
+    const [client, storage] = createOpenTestClient(options, cache)
+
+    await storage.set(TEST_SESSION_ID, validExampleSession)
+    const ready = await client.ready()
+
+    expectIs(ready, ReadyClient)
+
+    return [ready, storage]
+}
+
+export const validExampleSession: CompleteSession = {
+    // Initial
+    fhirServer: FHIR_SERVER,
+    tokenIssuer: AUTH_SERVER,
+    jwksUri: `${AUTH_SERVER}/jwks`,
+    introspectionEndpoint: `${AUTH_SERVER}/introspect`,
+    authorizationEndpoint: `${AUTH_SERVER}/authorize`,
+    tokenEndpoint: `${AUTH_SERVER}/token`,
+    codeVerifier: 'valid-code-verifier',
+    state: 'valid-state',
+    // Completed
+    accessToken: await createTestAccessToken(3600),
+    idToken: await createTestIdToken({
+        fhirUser: 'Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e',
+    }),
+    refreshToken: 'valid-refresh-token',
+    patient: 'valid-patient-id',
+    encounter: 'valid-encounter-id',
+}

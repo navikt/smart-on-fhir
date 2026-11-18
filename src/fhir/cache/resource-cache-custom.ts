@@ -1,0 +1,42 @@
+import { removeTrailingSlash } from '../../internal/lib/utils'
+import type { KnownPaths, ResponseFor } from '../resources/request-resource-map'
+
+import type { CacheItem } from './resource-cache'
+
+export type ResourceCache = {
+    set: (
+        key: string,
+        values: unknown,
+        /**
+         * Time in milliseconds until the cache entry expires
+         *
+         * MUST be respected by the ResourceCache implementation
+         */
+        ttl: number,
+    ) => Promise<void>
+    get: (key: string) => Promise<unknown>
+}
+
+export async function getCachedResourceCustom<Path extends KnownPaths>(
+    cache: ResourceCache | Promise<ResourceCache>,
+    item: CacheItem<Path>,
+): Promise<ResponseFor<Path> | null> {
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
+
+    const itemInCache = await (await cache).get(key)
+
+    return itemInCache as ResponseFor<Path> | null
+}
+
+export async function setCachedResourceCustom<Path extends KnownPaths>(
+    cache: ResourceCache | Promise<ResourceCache>,
+    item: CacheItem<Path> & { values: ResponseFor<Path> },
+    cacheOptions: { ttl: number },
+): Promise<void> {
+    const key = `${removeTrailingSlash(item.session.fhirServer)}|${item.resource}`
+
+    /**
+     * TODO: Consider the implications of caching not being scoped to a session.
+     */
+    return (await cache).set(key, item.values, cacheOptions.ttl)
+}

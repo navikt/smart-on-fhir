@@ -1,9 +1,9 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
+import { justOpenReadyClient } from '../../internal/test-utils/client-open'
+import { FHIR_SERVER } from '../../internal/test-utils/mocks/common'
 import type { FhirDocumentReference } from '../../zod'
-import { FHIR_SERVER } from '../mocks/common'
-import { justOpenReadyClient } from '../utils/client-open'
 
 const payload: FhirDocumentReference = {
     resourceType: 'DocumentReference',

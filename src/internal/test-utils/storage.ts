@@ -1,0 +1,28 @@
+import { type Mock, vi } from 'vitest'
+
+import type { SmartStorage } from '../../smart'
+
+export function createTestStorage(): SmartStorage {
+    const inMem = new Map()
+
+    return {
+        set: async (sessionId, values) => {
+            inMem.set(sessionId, values)
+        },
+        get: async (sessionId) => inMem.get(sessionId),
+    }
+}
+
+export function createMockedStorage(): SmartStorage & {
+    getFn: Mock
+    setFn: Mock
+} {
+    const getFn = vi.fn<never>()
+    const setFn = vi.fn<never>()
+    return {
+        get: getFn,
+        set: setFn,
+        getFn,
+        setFn,
+    }
+}
