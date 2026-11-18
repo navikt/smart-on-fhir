@@ -1,18 +1,20 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
+import { expectHas, expectIs } from '#test-utils/expect'
+import { AUTH_SERVER, FHIR_SERVER } from '#test-utils/mocks'
+import { mockTokenRefresh } from '#test-utils/mocks'
+import { mockCreateDocumentReference, mockUpdateDocumentReference } from '#test-utils/mocks'
+import { mockPractitioner } from '#test-utils/mocks'
+import { createTestAccessToken, createTestIdToken } from '#test-utils/token'
+
+import { ReadyClient } from '../index'
+
 import {
     createLaunchableOpenSmartClient,
     createLaunchedOpenReadyClient,
     validExampleSession,
-} from '../internal/test-utils/client-open'
-import { expectHas, expectIs } from '../internal/test-utils/expect'
-import { mockTokenRefresh } from '../internal/test-utils/mocks/auth'
-import { AUTH_SERVER, FHIR_SERVER } from '../internal/test-utils/mocks/common'
-import { mockCreateDocumentReference, mockUpdateDocumentReference } from '../internal/test-utils/mocks/create-resources'
-import { mockPractitioner } from '../internal/test-utils/mocks/resources'
-import { createTestAccessToken, createTestIdToken } from '../internal/test-utils/token'
-import { ReadyClient } from '../smart'
+} from './utils/smart-client-open'
 
 test('.ready - should not refresh token when expiry is more than 5 minutes', async () => {
     const [client] = await createLaunchableOpenSmartClient(

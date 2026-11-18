@@ -1,9 +1,9 @@
 import nock from 'nock'
 
-import type { PayloadForCreate, ResponseForCreate } from '../../../fhir/resources/create-resource-map'
-import type { FhirBatchBundle, FhirBatchResponseBundle, FhirDocumentReference } from '../../../zod'
+import type { PayloadForCreate, ResponseForCreate } from '#fhir/resources/create-resource-map'
+import type { FhirBatchBundle, FhirBatchResponseBundle, FhirDocumentReference } from '#zod'
 
-import { FHIR_SERVER } from './common'
+import { FHIR_SERVER } from './index'
 
 const createdDocumentReference: FhirDocumentReference = {
     resourceType: 'DocumentReference',

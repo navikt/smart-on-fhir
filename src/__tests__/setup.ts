@@ -1,7 +1,7 @@
 import nock from 'nock'
 import { beforeEach } from 'vitest'
 
-import { clearSmartConfigurationCache } from '../../smart/launch/well-known/smart-configuration-cache'
+import { clearSmartConfigurationCache } from '#smart/launch/well-known/smart-configuration-cache'
 
 beforeEach(() => {
     clearSmartConfigurationCache()

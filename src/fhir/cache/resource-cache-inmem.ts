@@ -1,6 +1,7 @@
 import QuickLRU from 'quick-lru'
 
-import { removeTrailingSlash } from '../../internal/lib/utils'
+import { removeTrailingSlash } from '#internal-lib/utils'
+
 import type { KnownPaths, ResponseFor } from '../resources/request-resource-map'
 
 import type { CacheItem, CacheValueItem } from './resource-cache'

@@ -1,4 +1,5 @@
-import { removeTrailingSlash } from '../internal/lib/utils'
+import { removeTrailingSlash } from '#internal-lib/utils'
+
 import type { FhirBatchBundle } from '../zod'
 
 import type { FhirServer } from './fhir-servers'

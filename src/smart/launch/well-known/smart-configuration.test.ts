@@ -1,10 +1,11 @@
 import { test } from 'vitest'
 
-import { expectHas } from '../internal/test-utils/expect'
-import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
-import { mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
-import { getSmartConfiguration } from '../smart/launch/well-known/smart-configuration'
-import { clearSmartConfigurationCache } from '../smart/launch/well-known/smart-configuration-cache'
+import { clearSmartConfigurationCache } from '#smart/launch/well-known/smart-configuration-cache'
+import { expectHas } from '#test-utils/expect'
+import { FHIR_SERVER } from '#test-utils/mocks'
+import { mockSmartConfiguration } from '#test-utils/mocks'
+
+import { getSmartConfiguration } from './smart-configuration'
 
 test('should cache smart configuration', async () => {
     mockSmartConfiguration()

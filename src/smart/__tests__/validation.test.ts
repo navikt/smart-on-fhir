@@ -1,11 +1,13 @@
 import { expect, test } from 'vitest'
 import * as z from 'zod'
 
-import { createLaunchableOpenSmartClient, validExampleSession } from '../internal/test-utils/client-open'
-import { expectIs } from '../internal/test-utils/expect'
-import { mockJwks, mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
-import { createOtherToken, createTestAccessToken, createTestIdToken } from '../internal/test-utils/token'
-import { ReadyClient } from '../smart'
+import { expectIs } from '#test-utils/expect'
+import { mockJwks, mockSmartConfiguration } from '#test-utils/mocks'
+import { createOtherToken, createTestAccessToken, createTestIdToken } from '#test-utils/token'
+
+import { ReadyClient } from '../index'
+
+import { createLaunchableOpenSmartClient, validExampleSession } from './utils/smart-client-open'
 
 test('.validate - should properly validate token', async () => {
     const [client] = await createLaunchableOpenSmartClient({

@@ -1,12 +1,13 @@
 import type { Span } from '@opentelemetry/api'
 
-import { multi } from '../internal/lib/multi'
-import { failSpan, OtelTaxonomy, spanAsync, squelchTracing } from '../internal/lib/otel'
-import { inferResourceType } from '../internal/lib/utils'
+import { multi } from '#internal-lib/multi'
+import { failSpan, OtelTaxonomy, spanAsync, squelchTracing } from '#internal-lib/otel'
+import { inferResourceType } from '#internal-lib/utils'
+
 import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '../zod'
 
 import { type CacheableResource, type CacheOptions, getCachedResource, setCachedResource } from './cache'
-import { responseToFormattedError } from './fhir-errors'
+import { fhirResponseToFormattedError } from './fhir-errors'
 import { bundleFhir, getFhir, postFhir, putFhir } from './fhir-fetch'
 import { fhirLogger } from './fhir-logger'
 import type { ResourceBatchErrors, ResourceCreateErrors, ResourceRequestErrors } from './fhir-resource-errors'
@@ -79,7 +80,7 @@ export class FhirClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'creation-failed')
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
@@ -133,7 +134,7 @@ export class FhirClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'update-failed')
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
@@ -200,7 +201,7 @@ export class FhirClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 if (response.status === 404) {
                     span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'not-found')
@@ -263,7 +264,7 @@ export class FhirClient {
             )
 
             if (!response.ok) {
-                const [responseError, operationOutcome] = await responseToFormattedError(response)
+                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(OtelTaxonomy.FhirResourceStatus, 'batch-failed')
                 failSpan(span, `Request for ${type} Bundle failed`, responseError)

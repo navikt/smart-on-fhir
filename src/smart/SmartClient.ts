@@ -1,24 +1,24 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
-import type { CacheOptions } from '../../fhir/cache'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../internal/lib/otel'
-import { removeTrailingSlash } from '../../internal/lib/utils'
-import type { FhirAuthMode, KnownFhirServer } from '../client-auth-method/config'
-import { ReadyClient } from '../ReadyClient'
-import { smartLogger } from '../smart-logger'
-import type { SafeSmartStorage, SmartStorage } from '../storage'
-import { safeSmartStorage } from '../storage'
-import type { CompleteSession, InitialSession } from '../storage/schema'
-import type { CompleteSessionErrors, InitialSessionErrors } from '../storage/storage-errors'
-import type { CallbackError, SmartClientReadyErrors } from '../types/client-errors'
-import type { SmartClientConfiguration, SmartClientOptions } from '../types/config'
-import { SmartValidatorRuntime } from '../validator/smart-validator-runtime'
+import type { CacheOptions } from '#fhir/cache'
+import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+import { removeTrailingSlash } from '#internal-lib/utils'
 
-import { exchangeToken, refreshToken, tokenExpiresIn } from './token/token'
-import type { RefreshTokenErrors } from './token/token-errors'
-import { assertGoodSessionId, assertNotBrowser, verifyUrlIsHttps } from './utils'
-import { getSmartConfiguration } from './well-known/smart-configuration'
-import type { SmartConfigurationErrors } from './well-known/smart-configuration-errors'
+import type { FhirAuthMode, KnownFhirServer } from './client-auth-method/config'
+import { exchangeToken, refreshToken, tokenExpiresIn } from './launch/token/token'
+import type { RefreshTokenErrors } from './launch/token/token-errors'
+import { assertGoodSessionId, assertNotBrowser, verifyUrlIsHttps } from './launch/utils'
+import { getSmartConfiguration } from './launch/well-known/smart-configuration'
+import type { SmartConfigurationErrors } from './launch/well-known/smart-configuration-errors'
+import { logger } from './logger'
+import { ReadyClient } from './ReadyClient'
+import type { SafeSmartStorage, SmartStorage } from './storage'
+import { safeSmartStorage } from './storage'
+import type { CompleteSession, InitialSession } from './storage/schema'
+import type { CompleteSessionErrors, InitialSessionErrors } from './storage/storage-errors'
+import type { CallbackError, SmartClientReadyErrors } from './types/client-errors'
+import type { SmartClientConfiguration, SmartClientOptions } from './types/config'
+import { SmartValidatorRuntime } from './validator/smart-validator-runtime'
 
 /**
  * The smart client is used to handle the launch of the Smart on FHIR application. It requires at the very least:
@@ -335,7 +335,7 @@ export class SmartClient {
                 return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer', async () => {
                     const session = await this.getCompleteSession()
                     if ('error' in session) {
-                        smartLogger.warn(`Unable to persist validator state, session loading said: ${session.error})`)
+                        logger.warn(`Unable to persist validator state, session loading said: ${session.error})`)
                         return
                     }
 

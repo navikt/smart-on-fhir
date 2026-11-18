@@ -2,13 +2,14 @@
 
 import { decodeJwt } from 'jose'
 
-import { BaseValidator } from '../../internal/validator/base-validator'
-import { now } from '../../internal/validator/utils'
-import type { Loosely, Validations } from '../../internal/validator/validations'
-import { ValidatorBuilder } from '../../internal/validator/validator-builder'
+import { BaseValidator } from '#internal-validator/base-validator'
+import { now } from '#internal-validator/utils'
+import type { Loosely, Validations } from '#internal-validator/validations'
+import { ValidatorBuilder } from '#internal-validator/validator-builder'
+
 import { IdTokenSchema, type TokenRefreshResponse, type TokenResponse } from '../launch/token/token-schema'
 import type { SmartConfiguration } from '../launch/well-known/smart-configuration-schema'
-import { smartLogger } from '../smart-logger'
+import { logger } from '../logger'
 
 import { type SmartValidation, type SmartValidationType, allSmartValidations } from './validations'
 
@@ -65,7 +66,7 @@ export class SmartValidatorRuntime extends BaseValidator<SmartValidationType> {
 
             this.update(outcomes)
         } catch (e) {
-            smartLogger.warn(new Error('SMART_CONFIGURATION validation failed, ignoring', { cause: e }))
+            logger.warn(new Error('SMART_CONFIGURATION validation failed, ignoring', { cause: e }))
         }
     }
 
@@ -85,7 +86,7 @@ export class SmartValidatorRuntime extends BaseValidator<SmartValidationType> {
              */
             this.idToken(tr.id_token)
         } catch (e) {
-            smartLogger.warn(new Error('TOKEN_RESPONSE validation failed, ignoring', { cause: e }))
+            logger.warn(new Error('TOKEN_RESPONSE validation failed, ignoring', { cause: e }))
         }
     }
 
@@ -110,7 +111,7 @@ export class SmartValidatorRuntime extends BaseValidator<SmartValidationType> {
 
             this.update(outcomes)
         } catch (e) {
-            smartLogger.warn(new Error('TOKEN_REFRESH_RESPONSE validation failed, ignoring', { cause: e }))
+            logger.warn(new Error('TOKEN_REFRESH_RESPONSE validation failed, ignoring', { cause: e }))
         }
     }
 
@@ -127,7 +128,7 @@ export class SmartValidatorRuntime extends BaseValidator<SmartValidationType> {
 
             this.update(outcomes)
         } catch (e) {
-            smartLogger.warn(new Error('ID_TOKEN validation failed, ignoring', { cause: e }))
+            logger.warn(new Error('ID_TOKEN validation failed, ignoring', { cause: e }))
         }
     }
 
@@ -137,7 +138,7 @@ export class SmartValidatorRuntime extends BaseValidator<SmartValidationType> {
 
         const parsed = JSON.parse(persisted)
         if (typeof parsed !== 'object' || Object.keys(parsed).length !== allSmartValidations.length) {
-            smartLogger.warn('Invalid persisted validator runtime state, ignoring')
+            logger.warn('Invalid persisted validator runtime state, ignoring')
             return
         }
 

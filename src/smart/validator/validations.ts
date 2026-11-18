@@ -1,5 +1,5 @@
-import { fhirResourcesValidation } from '../../fhir/validation/fhir-validators'
-import type { Validation } from '../../internal/validator/validations'
+import { fhirResourcesValidation } from '#fhir/validation/fhir-validators'
+import type { Validation } from '#internal-validator/validations'
 
 export const allSmartValidations = [
     'SMART_CONFIGURATION',

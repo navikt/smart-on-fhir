@@ -1,12 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { createLaunchedOpenReadyClient, validExampleSession } from '../../internal/test-utils/client-open'
-import { expectHas } from '../../internal/test-utils/expect'
-import { mockBatchBundle } from '../../internal/test-utils/mocks/create-resources'
-import type { FhirBatchBundle } from '../../zod'
+import { expectHas } from '#test-utils/expect'
+import { mockBatchBundle } from '#test-utils/mocks'
+import type { FhirBatchBundle } from '#zod'
 
-test('SmartClient.batch - /Bundle with transaction', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
+import { createOpenFhirClient } from './utils/fhir-client-open'
+
+test('FhirClient.batch - /Bundle with transaction', async () => {
+    const fhir = createOpenFhirClient()
 
     const testResources: FhirBatchBundle['entry'] = [
         {
@@ -39,15 +40,15 @@ test('SmartClient.batch - /Bundle with transaction', async () => {
             })),
         },
     )
-    const batchResponse = await ready.batch('transaction', testResources)
+    const batchResponse = await fhir.batch('transaction', testResources)
 
     expect(mock.isDone()).toBe(true)
     expectHas(batchResponse, 'resourceType')
     expect(batchResponse.entry.map((it) => it.response.status)).toEqual(['200', '200'])
 })
 
-test('SmartClient.batch - /Bundle with resources', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
+test('FhirClient.batch - /Bundle with resources', async () => {
+    const fhir = createOpenFhirClient()
 
     const testResources: FhirBatchBundle['entry'] = [
         { request: { method: 'GET', url: 'Patient/ed7bcb23-400f-4748-9e2a-6151fb5d9285' } },
@@ -75,7 +76,7 @@ test('SmartClient.batch - /Bundle with resources', async () => {
             ],
         },
     )
-    const batchResponse = await ready.batch('batch', testResources)
+    const batchResponse = await fhir.batch('batch', testResources)
 
     expect(mock.isDone()).toBe(true)
     expectHas(batchResponse, 'resourceType')

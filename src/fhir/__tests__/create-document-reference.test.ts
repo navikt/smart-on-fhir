@@ -1,12 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { createLaunchedOpenReadyClient, validExampleSession } from '../../internal/test-utils/client-open'
-import { expectHas } from '../../internal/test-utils/expect'
-import { mockUpdateDocumentReference } from '../../internal/test-utils/mocks/create-resources'
-import type { FhirDocumentReference, FhirQuestionnaireResponse } from '../../zod'
+import { expectHas } from '#test-utils/expect'
+import { mockUpdateDocumentReference } from '#test-utils/mocks'
+import type { FhirDocumentReference, FhirQuestionnaireResponse } from '#zod'
 
-test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
+import { createOpenFhirClient } from './utils/fhir-client-open'
+
+test('FhirClient.create - /DocumentReference with QuestionnaireResponse as base64 payload', async () => {
+    const fhir = createOpenFhirClient()
 
     const documentReferencePayloadWithQuestionnaire: Omit<FhirDocumentReference, 'id'> = {
         resourceType: 'DocumentReference',
@@ -78,7 +79,7 @@ test('SmartClient.create - /DocumentReference with QuestionnaireResponse as base
         } satisfies FhirDocumentReference,
     })
 
-    const documentReference = await ready.update('DocumentReference', {
+    const documentReference = await fhir.update('DocumentReference', {
         id: 'min-kule-sykmelding-id',
         payload: documentReferencePayloadWithQuestionnaire,
     })

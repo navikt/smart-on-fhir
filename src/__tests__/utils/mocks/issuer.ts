@@ -1,9 +1,8 @@
 import nock from 'nock'
 
-import type { SmartConfiguration } from '../../../smart/launch/well-known/smart-configuration-schema'
-import { createKeys } from '../jwt'
-
-import { AUTH_SERVER, FHIR_SERVER } from './common'
+import type { SmartConfiguration } from '#smart/launch/well-known/smart-configuration-schema'
+import { createKeys } from '#test-utils/jwt'
+import { AUTH_SERVER, FHIR_SERVER } from '#test-utils/mocks/index'
 
 export function fhirNock(): nock.Scope {
     return nock(FHIR_SERVER)

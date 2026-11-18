@@ -1,7 +1,8 @@
-import { configureFetchWithRetry } from '../../../internal/lib/fetch'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../../internal/lib/otel'
-import { removeTrailingSlash } from '../../../internal/lib/utils'
-import { smartLogger } from '../../smart-logger'
+import { configureFetchWithRetry } from '#internal-lib/fetch'
+import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+import { removeTrailingSlash } from '#internal-lib/utils'
+
+import { logger } from '../../logger'
 
 import { getCachedSmartConfiguration, setSmartConfigurationCache } from './smart-configuration-cache'
 import type { SmartConfigurationErrors } from './smart-configuration-errors'
@@ -27,7 +28,7 @@ export async function getSmartConfiguration(
             const smartConfigurationUrl = `${fhirServer}/.well-known/smart-configuration`
             const response = await fetchWithRetry(smartConfigurationUrl)
             if (!response.ok) {
-                smartLogger.error(`FHIR Server responded with ${response.status} ${response.statusText}`)
+                logger.error(`FHIR Server responded with ${response.status} ${response.statusText}`)
                 return { error: 'WELL_KNOWN_INVALID_RESPONSE' }
             }
 

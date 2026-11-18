@@ -1,17 +1,17 @@
 import type * as z from 'zod'
 
-import type { ResourceRequestErrors } from '../fhir'
-import { FhirClient } from '../fhir'
-import type { CacheableResource } from '../fhir/cache'
-import { FhirValidatorRuntime } from '../fhir/validation/fhir-validator-runtime'
-import { multi } from '../internal/lib/multi'
-import { failSpan, OtelTaxonomy, type Span } from '../internal/lib/otel'
-import { type FhirEncounter, type FhirPatient, type FhirPractitioner } from '../zod'
+import type { CacheableResource } from '#fhir/cache'
+import type { ResourceRequestErrors } from '#fhir/fhir-resource-errors'
+import { FhirClient } from '#fhir/FhirClient'
+import { FhirValidatorRuntime } from '#fhir/validation/fhir-validator-runtime'
+import { multi } from '#internal-lib/multi'
+import { failSpan, OtelTaxonomy, type Span } from '#internal-lib/otel'
+import { type FhirEncounter, type FhirPatient, type FhirPractitioner } from '#zod'
 
-import type { SmartClient } from './launch/SmartClient'
 import { tokenExpiresIn, validateToken } from './launch/token/token'
 import type { IdToken } from './launch/token/token-schema'
-import { smartLogger } from './smart-logger'
+import { logger } from './logger'
+import type { SmartClient } from './SmartClient'
 import { type CompleteSession, idTokenClaims } from './storage/schema'
 import type { ClaimErrors } from './types/client-errors'
 import type { SmartValidation } from './validator/validations'
@@ -124,7 +124,7 @@ export class ReadyClient {
         try {
             return schema ? schema.parse(claimValue) : claimValue
         } catch (e) {
-            smartLogger.error(new Error(`Claim validation failed for claim ${claim}`, { cause: e }))
+            logger.error(new Error(`Claim validation failed for claim ${claim}`, { cause: e }))
             return { error: 'CLAIM_INVALID' }
         }
     }
