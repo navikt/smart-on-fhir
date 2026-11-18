@@ -1,5 +1,5 @@
 import { logger as pinoLogger } from '@navikt/pino-logger'
-import { context, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
+import { context, type Span, SpanStatusCode, trace, type Tracer } from '@opentelemetry/api'
 import { suppressTracing } from '@opentelemetry/core'
 
 export type { Span }
@@ -7,26 +7,44 @@ export type { Span }
 export const otelLogger = pinoLogger.child({}, { msgPrefix: '[SoF Otel] ' })
 
 const LIB_NAME = '@navikt/smart-on-fhir'
-const SPAN_PREFIX = 'SmartClient.'
 
-export async function spanAsync<Result>(name: string, fn: (span: Span) => Promise<Result>): Promise<Result> {
-    const tracer = trace.getTracer(LIB_NAME, LIB_VERSION)
-    const span = tracer.startSpan(`${SPAN_PREFIX}${name}`)
+/**
+ * The part of the library a span originates from. Used both as the span name prefix
+ * (e.g. `fhir.read.Patient`) and as the instrumentation scope (e.g. `@navikt/smart-on-fhir/fhir`).
+ */
+export type TracingScope = 'smart' | 'fhir' | 'http'
 
-    return context.with(trace.setSpan(context.active(), span), async () => fn(span).finally(() => span.end()))
+export type Tracing = {
+    spanAsync: <Result>(name: string, fn: (span: Span) => Promise<Result>) => Promise<Result>
+    spanSync: <Result>(name: string, fn: (span: Span) => Result) => Result
 }
 
-export function spanSync<Result>(name: string, fn: () => Result): Result {
-    const tracer = trace.getTracer(LIB_NAME, LIB_VERSION)
-    const span = tracer.startSpan(`${SPAN_PREFIX}${name}`)
+/**
+ * Creates span helpers bound to a specific part of the library.
+ *
+ * Span name convention: `<scope>.<component>.<operation>`, dot-separated segments in kebab-case,
+ * except FHIR resource types which keep their spec capitalization (e.g. `fhir.read.DocumentReference`).
+ */
+export function createTracing(scope: TracingScope): Tracing {
+    const spanName = (name: string): string => `${scope}.${name}`
+    const getTracer = (): Tracer => trace.getTracer(`${LIB_NAME}/${scope}`, LIB_VERSION)
 
-    return context.with(trace.setSpan(context.active(), span), () => {
-        try {
-            return fn()
-        } finally {
-            span.end()
-        }
-    })
+    return {
+        spanAsync: async (name, fn) => {
+            const span = getTracer().startSpan(spanName(name))
+            return context.with(trace.setSpan(context.active(), span), async () => fn(span).finally(() => span.end()))
+        },
+        spanSync: (name, fn) => {
+            const span = getTracer().startSpan(spanName(name))
+            return context.with(trace.setSpan(context.active(), span), () => {
+                try {
+                    return fn(span)
+                } finally {
+                    span.end()
+                }
+            })
+        },
+    }
 }
 
 export async function squelchTracing<Result>(fn: () => Promise<Result>): Promise<Result> {
@@ -52,22 +70,6 @@ export function failSpan(span: Span, what: string, error?: unknown): void {
     span.setStatus({ code: SpanStatusCode.ERROR, message: what })
 }
 
-export const OtelTaxonomy = {
+export const SharedOtelAttributes = {
     FhirServer: 'fhir.server',
-    FhirResource: 'fhir.resource',
-    FhirResourceStatus: 'fhir.resource.status',
-    FhirAuthorizationType: 'fhir.auth-type',
-    SmartConfigurationCacheHit: 'fhir.smart-configuration.cache-hit',
-    ResourceCacheEnabled: 'fhir.resource.cache-enabled',
-    ResourceCacheHit: 'fhir.resource.cache-hit',
-    ResourceCacheUpdated: 'fhir.resource.cache-updated',
-    SessionExpired: 'session.expired',
-    SessionError: 'session.error',
-    SessionRefreshed: 'session.refreshed',
-    SessionTokenExpiresInSeconds: 'session.token.expires-in-seconds',
-    SessionTokenAlreadyExpired: 'session.token.already-expired',
-    SessionRefreshedTokenExpiresInSeconds: 'session.refreshed.token.expires-in-seconds',
-    SessionRefreshedNewRefreshToken: 'session.refreshed.new-refresh-token',
-    SessionMulti: 'session.multi-launch',
-    SessionMultiFallback: 'session.multi-launch.hit-fallback',
-}
+} as const

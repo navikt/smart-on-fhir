@@ -1,12 +1,15 @@
 import { configureFetchWithRetry } from '#internal-lib/fetch'
-import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+import { createTracing, failSpan } from '#internal-lib/otel'
 import { removeTrailingSlash } from '#internal-lib/utils'
 
 import { logger } from '../../logger'
+import { SmartOtelAttributes } from '../../smart-otel'
 
 import { getCachedSmartConfiguration, setSmartConfigurationCache } from './smart-configuration-cache'
 import type { SmartConfigurationErrors } from './smart-configuration-errors'
 import { type SmartConfiguration, SmartConfigurationSchema } from './smart-configuration-schema'
+
+const { spanAsync } = createTracing('smart')
 
 const fetchWithRetry = configureFetchWithRetry({ maxAttempts: 5 })
 
@@ -15,12 +18,12 @@ export async function getSmartConfiguration(
 ): Promise<SmartConfiguration | SmartConfigurationErrors> {
     fhirServer = removeTrailingSlash(fhirServer)
 
-    return spanAsync('smart-configuration', async (span) => {
-        span.setAttribute(OtelTaxonomy.FhirServer, fhirServer)
+    return spanAsync('well-known.smart-configuration', async (span) => {
+        span.setAttribute(SmartOtelAttributes.FhirServer, fhirServer)
 
         const cachedSmartConfig = getCachedSmartConfiguration(fhirServer)
         if (cachedSmartConfig) {
-            span.setAttribute(OtelTaxonomy.SmartConfigurationCacheHit, true)
+            span.setAttribute(SmartOtelAttributes.SmartConfigurationCacheHit, true)
             return cachedSmartConfig
         }
 
@@ -45,7 +48,7 @@ export async function getSmartConfiguration(
             }
 
             setSmartConfigurationCache(fhirServer, validatedWellKnown.data)
-            span.setAttribute(OtelTaxonomy.SmartConfigurationCacheHit, false)
+            span.setAttribute(SmartOtelAttributes.SmartConfigurationCacheHit, false)
 
             return validatedWellKnown.data
         } catch (e) {

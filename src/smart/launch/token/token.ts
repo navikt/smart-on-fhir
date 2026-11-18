@@ -2,11 +2,12 @@ import { decodeJwt, jwtVerify } from 'jose'
 import { JOSEError } from 'jose/errors'
 
 import { responseToError } from '#internal-lib/fetch'
-import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+import { createTracing, failSpan } from '#internal-lib/otel'
 
 import type { FhirAuthMode } from '../../client-auth-method/config'
 import { postFormEncodedTokenEndpoint, type TokenRequestPayload } from '../../client-auth-method/token-endpoint'
 import { logger } from '../../logger'
+import { SmartOtelAttributes } from '../../smart-otel'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { SmartClientConfiguration } from '../../types/config'
 
@@ -19,16 +20,18 @@ import {
     TokenResponseSchema,
 } from './token-schema'
 
+const { spanAsync } = createTracing('smart')
+
 export async function exchangeToken(
     code: string,
     session: InitialSession,
     config: SmartClientConfiguration,
     authMode: FhirAuthMode,
 ): Promise<TokenResponse | TokenExchangeErrors> {
-    return spanAsync('token-exchange', async (span) => {
+    return spanAsync('token.exchange', async (span) => {
         span.setAttributes({
-            [OtelTaxonomy.FhirServer]: session.fhirServer,
-            [OtelTaxonomy.FhirAuthorizationType]: authMode.type,
+            [SmartOtelAttributes.FhirServer]: session.fhirServer,
+            [SmartOtelAttributes.AuthorizationType]: authMode.type,
         })
 
         const tokenRequestBody: TokenRequestPayload = {
@@ -89,10 +92,10 @@ export async function refreshToken(
     config: SmartClientConfiguration,
     authMode: FhirAuthMode,
 ): Promise<TokenRefreshResponse | RefreshTokenErrors> {
-    return spanAsync('token-refresh', async (span) => {
+    return spanAsync('token.refresh', async (span) => {
         span.setAttributes({
-            [OtelTaxonomy.FhirServer]: session.fhirServer,
-            [OtelTaxonomy.FhirAuthorizationType]: authMode.type,
+            [SmartOtelAttributes.FhirServer]: session.fhirServer,
+            [SmartOtelAttributes.AuthorizationType]: authMode.type,
         })
 
         const tokenRequestBody: TokenRequestPayload = {
@@ -149,12 +152,12 @@ type InvalidTokenValidation = {
  * Validates JWT (does not support opaque tokens) using jose.
  */
 export async function validateToken(session: CompleteSession): Promise<ValidTokenValidation | InvalidTokenValidation> {
-    return spanAsync('token-validate', async (span) => {
-        span.setAttribute(OtelTaxonomy.FhirServer, session.fhirServer)
+    return spanAsync('token.validate', async (span) => {
+        span.setAttribute(SmartOtelAttributes.FhirServer, session.fhirServer)
 
         try {
-            return await spanAsync('jwt-verify', async (span) => {
-                span.setAttribute(OtelTaxonomy.FhirServer, session.fhirServer)
+            return await spanAsync('token.jwt-verify', async (span) => {
+                span.setAttribute(SmartOtelAttributes.FhirServer, session.fhirServer)
 
                 const verified = await jwtVerify(session.accessToken, getJwkSet(session.jwksUri), {
                     issuer: session.tokenIssuer,
