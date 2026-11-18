@@ -1,14 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { expectHas } from '../internal/test-utils/expect'
-import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
-import { mockCreateDocumentReference, mockUpdateDocumentReference } from '../internal/test-utils/mocks/create-resources'
-import { mockPractitioner, mockPractitionerWithOperationOutcome } from '../internal/test-utils/mocks/resources'
+import { expectHas } from '#test-utils/expect'
+import { mockCreateDocumentReference, mockUpdateDocumentReference } from '#test-utils/mocks'
+import { mockPractitioner, mockPractitionerWithOperationOutcome } from '#test-utils/mocks'
 
-import { FhirClient } from './FhirClient'
+import { createOpenFhirClient } from './__tests__/utils/fhir-client-open'
 
 test('FhirClient.request - /Practitioner should fetch and parse Practitioner resource', async () => {
-    const client = new FhirClient({ fhirServer: FHIR_SERVER })
+    const client = createOpenFhirClient()
 
     const mock = mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
     const practitioner = await client.request(`Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e`)
@@ -24,7 +23,7 @@ test('FhirClient.request - /Practitioner should fetch and parse Practitioner res
 })
 
 test('FhirClient.request - Should handle FHIR errors (OperationOutcome)', async () => {
-    const client = new FhirClient({ fhirServer: FHIR_SERVER })
+    const client = createOpenFhirClient()
 
     const mock = mockPractitionerWithOperationOutcome('ac768edb-d56a-4304-8574-f866c6af4e7e')
     const practitioner = await client.request(`Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e`)
@@ -35,7 +34,7 @@ test('FhirClient.request - Should handle FHIR errors (OperationOutcome)', async 
 })
 
 test('FhirClient.create - /DocumentReference should POST and parse DocumentReference resource', async () => {
-    const client = new FhirClient({ fhirServer: FHIR_SERVER })
+    const client = createOpenFhirClient()
 
     const mock = mockCreateDocumentReference({
         resourceType: 'DocumentReference',
@@ -56,7 +55,7 @@ test('FhirClient.create - /DocumentReference should POST and parse DocumentRefer
 })
 
 test('FhirClient.update - /DocumentReference should PUT and parse DocumentReference resource', async () => {
-    const client = new FhirClient({ fhirServer: FHIR_SERVER })
+    const client = createOpenFhirClient()
 
     const mock = mockUpdateDocumentReference({
         expectedId: 'my-id',

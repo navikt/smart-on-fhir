@@ -13,7 +13,15 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "dist",
-        "verbatimModuleSyntax": true
+        "verbatimModuleSyntax": true,
+        "paths": {
+            "#smart/*": ["./src/smart/*"],
+            "#fhir/*": ["./src/fhir/*"],
+            "#zod": ["./src/zod"],
+            "#internal-lib/*": ["./src/internal/lib/*"],
+            "#internal-validator/*": ["./src/internal/validator/*"],
+            "#test-utils/*": ["./src/__tests__/utils/*"]
+        }
     },
     "include": ["src"]
 }

@@ -1,12 +1,11 @@
-import type { CacheOptions } from '../../fhir/cache'
-import { ReadyClient, SmartClient, type SmartClientOptions } from '../../smart'
-import { type SafeSmartStorage, safeSmartStorage } from '../../smart/storage'
-import type { CompleteSession } from '../../smart/storage/schema'
-
-import { expectIs } from './expect'
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { createTestStorage } from './storage'
-import { createTestAccessToken, createTestIdToken } from './token'
+import type { CacheOptions } from '#fhir/cache'
+import { createTestStorage } from '#smart/__tests__/utils/storage'
+import { ReadyClient, SmartClient, type SmartClientOptions } from '#smart/index'
+import { type SafeSmartStorage, safeSmartStorage } from '#smart/storage'
+import type { CompleteSession } from '#smart/storage/schema'
+import { expectIs } from '#test-utils/expect'
+import { AUTH_SERVER, FHIR_SERVER } from '#test-utils/mocks'
+import { createTestAccessToken, createTestIdToken } from '#test-utils/token'
 
 export const TEST_SESSION_ID = 'test-session'
 

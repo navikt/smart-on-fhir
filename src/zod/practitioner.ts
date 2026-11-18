@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-import { NameSchema } from '../zod'
+import { NameSchema } from './common'
 
 const TelecomSystemSchema = z.enum(['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'])
 const ContactPointSchema = z.object({

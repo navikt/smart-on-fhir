@@ -54,3 +54,23 @@ export function configureFetchWithRetry(opts: FetchWithRetry = { maxAttempts: 5 
         return doFetch(1)
     }
 }
+
+/**
+ * Converts a non-OK response into a human-readable error message, attempting to parse FHIR OperationOutcome if possible.
+ */
+export async function responseToError(response: Response): Promise<Error> {
+    const contentType = response.headers.get('Content-Type')
+    if (!contentType) {
+        return Error(`HTTP error - ${status(response)} (without content-type)`)
+    }
+
+    if (contentType.includes('application/json')) {
+        const json = await response.text()
+        return Error(`HTTP error with JSON body - ${status(response)}, server says: ${json}`)
+    }
+
+    const text = await response.text()
+    return Error(`HTTP error with text body - ${status(response)}, server says: ${text}`)
+}
+
+export const status = (response: Response): string => `${response.status} ${response.statusText}`

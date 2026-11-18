@@ -1,15 +1,16 @@
 import { expect, test } from 'vitest'
 import * as z from 'zod'
 
-import { ReadyClient } from '../smart'
-import { MockReadyClient } from '../test'
+import { ReadyClient } from '#smart/ReadyClient'
 import type {
     FhirBatchResponseBundle,
     FhirDocumentReference,
     FhirPatient,
     FhirSearchsetBundle,
     FhirCondition,
-} from '../zod'
+} from '#zod'
+
+import { MockReadyClient } from './index'
 
 const patient: FhirPatient = {
     resourceType: 'Patient',

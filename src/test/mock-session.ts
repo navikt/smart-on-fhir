@@ -1,6 +1,7 @@
+import type { CompleteSession } from '#smart/storage/schema'
+import { SmartValidatorRuntime } from '#smart/validator/smart-validator-runtime'
+
 import type { SmartClient } from '../smart'
-import type { CompleteSession } from '../smart/storage/schema'
-import { SmartValidatorRuntime } from '../smart/validator/smart-validator-runtime'
 
 import type { MockReadyClientOptions } from './MockReadyClient'
 

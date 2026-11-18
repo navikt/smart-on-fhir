@@ -14,8 +14,7 @@ environment.
 
 - [Documentation](https://navikt.github.io/smart-on-fhir/)
 - Main entry points:
-  - [SmartClient](src/smart/launch/SmartClient.ts) - Smart on FHIR launch, callback and
-    authorization
+  - [SmartClient](src/smart/SmartClient.ts) - Smart on FHIR launch, callback and authorization
   - [ReadyClient](src/smart/ReadyClient.ts) - Access FHIR resources
 
 ## Mocking a ready client

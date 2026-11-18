@@ -1,4 +1,4 @@
-import type { Validation } from '../../internal/validator/validations'
+import type { Validation } from '#internal-validator/validations'
 
 export const fhirResourcesValidation = [
     'ENCOUNTER',

@@ -1,6 +1,6 @@
 import { expect, test, vi } from 'vitest'
 
-import { FhirValidatorRuntime } from '../../fhir/validation/fhir-validator-runtime'
+import { FhirValidatorRuntime } from '#fhir/validation/fhir-validator-runtime'
 
 import { SmartValidatorRuntime } from './smart-validator-runtime'
 import { allSmartValidations } from './validations'

@@ -1,8 +1,9 @@
+import type { CacheableResource } from '#fhir/cache'
+import type { ResourceBatchErrors } from '#fhir/fhir-resource-errors'
+import type { KnownCreatePaths, PayloadForCreate, ResponseForCreate } from '#fhir/resources/create-resource-map'
+import type { KnownPaths, ResponseFor } from '#fhir/resources/request-resource-map'
+
 import type { ResourceCreateErrors, ResourceRequestErrors } from '../fhir'
-import type { CacheableResource } from '../fhir/cache'
-import type { ResourceBatchErrors } from '../fhir/fhir-resource-errors'
-import type { KnownCreatePaths, PayloadForCreate, ResponseForCreate } from '../fhir/resources/create-resource-map'
-import type { KnownPaths, ResponseFor } from '../fhir/resources/request-resource-map'
 import { ReadyClient } from '../smart'
 import type { SmartValidation } from '../smart'
 import type { FhirBatchBundle, FhirBatchResponseBundle } from '../zod'

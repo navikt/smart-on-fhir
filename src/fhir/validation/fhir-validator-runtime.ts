@@ -1,9 +1,10 @@
 // oxlint-disable typescript/no-explicit-any no-unused-vars - This type of validation requires actual any
 
-import { BaseValidator } from '../../internal/validator/base-validator'
-import { now } from '../../internal/validator/utils'
-import type { Loosely, Validations } from '../../internal/validator/validations'
-import { ValidatorBuilder } from '../../internal/validator/validator-builder'
+import { BaseValidator } from '#internal-validator/base-validator'
+import { now } from '#internal-validator/utils'
+import type { Loosely, Validations } from '#internal-validator/validations'
+import { ValidatorBuilder } from '#internal-validator/validator-builder'
+
 import type {
     FhirDocumentReference,
     FhirEncounter,

@@ -1,19 +1,20 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import { justOpenReadyClient } from '../internal/test-utils/client-open'
-import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
-import { mockPatient, mockPractitioner } from '../internal/test-utils/mocks/resources'
+import { FHIR_SERVER } from '#test-utils/mocks'
+import { mockPatient, mockPractitioner } from '#test-utils/mocks'
 
-test('multi should combine successful parallel resource requests', async () => {
-    const [ready] = await justOpenReadyClient()
+import { createOpenFhirClient } from './utils/fhir-client-open'
+
+test('FhirClient.multi - should combine successful parallel resource requests', async () => {
+    const ready = createOpenFhirClient()
 
     mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
     mockPatient('valid-patient-id')
 
     const multiResult = await ready.multi({
-        practitioner: ready.user.request(),
-        patient: ready.patient.request(),
+        practitioner: ready.request('Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e'),
+        patient: ready.request('Patient/valid-patient-id'),
     })
 
     if (!multiResult.ok) {
@@ -26,16 +27,16 @@ test('multi should combine successful parallel resource requests', async () => {
     expect(multiResult.patient.resourceType).toEqual('Patient')
 })
 
-test('multi should combine errors when some resources fail', async () => {
-    const [ready] = await justOpenReadyClient()
+test('FhirClient.multi - should combine errors when some resources fail', async () => {
+    const ready = createOpenFhirClient()
 
     // Patient succeeds, practitioner responds 404 -> combined into a single failure.
     mockPatient('valid-patient-id')
     nock(FHIR_SERVER).get('/Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e').reply(404)
 
     const multiResult = await ready.multi({
-        practitioner: ready.user.request(),
-        patient: ready.patient.request(),
+        practitioner: ready.request('Practitioner/ac768edb-d56a-4304-8574-f866c6af4e7e'),
+        patient: ready.request('Patient/valid-patient-id'),
     })
 
     expect(multiResult.ok).toBe(false)

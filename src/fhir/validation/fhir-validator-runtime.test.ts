@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest'
 
-import { expectHas } from '../../internal/test-utils/expect'
+import { expectHas } from '#test-utils/expect'
+
 import type {
     FhirDocumentReference,
     FhirEncounter,

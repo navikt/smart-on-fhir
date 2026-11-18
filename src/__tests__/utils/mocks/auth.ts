@@ -2,7 +2,7 @@ import nock from 'nock'
 
 import { createTestAccessToken, createTestIdToken } from '../token'
 
-import { AUTH_SERVER } from './common'
+import { AUTH_SERVER } from './index'
 
 type TokenExchangeValues = {
     client_id: string

@@ -1,11 +1,12 @@
 import { decodeJwt, jwtVerify } from 'jose'
 import { JOSEError } from 'jose/errors'
 
-import { responseToFormattedError } from '../../../fhir/fhir-errors'
-import { failSpan, OtelTaxonomy, spanAsync } from '../../../internal/lib/otel'
+import { responseToError } from '#internal-lib/fetch'
+import { failSpan, OtelTaxonomy, spanAsync } from '#internal-lib/otel'
+
 import type { FhirAuthMode } from '../../client-auth-method/config'
 import { postFormEncodedTokenEndpoint, type TokenRequestPayload } from '../../client-auth-method/token-endpoint'
-import { smartLogger } from '../../smart-logger'
+import { logger } from '../../logger'
 import type { CompleteSession, InitialSession } from '../../storage/schema'
 import type { SmartClientConfiguration } from '../../types/config'
 
@@ -50,8 +51,8 @@ export async function exchangeToken(
          * Upon successful verification the authorization server issues id_token, access_token and (optional) refresh_token.
          */
         if (!response.ok) {
-            const [responseError] = await responseToFormattedError(response)
-            smartLogger.error(
+            const responseError = await responseToError(response)
+            logger.error(
                 `Token exchange failed, token_endpoint responed with ${response.status} ${response.statusText}, server says: ${responseError}`,
             )
 
@@ -103,7 +104,7 @@ export async function refreshToken(
         const response = await postFormEncodedTokenEndpoint(tokenRequestBody, session, config.clientId, authMode)
 
         if (!response.ok) {
-            const [responseError] = await responseToFormattedError(response)
+            const responseError = await responseToError(response)
 
             failSpan(
                 span,

@@ -1,8 +1,9 @@
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+    resolve: { tsconfigPaths: true },
     test: {
-        setupFiles: ['src/internal/test-utils/setup.ts'],
+        setupFiles: ['src/__tests__/setup.ts'],
         include: ['src/**/*.test.ts'],
         reporters: ['default', 'json'],
         outputFile: {

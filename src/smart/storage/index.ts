@@ -1,4 +1,4 @@
-import { smartLogger } from '../smart-logger'
+import { logger } from '../logger'
 
 import { type CompleteSession, CompleteSessionSchema, type InitialSession, InitialSessionSchema } from './schema'
 import type { CompleteSessionErrors, InitialSessionErrors } from './storage-errors'
@@ -29,7 +29,7 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
 
             const initialParsed = InitialSessionSchema.safeParse(raw)
             if (initialParsed.error) {
-                smartLogger.error(
+                logger.error(
                     new Error(`SmartSession state (partial) for session ${key} is broken`, {
                         cause: initialParsed.error,
                     }),
@@ -49,7 +49,7 @@ export function safeSmartStorage(smartStorage: SmartStorage | Promise<SmartStora
 
             const completeParsed = CompleteSessionSchema.safeParse(raw)
             if (completeParsed.error) {
-                smartLogger.error(
+                logger.error(
                     new Error(
                         `SmartSession state (complete) for session ${key} was expected to be complete, but wasn't`,
                         { cause: completeParsed.error },

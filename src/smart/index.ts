@@ -1,6 +1,6 @@
 export type { KnownFhirServer } from './client-auth-method/config'
 export { ReadyClient } from './ReadyClient'
-export { SmartClient } from './launch/SmartClient'
+export { SmartClient } from './SmartClient'
 export type { SmartClientReadyErrors } from './types/client-errors'
 export type { SmartClientConfiguration, SmartClientOptions } from './types/config'
 export type { SmartStorage } from './storage'

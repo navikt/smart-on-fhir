@@ -1,9 +1,10 @@
 import nock from 'nock'
 import { expect, test } from 'vitest'
 
-import { createLaunchedOpenReadyClient, validExampleSession } from '../internal/test-utils/client-open'
-import { expectHas } from '../internal/test-utils/expect'
-import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { expectHas } from '#test-utils/expect'
+import { FHIR_SERVER } from '#test-utils/mocks'
+
+import { createOpenFhirClient } from './utils/fhir-client-open'
 
 const operationOutcome = {
     resourceType: 'OperationOutcome',
@@ -20,14 +21,14 @@ const operationOutcome = {
     ],
 }
 
-test('SmartClient.request - 404 preserves the OperationOutcome instead of discarding it', async () => {
-    const [ready] = await createLaunchedOpenReadyClient(validExampleSession)
+test('FhirClient.request - 404 preserves the OperationOutcome instead of discarding it', async () => {
+    const client = createOpenFhirClient()
 
     const mock = nock(FHIR_SERVER)
         .get('/QuestionnaireResponse/sykmelding-1')
         .reply(404, operationOutcome, { 'Content-Type': 'application/fhir+json' })
 
-    const result = await ready.request('QuestionnaireResponse/sykmelding-1', { expectNotFound: true })
+    const result = await client.request('QuestionnaireResponse/sykmelding-1', { expectNotFound: true })
 
     expect(mock.isDone()).toBe(true)
     expectHas(result, 'error')

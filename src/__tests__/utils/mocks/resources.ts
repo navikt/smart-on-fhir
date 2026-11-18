@@ -1,8 +1,8 @@
 import nock from 'nock'
 
-import type { FhirEncounter, FhirPatient, FhirPractitioner } from '../../../zod'
+import type { FhirEncounter, FhirPatient, FhirPractitioner } from '#zod'
 
-import { FHIR_SERVER } from './common'
+import { FHIR_SERVER } from './index'
 
 export function mockPractitioner(id: string): nock.Scope {
     return nock(FHIR_SERVER)
