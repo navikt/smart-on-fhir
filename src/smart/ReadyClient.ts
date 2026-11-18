@@ -47,12 +47,13 @@ export class ReadyClient {
         this._client = client
         this._session = session
 
-        this._fhirClient = new FhirClient(this._session, this.fetchWithRefresh, {
+        this._fhirClient = new FhirClient(this._session, {
+            fetcher: this.fetchWithRefresh,
+            cache: client.options.cache,
             validator: {
                 runtime: new FhirValidatorRuntime(this._client.validator.validations),
                 persist: persistValidation,
             },
-            cache: client.options.cache,
         })
 
         this.#idToken = idTokenClaims(this._session)

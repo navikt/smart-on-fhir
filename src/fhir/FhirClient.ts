@@ -3,8 +3,7 @@ import type { Span } from '@opentelemetry/api'
 import { multi } from '#internal-lib/multi'
 import { createTracing, failSpan, squelchTracing } from '#internal-lib/otel'
 import { inferResourceType } from '#internal-lib/utils'
-
-import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '../zod'
+import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '#zod'
 
 import { type CacheableResource, type CacheOptions, getCachedResource, setCachedResource } from './cache'
 import { fhirResponseToFormattedError } from './fhir-errors'
@@ -39,11 +38,11 @@ export class FhirClient {
 
     constructor(
         server: AuthenticatedServer | OpenServer,
-        /**
-         * Optional fetcher, used if you for example want to refresh tokens and retry.
-         */
-        fetcher?: (request: () => Promise<Response>, span: Span) => Promise<Response>,
         options?: {
+            /**
+             * Optional fetcher, used if you for example want to refresh tokens and retry.
+             */
+            fetcher?: (request: () => Promise<Response>, span: Span) => Promise<Response>
             /**
              * The validator runtime to use for validating FHIR resources.
              */
@@ -62,7 +61,7 @@ export class FhirClient {
         this.#persistValidation = options?.validator?.persist
         this.#cache = options?.cache ?? 'disabled'
 
-        this.#fetcher = fetcher ?? ((request) => request())
+        this.#fetcher = options?.fetcher ?? ((request) => request())
     }
 
     public async create<Path extends KnownCreatePaths>(
