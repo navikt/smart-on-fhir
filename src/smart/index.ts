@@ -6,3 +6,4 @@ export type { SmartClientConfiguration, SmartClientOptions } from './types/confi
 export type { SmartStorage } from './storage'
 export type { SmartValidation } from './validator/validations'
 export type { ValidationOutcome, ValidationTest } from '../internal/validator/validations'
+export * from '../fhir'
