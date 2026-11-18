@@ -1,13 +1,12 @@
 import { calculatePKCECodeChallenge } from 'openid-client'
 import { expect, test } from 'vitest'
 
-import { ReadyClient, SmartClient } from '../client'
-
-import { mockTokenExchange } from './mocks/auth'
-import { FHIR_SERVER } from './mocks/common'
-import { mockSmartConfiguration } from './mocks/issuer'
-import { expectHas, expectIs, searchParamsToObject } from './utils/expect'
-import { createTestStorage } from './utils/storage'
+import { expectHas, expectIs, searchParamsToObject } from '../internal/test-utils/expect'
+import { mockTokenExchange } from '../internal/test-utils/mocks/auth'
+import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
+import { createTestStorage } from '../internal/test-utils/storage'
+import { ReadyClient, SmartClient } from '../smart'
 
 test('pkce verification should be correct', async () => {
     const sessionId = '689fe0f1-2304-45e9-bb45-bb1b8dac2379'

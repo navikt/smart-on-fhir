@@ -1,10 +1,11 @@
-import type { SmartClient } from '../client'
-import type { CompleteSession } from '../client/storage/schema'
+import type { SmartClient } from '../smart'
+import type { CompleteSession } from '../smart/storage/schema'
+import { SmartValidatorRuntime } from '../smart/validator/smart-validator-runtime'
 
 import type { MockReadyClientOptions } from './MockReadyClient'
 
 export function mockClient(): SmartClient {
-    return { options: { cache: 'disabled' } } as SmartClient
+    return { options: { cache: 'disabled' }, validator: new SmartValidatorRuntime() } as SmartClient
 }
 
 export function mockSession(options: MockReadyClientOptions): CompleteSession {

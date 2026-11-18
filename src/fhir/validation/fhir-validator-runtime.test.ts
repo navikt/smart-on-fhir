@@ -1,0 +1,396 @@
+import { expect, test } from 'vitest'
+
+import { expectHas } from '../../internal/test-utils/expect'
+import type {
+    FhirDocumentReference,
+    FhirEncounter,
+    FhirOrganization,
+    FhirPatient,
+    FhirPractitioner,
+    FhirQuestionnaireResponse,
+} from '../../zod'
+
+import { FhirValidatorRuntime } from './fhir-validator-runtime'
+
+test('encounter validation passes for a complete encounter', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.encounter({
+        resourceType: 'Encounter',
+        id: '320fd29a-31b9-4c9f-963c-c6c88332d89a',
+        status: 'in-progress',
+        subject: { reference: 'Patient/2b4b6bd4-0b88-4762-aab5-74776e1f50c4' },
+        participant: [{ individual: { reference: 'Practitioner/40426ee8-6293-456c-9b79-2016821673ca' } }],
+        serviceProvider: { reference: 'Organization/458ae08a-e249-4e16-a9a0-1ba45d358f6c' },
+        diagnosis: [{ condition: { reference: 'Condition/ff0dba18-b879-4fd2-b047-15f58f21696e' } }],
+        type: [{ coding: [{ system: 'urn:oid:2.16.578.1.12.4.1.1.8432', code: '1' }] }],
+    } satisfies FhirEncounter & { type: unknown })
+
+    const encounter = runtime.report().find((v) => v.type === 'ENCOUNTER')
+
+    expectHas(encounter, 'tests')
+    expect(encounter.status).toEqual('OK')
+})
+
+test('encounter validation fails when subject and participant are missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.encounter({
+        resourceType: 'Encounter',
+        id: '320fd29a-31b9-4c9f-963c-c6c88332d89a',
+        status: 'in-progress',
+        serviceProvider: { reference: 'Organization/458ae08a-e249-4e16-a9a0-1ba45d358f6c' },
+    } satisfies FhirEncounter)
+
+    const encounter = runtime.report().find((v) => v.type === 'ENCOUNTER')
+
+    expectHas(encounter, 'tests')
+    expect(encounter.status).toEqual('ERROR')
+    expect(encounter.tests).toContainEqual({ type: 'ERROR', message: 'subject is missing' })
+    expect(encounter.tests).toContainEqual({ type: 'ERROR', message: 'participant is missing' })
+})
+
+test('practitioner validation passes when hpr-nummer identifier is present', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.practitioner({
+        resourceType: 'Practitioner',
+        id: '40426ee8-6293-456c-9b79-2016821673ca',
+        name: [{ family: 'Doe', given: ['John'] }],
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.4', value: '9144889' }],
+    } satisfies FhirPractitioner)
+
+    const practitioner = runtime.report().find((v) => v.type === 'PRACTITIONER')
+
+    expectHas(practitioner, 'tests')
+    expect(practitioner.status).toEqual('OK')
+    expect(practitioner.tests).toContainEqual({
+        type: 'OK',
+        message: 'hpr-nummer identifier present in practitioner',
+    })
+})
+
+test('practitioner validation fails when hpr-nummer identifier is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.practitioner({
+        resourceType: 'Practitioner',
+        id: '40426ee8-6293-456c-9b79-2016821673ca',
+        name: [{ family: 'Doe', given: ['John'] }],
+        identifier: [{ system: 'urn:oid:some-other-system', value: '9144889' }],
+    } satisfies FhirPractitioner)
+
+    const practitioner = runtime.report().find((v) => v.type === 'PRACTITIONER')
+
+    expectHas(practitioner, 'tests')
+    expect(practitioner.status).toEqual('ERROR')
+    expect(practitioner.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'hpr-nummer identifier (urn:oid:2.16.578.1.12.4.1.4.4) is missing in practitioner',
+    })
+})
+
+test('patient validation passes when identifier and name are present', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.1', value: '12345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('OK')
+    expect(patient.tests).toContainEqual({
+        type: 'OK',
+        message: 'fødselsnummer or d-nummer identifier present in patient',
+    })
+    expect(patient.tests).toContainEqual({ type: 'OK', message: 'name present in patient' })
+})
+
+test('patient validation accepts d-nummer as identifier', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.2', value: '52345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('OK')
+})
+
+test('patient validation fails when identifier is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('ERROR')
+    expect(patient.tests).toContainEqual({ type: 'ERROR', message: 'identifier is missing' })
+})
+
+test('patient validation fails when identifier has neither fødselsnummer nor d-nummer', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.patient({
+        resourceType: 'Patient',
+        id: '2b4b6bd4-0b88-4762-aab5-74776e1f50c4',
+        name: [{ family: 'Doe', given: ['Jane'] }],
+        identifier: [{ system: 'urn:oid:some-other-system', value: '12345678901' }],
+    } satisfies FhirPatient)
+
+    const patient = runtime.report().find((v) => v.type === 'PATIENT')
+
+    expectHas(patient, 'tests')
+    expect(patient.status).toEqual('ERROR')
+    expect(patient.tests).toContainEqual({
+        type: 'ERROR',
+        message:
+            'fødselsnummer (urn:oid:2.16.578.1.12.4.1.4.1) or d-nummer (urn:oid:2.16.578.1.12.4.1.4.2) identifier is missing in patient',
+    })
+})
+
+test('organization validation passes when organisasjonsnummer and phone are present', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.101', value: '123456789' }],
+        telecom: [{ system: 'phone', value: '12345678' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('OK')
+    expect(organization.tests).toContainEqual({
+        type: 'OK',
+        message: 'organisasjonsnummer identifier present in organization',
+    })
+    expect(organization.tests).toContainEqual({ type: 'OK', message: 'phone telecom present in organization' })
+})
+
+test('organization validation fails when organisasjonsnummer identifier is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:some-other-system', value: '123456789' }],
+        telecom: [{ system: 'phone', value: '12345678' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('ERROR')
+    expect(organization.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'organisasjonsnummer (urn:oid:2.16.578.1.12.4.1.4.101) identifier is missing in organization',
+    })
+})
+
+test('organization validation fails when phone telecom is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.organization({
+        resourceType: 'Organization',
+        id: '458ae08a-e249-4e16-a9a0-1ba45d358f6c',
+        name: 'Legekontoret',
+        identifier: [{ system: 'urn:oid:2.16.578.1.12.4.1.4.101', value: '123456789' }],
+        telecom: [{ system: 'email', value: 'post@legekontoret.no' }],
+    } satisfies FhirOrganization)
+
+    const organization = runtime.report().find((v) => v.type === 'ORGANIZATION')
+
+    expectHas(organization, 'tests')
+    expect(organization.status).toEqual('ERROR')
+    expect(organization.tests).toContainEqual({ type: 'ERROR', message: 'phone telecom is missing in organization' })
+})
+
+function completeDocumentReference(): FhirDocumentReference {
+    return {
+        resourceType: 'DocumentReference',
+        id: 'unik-document-reference-id',
+        status: 'current',
+        meta: { lastUpdated: '2026-06-01T00:00:00.000+00:00' },
+        description: '100% Sykmelding fra 01.06.2024 til 07.06.2024',
+        type: {
+            coding: [
+                { system: 'urn:oid:2.16.578.1.12.4.1.1.9602', code: 'J01-2', display: 'Sykmeldinger og trygdesaker' },
+            ],
+        },
+        content: [
+            {
+                attachment: {
+                    title: 'Tittel generert av Nav',
+                    language: 'NO-nb',
+                    contentType: 'application/pdf',
+                    data: 'base64 PDF',
+                },
+            },
+        ],
+        subject: { reference: 'Patient/2b4b6bd4-0b88-4762-aab5-74776e1f50c4' },
+        author: [{ reference: 'Practitioner/40426ee8-6293-456c-9b79-2016821673ca' }],
+        context: {
+            encounter: [{ reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' }],
+        },
+    }
+}
+
+test('documentReference validation passes for a complete document reference', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.documentReference(completeDocumentReference())
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('OK')
+    expect(dr.tests).toContainEqual({
+        type: 'OK',
+        message: 'context.encounter reference present in documentReference',
+    })
+    expect(dr.tests).toContainEqual({ type: 'OK', message: 'type coding J01-2 present in documentReference' })
+})
+
+test('documentReference validation fails when context.encounter reference is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.documentReference({
+        ...completeDocumentReference(),
+        context: { encounter: [] },
+    } satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('ERROR')
+    expect(dr.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'context.encounter reference is missing in documentReference',
+    })
+})
+
+test('documentReference validation fails when type code is not J01-2', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.documentReference({
+        ...completeDocumentReference(),
+        type: { coding: [{ system: 'urn:oid:2.16.578.1.12.4.1.1.9602', code: 'X99-9', display: 'Annet' }] },
+    } satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('ERROR')
+    expect(dr.tests).toContainEqual({
+        type: 'ERROR',
+        message: 'type coding J01-2 (urn:oid:2.16.578.1.12.4.1.1.9602) is missing in documentReference',
+    })
+})
+
+test('documentReference validation warns when description is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    const { description: _description, ...withoutDescription } = completeDocumentReference()
+    runtime.documentReference(withoutDescription satisfies FhirDocumentReference)
+
+    const dr = runtime.report().find((v) => v.type === 'DOCUMENT_REFERENCE')
+
+    expectHas(dr, 'tests')
+    expect(dr.status).toEqual('WARNING')
+    expect(dr.tests).toContainEqual({ type: 'WARNING', message: 'no description present in documentReference' })
+})
+
+function completeQuestionnaireResponse(): FhirQuestionnaireResponse {
+    return {
+        resourceType: 'QuestionnaireResponse',
+        id: 'unik-document-reference-id',
+        status: 'completed',
+        questionnaire: 'https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1',
+        subject: { reference: 'Patient/2b4b6bd4-0b88-4762-aab5-74776e1f50c4' },
+        encounter: { reference: 'Encounter/320fd29a-31b9-4c9f-963c-c6c88332d89a' },
+        author: { reference: 'Practitioner/40426ee8-6293-456c-9b79-2016821673ca' },
+        authored: '2026-02-10T09:30:00+01:00',
+        item: [
+            {
+                linkId: 'hoveddiagnose',
+                text: 'Hoveddiagnose',
+                answer: [
+                    {
+                        valueCoding: {
+                            system: 'urn:oid:2.16.578.1.12.4.1.1.7110',
+                            code: 'M54.5',
+                            display: 'Korsryggsmerter',
+                        },
+                    },
+                ],
+            },
+        ],
+    }
+}
+
+test('questionnaireResponse validation passes for a complete response', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.questionnaireResponse(completeQuestionnaireResponse())
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('OK')
+    expect(qr.tests).toContainEqual({
+        type: 'OK',
+        message: 'questionnaire references the canonical Nav Questionnaire',
+    })
+})
+
+test('questionnaireResponse validation fails when questionnaire is not the canonical Nav url', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    runtime.questionnaireResponse({
+        ...completeQuestionnaireResponse(),
+        questionnaire: 'https://example.com/some/other/Questionnaire',
+    } satisfies FhirQuestionnaireResponse)
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('ERROR')
+    expect(qr.tests).toContainEqual({
+        type: 'ERROR',
+        message:
+            'questionnaire should reference https://www.nav.no/samarbeidspartner/sykmelding/fhir/R4/Questionnaire/V1',
+    })
+})
+
+test('questionnaireResponse validation fails when encounter reference is missing', () => {
+    const runtime = new FhirValidatorRuntime()
+
+    const { encounter: _encounter, ...withoutEncounter } = completeQuestionnaireResponse()
+    runtime.questionnaireResponse(withoutEncounter satisfies FhirQuestionnaireResponse)
+
+    const qr = runtime.report().find((v) => v.type === 'QUESTIONNAIRE_RESPONSE')
+
+    expectHas(qr, 'tests')
+    expect(qr.status).toEqual('ERROR')
+    expect(qr.tests).toContainEqual({ type: 'ERROR', message: 'encounter is missing' })
+})

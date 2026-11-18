@@ -1,14 +1,13 @@
 import { expect, test } from 'vitest'
 
-import { ReadyClient, SmartClient, type SmartStorage } from '../client'
-import { safeSmartStorage } from '../client/storage'
-
-import { mockTokenExchange } from './mocks/auth'
-import { FHIR_SERVER } from './mocks/common'
-import { mockSmartConfiguration } from './mocks/issuer'
-import { TEST_SESSION_ID } from './utils/client-open'
-import { expectHas, expectIs } from './utils/expect'
-import { createTestStorage } from './utils/storage'
+import { TEST_SESSION_ID } from '../internal/test-utils/client-open'
+import { expectHas, expectIs } from '../internal/test-utils/expect'
+import { mockTokenExchange } from '../internal/test-utils/mocks/auth'
+import { FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
+import { createTestStorage } from '../internal/test-utils/storage'
+import { ReadyClient, SmartClient, type SmartStorage } from '../smart'
+import { safeSmartStorage } from '../smart/storage'
 
 test('launching multiple patients within same session should be supported', async () => {
     const storage = createTestStorage()

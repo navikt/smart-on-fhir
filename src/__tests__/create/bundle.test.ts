@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest'
 
+import { createLaunchedOpenReadyClient, validExampleSession } from '../../internal/test-utils/client-open'
+import { expectHas } from '../../internal/test-utils/expect'
+import { mockBatchBundle } from '../../internal/test-utils/mocks/create-resources'
 import type { FhirBatchBundle } from '../../zod'
-import { mockBatchBundle } from '../mocks/create-resources'
-import { createLaunchedOpenReadyClient, validExampleSession } from '../utils/client-open'
-import { expectHas } from '../utils/expect'
 
 test('SmartClient.batch - /Bundle with transaction', async () => {
     const [ready] = await createLaunchedOpenReadyClient(validExampleSession)

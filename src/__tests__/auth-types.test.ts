@@ -1,16 +1,15 @@
 import { jwtVerify } from 'jose'
 import { describe, expect, test } from 'vitest'
 
-import { SmartClient } from '../client'
-import { safeSmartStorage } from '../client/storage'
-import type { InitialSession } from '../client/storage/schema'
-
-import { mockPrivateKeyJwtTokenExchange, mockTokenExchange } from './mocks/auth'
-import { AUTH_SERVER, FHIR_SERVER } from './mocks/common'
-import { mockSmartConfiguration } from './mocks/issuer'
-import { expectHas } from './utils/expect'
-import { privateKeyAsJwkString, verifyPublicKey } from './utils/jwt'
-import { createMockedStorage, createTestStorage } from './utils/storage'
+import { expectHas } from '../internal/test-utils/expect'
+import { privateKeyAsJwkString, verifyPublicKey } from '../internal/test-utils/jwt'
+import { mockPrivateKeyJwtTokenExchange, mockTokenExchange } from '../internal/test-utils/mocks/auth'
+import { AUTH_SERVER, FHIR_SERVER } from '../internal/test-utils/mocks/common'
+import { mockSmartConfiguration } from '../internal/test-utils/mocks/issuer'
+import { createMockedStorage, createTestStorage } from '../internal/test-utils/storage'
+import { SmartClient } from '../smart'
+import { safeSmartStorage } from '../smart/storage'
+import type { InitialSession } from '../smart/storage/schema'
 
 test('public, launch - should allow launches for known issuers', async () => {
     const storage = createMockedStorage()

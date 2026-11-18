@@ -1,11 +1,10 @@
 import QuickLRU from 'quick-lru'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import type { ResourceCache } from '../client/cache/resource-cache-custom'
-
-import { mockPractitioner } from './mocks/resources'
-import { validExampleSession } from './utils/client-open'
-import { expectHas } from './utils/expect'
+import type { ResourceCache } from '../fhir/cache/resource-cache-custom'
+import { validExampleSession } from '../internal/test-utils/client-open'
+import { expectHas } from '../internal/test-utils/expect'
+import { mockPractitioner } from '../internal/test-utils/mocks/resources'
 
 beforeEach(() => {
     vi.useFakeTimers()
@@ -18,7 +17,7 @@ afterEach(() => {
 
 describe('Inmemory Cache', () => {
     test('SmartClient.request - /Practitioner should fetch and cache Practitioner resource', async () => {
-        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
         const cacheConfig = { cache: { ttl: 15 * 1000 } }
 
         const [ready] = await createLaunchedOpenReadyClient(validExampleSession, undefined, 'in-memory')
@@ -34,7 +33,7 @@ describe('Inmemory Cache', () => {
     })
 
     test('SmartClient.request - /Practitioner cache should respect ttl value', async () => {
-        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
         const cacheConfig = { cache: { ttl: 15 * 1000 } }
 
         const [ready] = await createLaunchedOpenReadyClient(validExampleSession, undefined, 'in-memory')
@@ -58,7 +57,7 @@ describe('Inmemory Cache', () => {
     })
 
     test('SmartClient.user.request - /Practitioner should fetch and cache Practitioner resource', async () => {
-        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
         const cacheConfig = { cache: { ttl: 15 * 1000 } }
 
         const [ready] = await createLaunchedOpenReadyClient(validExampleSession, undefined, 'in-memory')
@@ -87,7 +86,7 @@ describe('ResourceCache Cache', () => {
     }
 
     test('SmartClient.request - /Practitioner should fetch and cache Practitioner resource', async () => {
-        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
         const cacheConfig = { cache: { ttl: 15 * 1000 } }
 
         const cache = createTestCache()
@@ -104,7 +103,7 @@ describe('ResourceCache Cache', () => {
     })
 
     test('SmartClient.request - Should use provided ResourceCache implementation if provided', async () => {
-        const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+        const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
         const cacheConfig = { cache: { ttl: 15 * 1000 } }
 
         const cache = createTestCache()
@@ -129,7 +128,7 @@ describe('ResourceCache Cache', () => {
 })
 
 test('No Cache - should not cache anything', async () => {
-    const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+    const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
     const [ready] = await createLaunchedOpenReadyClient(validExampleSession, undefined, 'disabled')
 
     const scope = mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')
@@ -146,7 +145,7 @@ test('No Cache - should not cache anything', async () => {
 })
 
 test('No Cache - attempting to cache a request with no cache configured should fail', async () => {
-    const { createLaunchedOpenReadyClient } = await import('./utils/client-open')
+    const { createLaunchedOpenReadyClient } = await import('../internal/test-utils/client-open')
     const [ready] = await createLaunchedOpenReadyClient(validExampleSession, undefined, 'disabled')
 
     mockPractitioner('ac768edb-d56a-4304-8574-f866c6af4e7e')

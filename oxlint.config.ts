@@ -8,7 +8,63 @@ export default defineConfig({
     ignorePatterns: ['docs/.vitepress/**'],
     overrides: [
         {
-            files: ['src/__tests__/**/*.{ts,tsx}'],
+            files: ['src/fhir/**/*.ts'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: ['**/smart', '**/smart/**', '@navikt/smart-on-fhir/smart'],
+                                message: '/fhir must not depend on /smart (only smart → fhir is allowed).',
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
+            files: ['src/zod/**/*.ts'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: ['**/smart', '**/smart/**', '@navikt/smart-on-fhir/smart'],
+                                message: '/zod must not depend on /smart (only smart → zod is allowed).',
+                            },
+                            {
+                                group: ['**/fhir', '**/fhir/**', '@navikt/smart-on-fhir/fhir'],
+                                message: '/zod must not depend on /fhir (only fhir → zod is allowed).',
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
+            files: ['src/lib/**/*.ts'],
+            rules: {
+                'no-restricted-imports': [
+                    'error',
+                    {
+                        patterns: [
+                            {
+                                group: ['**/smart', '**/smart/**', '@navikt/smart-on-fhir/smart'],
+                                message: '/lib must not depend on /smart (only smart → lib is allowed).',
+                            },
+                            {
+                                group: ['**/fhir', '**/fhir/**', '@navikt/smart-on-fhir/fhir'],
+                                message: '/lib must not depend on /fhir (only fhir → lib is allowed).',
+                            },
+                        ],
+                    },
+                ],
+            },
+        },
+        {
+            files: ['src/**/*.test.{ts,tsx}', 'src/internal/test-utils/**/*.ts'],
             rules: {
                 'vitest/expect-expect': [
                     'error',

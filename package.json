@@ -19,7 +19,8 @@
         "next:minor": "yarn version -i minor",
         "docs:dev": "vitepress dev docs",
         "docs:build": "vitepress build docs",
-        "docs:preview": "vitepress preview docs"
+        "docs:preview": "vitepress preview docs",
+        "deps:graph": "yarn dlx madge --exclude '(\\.(test|spec)\\.ts$|__tests__/|/test/)' --extensions ts --ts-config tsconfig.json --image graph.svg src"
     },
     "publishConfig": {
         "access": "public",
@@ -31,9 +32,13 @@
         "LICENSE"
     ],
     "exports": {
-        "./client": {
-            "types": "./dist/client/index.d.mts",
-            "import": "./dist/client/index.mjs"
+        "./fhir": {
+            "types": "./dist/fhir/index.d.mts",
+            "import": "./dist/fhir/index.mjs"
+        },
+        "./smart": {
+            "types": "./dist/smart/index.d.mts",
+            "import": "./dist/smart/index.mjs"
         },
         "./zod": {
             "types": "./dist/zod/index.d.mts",
