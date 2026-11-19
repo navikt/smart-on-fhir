@@ -1,6 +1,12 @@
 import { calculatePKCECodeChallenge, randomPKCECodeVerifier, randomState } from 'openid-client'
 
 import type { CacheOptions } from '#fhir/cache'
+import {
+    type ErrorRecoveryStorage,
+    safeErrorRecoveryStorage,
+    type SafeErrorRecoveryStorage,
+} from '#fhir/error-recorder/error-recovery-storage'
+import { ErrorRecorder } from '#fhir/error-recorder/ErrorRecorder'
 import { createTracing, failSpan } from '#internal-lib/otel'
 import { removeTrailingSlash } from '#internal-lib/utils'
 
@@ -58,6 +64,7 @@ export class SmartClient {
     }
 
     private readonly _storage: SafeSmartStorage
+    private readonly _errorRecoveryStorage: SafeErrorRecoveryStorage | undefined
     private readonly _clientConfig: SmartClientConfiguration
 
     /**
@@ -86,6 +93,7 @@ export class SmartClient {
         configuration: {
             storage: SmartStorage | Promise<SmartStorage>
             cache?: CacheOptions
+            errorRecovery?: ErrorRecoveryStorage | Promise<ErrorRecoveryStorage>
             options?: SmartClientOptions & {
                 /**
                  * When enabled, will redirect to redirectUrl with the patient ID as a query parameter, allowing the
@@ -106,6 +114,7 @@ export class SmartClient {
         configuration: {
             storage: SmartStorage | Promise<SmartStorage>
             cache?: CacheOptions
+            errorRecovery?: ErrorRecoveryStorage | Promise<ErrorRecoveryStorage>
             options?: SmartClientOptions & { enableMultiLaunch?: true }
         },
     ) {
@@ -126,8 +135,11 @@ export class SmartClient {
         this.sessionId = sessionId
         this.activePatient = activePatient ?? null
 
-        this._storage = safeSmartStorage(configuration.storage)
         this._clientConfig = clientConfiguration
+        this._storage = safeSmartStorage(configuration.storage)
+        this._errorRecoveryStorage = configuration.errorRecovery
+            ? safeErrorRecoveryStorage(configuration.errorRecovery)
+            : undefined
 
         this.options = {
             autoRefresh: configuration.options?.autoRefresh ?? false,
@@ -136,8 +148,12 @@ export class SmartClient {
             cache: configuration.cache ?? 'disabled',
         }
 
+        if (this._errorRecoveryStorage != null && !this.options.multiLaunch) {
+            throw new Error('Enabling error recovery requires multi-launch for fully identified sessions.')
+        }
+
         /**
-         * Initialize a stateless validator, this will merge with the current session later.
+         * Initialise a stateless validator, this will merge with the current session later.
          */
         this.validator = new SmartValidatorRuntime()
     }
@@ -336,8 +352,14 @@ export class SmartClient {
 
             try {
                 const currentIssuer = this.getKnownFhirServer(session.fhirServer)
+                const errorRecorder = this._errorRecoveryStorage
+                    ? new ErrorRecorder({
+                          errorGroupKey: `${this.sessionId}:${this.activePatient}`,
+                          storage: this._errorRecoveryStorage,
+                      })
+                    : undefined
 
-                return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer', async () => {
+                return new ReadyClient(this, session, currentIssuer?.name ?? 'open issuer', errorRecorder, async () => {
                     const session = await this.getCompleteSession()
                     if ('error' in session) {
                         logger.warn(`Unable to persist validator state, session loading said: ${session.error})`)

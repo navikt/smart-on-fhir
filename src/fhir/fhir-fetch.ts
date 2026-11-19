@@ -30,7 +30,7 @@ export type FhirFetchResult =
           error: Error
       }
 
-type PutPostFhirPayload = {
+export type PutPostFhirPayload = {
     payload: unknown
 }
 
@@ -100,14 +100,14 @@ export async function bundleFhir(server: FhirServer, { payload }: BundleFhir): P
     })
 }
 
-type PutFhir = {
+export type PutFhirResourceIdentifier = {
     path: KnownCreatePaths
     id: string
 }
 
 export async function putFhir(
     server: FhirServer,
-    { path, id }: PutFhir,
+    { path, id }: PutFhirResourceIdentifier,
     { payload }: PutPostFhirPayload,
 ): Promise<FhirFetchResult> {
     return spanAsync('fhir.put', async (span) => {

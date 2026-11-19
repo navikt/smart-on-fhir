@@ -1,4 +1,5 @@
 import type { CacheOptions } from '#fhir/cache'
+import type { ErrorRecoveryStorage } from '#fhir/error-recorder/error-recovery-storage'
 import { createTestStorage } from '#smart/__tests__/utils/storage'
 import { ReadyClient, SmartClient, type SmartClientOptions } from '#smart/index'
 import { type SafeSmartStorage, safeSmartStorage } from '#smart/storage'
@@ -53,6 +54,34 @@ export async function createLaunchedOpenReadyClient(
     expectIs(ready, ReadyClient)
 
     return [ready, storage]
+}
+
+export async function createReadyClientWithErrorRecovery(
+    session: CompleteSession,
+    options?: SmartClientOptions,
+    cache?: CacheOptions,
+): Promise<[ReadyClient, SafeSmartStorage]> {
+    const storage = createTestStorage()
+    const errorRecovery: ErrorRecoveryStorage = {} as ErrorRecoveryStorage
+
+    const client = new SmartClient(
+        { sessionId: TEST_SESSION_ID, activePatient: 'test-patient' },
+        {
+            clientId: 'test-client',
+            scope: 'openid fhirUser launch/patient',
+            callbackUrl: 'http://app/callback',
+            redirectUrl: 'http://app/redirect',
+            allowAnyIssuer: true,
+        },
+        { storage, errorRecovery, options: { enableMultiLaunch: true, ...options }, cache },
+    )
+
+    await storage.set(TEST_SESSION_ID, session)
+    const ready = await client.ready()
+
+    expectIs(ready, ReadyClient)
+
+    return [ready, safeSmartStorage(storage)]
 }
 
 export async function justOpenReadyClient(

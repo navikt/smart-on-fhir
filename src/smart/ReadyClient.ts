@@ -1,6 +1,7 @@
 import type * as z from 'zod'
 
 import type { CacheableResource } from '#fhir/cache'
+import type { ErrorRecorder } from '#fhir/error-recorder/ErrorRecorder'
 import type { FhirFetchResult } from '#fhir/fhir-fetch'
 import type { ResourceRequestErrors } from '#fhir/fhir-resource-errors'
 import { FhirClient } from '#fhir/FhirClient'
@@ -41,7 +42,8 @@ export class ReadyClient {
         client: SmartClient,
         session: CompleteSession,
         issuerName: string,
-        persistValidation: () => Promise<void>,
+        errorRecorder?: ErrorRecorder,
+        persistValidation?: () => Promise<void>,
     ) {
         this.issuerName = issuerName
 
@@ -55,6 +57,7 @@ export class ReadyClient {
                 runtime: new FhirValidatorRuntime(this._client.validator.validations),
                 persist: persistValidation,
             },
+            errorRecorder: errorRecorder,
         })
 
         this.#idToken = idTokenClaims(this._session)
