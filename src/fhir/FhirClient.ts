@@ -6,8 +6,16 @@ import { inferResourceType } from '#internal-lib/utils'
 import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '#zod'
 
 import { type CacheableResource, type CacheOptions, getCachedResource, setCachedResource } from './cache'
+import { assertErrorRecorderEnabled, type ErrorRecorder } from './error-recorder/ErrorRecorder'
 import { fhirResponseToFormattedError } from './fhir-errors'
-import { bundleFhir, getFhir, postFhir, putFhir } from './fhir-fetch'
+import {
+    bundleFhir,
+    getFhir,
+    postFhir,
+    putFhir,
+    type PutFhirResourceIdentifier,
+    type PutPostFhirPayload,
+} from './fhir-fetch'
 import { fhirLogger } from './fhir-logger'
 import { FhirOtelAttributes } from './fhir-otel'
 import type { ResourceBatchErrors, ResourceCreateErrors, ResourceRequestErrors } from './fhir-resource-errors'
@@ -33,12 +41,17 @@ export class FhirClient {
     readonly #fetcher: (request: () => Promise<Response>, span: Span) => Promise<Response>
     readonly #cache: CacheOptions
 
+    readonly #errorRecorder?: ErrorRecorder
     readonly #validator?: FhirValidatorRuntime
     readonly #persistValidation?: () => Promise<void>
 
     constructor(
         server: AuthenticatedServer | OpenServer,
         options?: {
+            /**
+             * Enable to opt-in to error recovery. If enabled, any failed requests will be recorded in the provided ErrorRecorder.
+             */
+            errorRecorder?: ErrorRecorder
             /**
              * Optional fetcher, used if you for example want to refresh tokens and retry.
              */
@@ -48,7 +61,7 @@ export class FhirClient {
              */
             validator?: {
                 runtime: FhirValidatorRuntime
-                persist: () => Promise<void>
+                persist?: () => Promise<void>
             }
             /**
              * If set, will cache FHIR resources in the provided cache. If not set, caching is disabled.
@@ -60,13 +73,20 @@ export class FhirClient {
         this.#validator = options?.validator?.runtime
         this.#persistValidation = options?.validator?.persist
         this.#cache = options?.cache ?? 'disabled'
+        this.#errorRecorder = options?.errorRecorder
 
         this.#fetcher = options?.fetcher ?? ((request) => request())
     }
 
     public async create<Path extends KnownCreatePaths>(
         resource: Path,
-        params: { payload: PayloadForCreate<Path> },
+        params: {
+            payload: PayloadForCreate<Path>
+            /**
+             * When true, will record any errors in the provided ErrorRecorder
+             */
+            recoverable?: boolean
+        },
     ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
         const resourceType = inferResourceType(resource)
 
@@ -76,16 +96,24 @@ export class FhirClient {
                 [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
-            const response = await this.#fetcher(
-                () => postFhir(this.#server, resource, { payload: params.payload }),
-                span,
-            )
+            const postPayload: PutPostFhirPayload = { payload: params.payload }
+            const response = await this.#fetcher(() => postFhir(this.#server, resource, postPayload), span)
 
             if (!response.ok) {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'creation-failed')
                 failSpan(span, `Request to create ${resourceType} failed`, responseError)
+
+                if (params.recoverable) {
+                    assertErrorRecorderEnabled(this.#errorRecorder)
+                    await this.#errorRecorder.add({
+                        method: 'POST',
+                        path: resource,
+                        payload: postPayload,
+                        error: operationOutcome ?? responseError,
+                    })
+                }
 
                 switch (response.status) {
                     case 501: // not implemented, should never hit
@@ -120,7 +148,14 @@ export class FhirClient {
 
     public async update<Path extends KnownCreatePaths>(
         resource: Path,
-        params: { id: string; payload: PayloadForCreate<Path> },
+        params: {
+            id: string
+            payload: PayloadForCreate<Path>
+            /**
+             * When true, will record any errors in the provided ErrorRecorder
+             */
+            recoverable?: boolean
+        },
     ): Promise<ResponseForCreate<Path> | ResourceCreateErrors> {
         const resourceType = inferResourceType(resource)
 
@@ -130,16 +165,25 @@ export class FhirClient {
                 [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
-            const response = await this.#fetcher(
-                () => putFhir(this.#server, { id: params.id, path: resource }, { payload: params.payload }),
-                span,
-            )
+            const resourceIdentifier: PutFhirResourceIdentifier = { id: params.id, path: resource }
+            const putPayload: PutPostFhirPayload = { payload: params.payload }
+            const response = await this.#fetcher(() => putFhir(this.#server, resourceIdentifier, putPayload), span)
 
             if (!response.ok) {
                 const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'update-failed')
                 failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
+
+                if (this.#errorRecorder) {
+                    assertErrorRecorderEnabled(this.#errorRecorder)
+                    await this.#errorRecorder.add({
+                        method: 'PUT',
+                        resource: resourceIdentifier,
+                        payload: putPayload,
+                        error: operationOutcome ?? responseError,
+                    })
+                }
 
                 switch (response.status) {
                     case 501: // not implemented, should never hit

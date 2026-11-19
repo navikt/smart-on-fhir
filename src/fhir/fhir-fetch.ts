@@ -6,11 +6,15 @@ import type { FhirServer } from './fhir-servers'
 import type { KnownCreatePaths } from './resources/create-resource-map'
 import type { KnownPaths } from './resources/request-resource-map'
 
-type PostFhir = {
+export type PutPostFhirPayload = {
     payload: unknown
 }
 
-export async function postFhir(server: FhirServer, path: KnownCreatePaths, { payload }: PostFhir): Promise<Response> {
+export async function postFhir(
+    server: FhirServer,
+    path: KnownCreatePaths,
+    { payload }: PutPostFhirPayload,
+): Promise<Response> {
     const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}`
 
     return await fetch(resourcePath, {
@@ -42,12 +46,16 @@ export async function bundleFhir(server: FhirServer, { payload }: BundleFhir): P
     })
 }
 
-type PutFhir = {
+export type PutFhirResourceIdentifier = {
     path: KnownCreatePaths
     id: string
 }
 
-export async function putFhir(server: FhirServer, { path, id }: PutFhir, { payload }: PostFhir): Promise<Response> {
+export async function putFhir(
+    server: FhirServer,
+    { path, id }: PutFhirResourceIdentifier,
+    { payload }: PutPostFhirPayload,
+): Promise<Response> {
     const resourcePath = `${removeTrailingSlash(server.fhirServer)}/${path}/${id}`
 
     return await fetch(resourcePath, {

@@ -38,7 +38,7 @@ export class MockReadyClient extends ReadyClient {
     private readonly mockOptions: MockReadyClientOptions
 
     constructor(options: MockReadyClientOptions) {
-        super(mockClient(), mockSession(options), options.issuerName ?? 'Mock issuer', async () => void 0)
+        super(mockClient(), mockSession(options), options.issuerName ?? 'Mock issuer', undefined, async () => void 0)
         this.mockOptions = options
     }
 
