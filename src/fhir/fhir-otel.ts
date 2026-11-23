@@ -5,6 +5,7 @@ import { SharedOtelAttributes } from '#internal-lib/otel'
  */
 export const FhirOtelAttributes = {
     ...SharedOtelAttributes,
+    FhirFetch: 'fhir.fetch',
     FhirResource: 'fhir.resource',
     FhirResourceStatus: 'fhir.resource.status',
     ResourceCacheEnabled: 'fhir.resource.cache-enabled',
