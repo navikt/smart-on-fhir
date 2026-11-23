@@ -1,5 +1,5 @@
 import { logger as pinoLogger } from '@navikt/pino-logger'
-import { context, type Span, SpanStatusCode, trace, type Tracer } from '@opentelemetry/api'
+import { context, type Span, type Attributes, SpanStatusCode, trace, type Tracer } from '@opentelemetry/api'
 import { suppressTracing } from '@opentelemetry/core'
 
 export type { Span }
@@ -56,8 +56,11 @@ export async function squelchTracing<Result>(fn: () => Promise<Result>): Promise
  */
 export function failSpan(span: Span, what: string): void
 export function failSpan(span: Span, what: string, error: unknown): void
-export function failSpan(span: Span, what: string, error?: unknown): void {
+export function failSpan(span: Span, what: string, error: unknown, attrs?: Attributes): void
+export function failSpan(span: Span, what: string, error?: unknown, attrs?: Attributes): void {
     otelLogger.error(new Error(what, { cause: error }))
+
+    if (attrs) span.setAttributes(attrs)
 
     if (error && error instanceof Error) {
         span.recordException(error)

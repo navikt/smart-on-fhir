@@ -6,8 +6,7 @@ import { inferResourceType } from '#internal-lib/utils'
 import { type FhirBatchBundle, type FhirBatchResponseBundle, FhirBatchResponseBundleSchema } from '#zod'
 
 import { type CacheableResource, type CacheOptions, getCachedResource, setCachedResource } from './cache'
-import { fhirResponseToFormattedError } from './fhir-errors'
-import { bundleFhir, getFhir, postFhir, putFhir } from './fhir-fetch'
+import { bundleFhir, type FhirFetchResult, getFhir, postFhir, putFhir } from './fhir-fetch'
 import { fhirLogger } from './fhir-logger'
 import { FhirOtelAttributes } from './fhir-otel'
 import type { ResourceBatchErrors, ResourceCreateErrors, ResourceRequestErrors } from './fhir-resource-errors'
@@ -30,7 +29,7 @@ const { spanAsync } = createTracing('fhir')
  */
 export class FhirClient {
     readonly #server: AuthenticatedServer | OpenServer
-    readonly #fetcher: (request: () => Promise<Response>, span: Span) => Promise<Response>
+    readonly #fetcher: (request: () => Promise<FhirFetchResult>, span: Span) => Promise<FhirFetchResult>
     readonly #cache: CacheOptions
 
     readonly #validator?: FhirValidatorRuntime
@@ -42,7 +41,7 @@ export class FhirClient {
             /**
              * Optional fetcher, used if you for example want to refresh tokens and retry.
              */
-            fetcher?: (request: () => Promise<Response>, span: Span) => Promise<Response>
+            fetcher?: (request: () => Promise<FhirFetchResult>, span: Span) => Promise<FhirFetchResult>
             /**
              * The validator runtime to use for validating FHIR resources.
              */
@@ -76,32 +75,35 @@ export class FhirClient {
                 [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
-            const response = await this.#fetcher(
+            const fhirFetch: FhirFetchResult = await this.#fetcher(
                 () => postFhir(this.#server, resource, { payload: params.payload }),
                 span,
             )
 
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+            if (!fhirFetch.success) {
+                if (fhirFetch.errorType === 'fetch-failed') {
+                    failSpan(span, `Request to create ${resourceType} fetch failed`, fhirFetch.error)
+                    return { error: 'CREATE_FAILED_FETCH_FAILED', operationOutcome: null }
+                }
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'creation-failed')
-                failSpan(span, `Request to create ${resourceType} failed`, responseError)
+                failSpan(span, `Request to create ${resourceType} failed`, fhirFetch)
 
-                switch (response.status) {
+                switch (fhirFetch.response.status) {
                     case 501: // not implemented, should never hit
                         fhirLogger.error(
                             `Server responded 501 to create ${resourceType}. This EHR (${this.#server.fhirServer}) is seriously misconfigured, contact the issuer.`,
                         )
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome: fhirFetch.operationOutcome }
                     case 404: // not implemented for writes
                     case 405: // the server does not support this verb on this resource
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome: fhirFetch.operationOutcome }
                     default:
-                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome: fhirFetch.operationOutcome }
                 }
             }
 
-            const result = await response.json()
+            const result = await fhirFetch.response.json()
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'parsing-failed')
@@ -130,32 +132,35 @@ export class FhirClient {
                 [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
-            const response = await this.#fetcher(
+            const fhirFetch = await this.#fetcher(
                 () => putFhir(this.#server, { id: params.id, path: resource }, { payload: params.payload }),
                 span,
             )
 
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+            if (!fhirFetch.success) {
+                if (fhirFetch.errorType === 'fetch-failed') {
+                    failSpan(span, `Request to update (PUT) ${resourceType} fetch failed`, fhirFetch.error)
+                    return { error: 'CREATE_FAILED_FETCH_FAILED', operationOutcome: null }
+                }
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'update-failed')
-                failSpan(span, `Request to update (PUT) ${resourceType} failed`, responseError)
+                failSpan(span, `Request to update (PUT) ${resourceType} failed`, fhirFetch.error)
 
-                switch (response.status) {
+                switch (fhirFetch.response.status) {
                     case 501: // not implemented, should never hit
                         fhirLogger.error(
                             `Server responded 501 to update ${resourceType}. This EHR (${this.#server.fhirServer}) is seriously misconfigured, contact the issuer.`,
                         )
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome: fhirFetch.operationOutcome }
                     case 404: // not implemented for updates
                     case 405: // the server does not support this verb on this resource
-                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome }
+                        return { error: 'CREATE_FAILED_NOT_SUPPORTED', operationOutcome: fhirFetch.operationOutcome }
                     default:
-                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome }
+                        return { error: 'CREATE_FAILED_NON_OK_RESPONSE', operationOutcome: fhirFetch.operationOutcome }
                 }
             }
 
-            const result = await response.json()
+            const result = await fhirFetch.response.json()
             const parsed = createResourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'parsing-failed')
@@ -196,30 +201,33 @@ export class FhirClient {
                 }
             }
 
-            const doRequest = (): Promise<Response> => getFhir(this.#server, resource)
-            const response = await this.#fetcher(
+            const doRequest = (): Promise<FhirFetchResult> => getFhir(this.#server, resource)
+            const fhirFetch = await this.#fetcher(
                 () => (config?.expectNotFound ? squelchTracing(doRequest) : doRequest()),
                 span,
             )
 
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+            if (!fhirFetch.success) {
+                if (fhirFetch.errorType === 'fetch-failed') {
+                    failSpan(span, `Request to get ${resourceType} fetch failed`, fhirFetch.error)
+                    return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: null }
+                }
 
-                if (response.status === 404) {
+                if (fhirFetch.response.status === 404) {
                     span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'not-found')
                     if (!config?.expectNotFound) {
                         fhirLogger.warn(`Resource (${resource}) was not found on FHIR server`)
                     }
-                    return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: operationOutcome }
+                    return { error: 'REQUEST_FAILED_RESOURCE_NOT_FOUND', operationOutcome: fhirFetch.operationOutcome }
                 }
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'request-failed')
-                failSpan(span, `Request to get ${resource} failed`, responseError)
+                failSpan(span, `Request to get ${resource} failed`, fhirFetch.error)
 
-                return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: operationOutcome }
+                return { error: 'REQUEST_FAILED_NON_OK_RESPONSE', operationOutcome: fhirFetch.operationOutcome }
             }
 
-            const result = await response.json()
+            const result = await fhirFetch.response.json()
             const parsed = resourceToSchema(resource).loose().safeParse(result)
             if (!parsed.success) {
                 failSpan(span, `${resourceType} parse error`, parsed.error)
@@ -253,7 +261,7 @@ export class FhirClient {
                 [FhirOtelAttributes.FhirServer]: this.#server.fhirServer,
             })
 
-            const response = await this.#fetcher(
+            const response: FhirFetchResult = await this.#fetcher(
                 () =>
                     bundleFhir(this.#server, {
                         payload: {
@@ -265,16 +273,25 @@ export class FhirClient {
                 span,
             )
 
-            if (!response.ok) {
-                const [responseError, operationOutcome] = await fhirResponseToFormattedError(response)
+            if (!response.success) {
+                if (response.errorType === 'fetch-failed') {
+                    failSpan(span, `Request for ${type} Bundle fetch failed`, response.error)
+                    return {
+                        error: 'BATCH_FAILED_NON_OK_RESPONSE',
+                        operationOutcome: null,
+                    } satisfies ResourceBatchErrors
+                }
 
                 span.setAttribute(FhirOtelAttributes.FhirResourceStatus, 'batch-failed')
-                failSpan(span, `Request for ${type} Bundle failed`, responseError)
+                failSpan(span, `Request for ${type} Bundle failed`, response.error)
 
-                return { error: 'BATCH_FAILED_NON_OK_RESPONSE', operationOutcome } satisfies ResourceBatchErrors
+                return {
+                    error: 'BATCH_FAILED_NON_OK_RESPONSE',
+                    operationOutcome: response.operationOutcome,
+                } satisfies ResourceBatchErrors
             }
 
-            const result = await response.json()
+            const result = await response.response.json()
             const parsed = FhirBatchResponseBundleSchema.loose().safeParse(result)
             if (!parsed.success) {
                 failSpan(span, `Failed to parse ${type} Bundle response`, parsed.error)

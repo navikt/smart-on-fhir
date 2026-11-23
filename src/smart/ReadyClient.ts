@@ -1,6 +1,7 @@
 import type * as z from 'zod'
 
 import type { CacheableResource } from '#fhir/cache'
+import type { FhirFetchResult } from '#fhir/fhir-fetch'
 import type { ResourceRequestErrors } from '#fhir/fhir-resource-errors'
 import { FhirClient } from '#fhir/FhirClient'
 import { FhirValidatorRuntime } from '#fhir/validation/fhir-validator-runtime'
@@ -137,10 +138,15 @@ export class ReadyClient {
 
     public multi = multi
 
-    private fetchWithRefresh = async (fetcher: () => Promise<Response>, span: Span): Promise<Response> => {
+    private fetchWithRefresh = async (
+        fetcher: () => Promise<FhirFetchResult>,
+        span: Span,
+    ): Promise<FhirFetchResult> => {
         const response = await fetcher()
         if (!this._client.options.autoRefresh) return response
-        if (response.status !== 401) return response
+        if (response.success || response.errorType === 'fetch-failed' || response.response.status !== 401) {
+            return response
+        }
 
         const expiresInSeconds = tokenExpiresIn(this._session.accessToken)
         span.setAttributes({

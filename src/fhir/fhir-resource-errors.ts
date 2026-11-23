@@ -1,7 +1,11 @@
 import type { OperationOutcome, FhirBatchResponseBundle } from '#zod'
 
 export type ResourceCreateErrors = {
-    error: 'CREATE_FAILED_NON_OK_RESPONSE' | 'CREATE_FAILED_INVALID_RESPONSE' | 'CREATE_FAILED_NOT_SUPPORTED'
+    error:
+        | 'CREATE_FAILED_NON_OK_RESPONSE'
+        | 'CREATE_FAILED_FETCH_FAILED'
+        | 'CREATE_FAILED_INVALID_RESPONSE'
+        | 'CREATE_FAILED_NOT_SUPPORTED'
     operationOutcome?: OperationOutcome | null
 }
 
