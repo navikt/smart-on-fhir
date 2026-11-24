@@ -616,7 +616,7 @@ __metadata:
     oxlint-tsgolint: "npm:^7.0.2008"
     pino: "npm:^10.4.0"
     pinst: "npm:^3.0.0"
-    quick-lru: "npm:^7.3.0"
+    quick-lru: "npm:^8.0.0"
     tsdown: "npm:0.23.7"
     typescript: "npm:7.0.2"
     vite: "npm:^8.3.8"
@@ -3818,10 +3818,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"quick-lru@npm:^7.3.0":
-  version: 7.3.0
-  resolution: "quick-lru@npm:7.3.0"
-  checksum: 10c0/28dc8eaadcd489d26917f238ad27a6b09f8fe3a609152b0a4f399d5805094e07b56fe1e8c0d7ade0c11463c31bef329803672effc559601daf160a85f578fd05
+"quick-lru@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "quick-lru@npm:8.0.0"
+  checksum: 10c0/0d8e9ba770de9ee56c6e4bede10399c5b20b506c71c4e7eb1f745f473ce44ca4356c313ef53720e49609d952f054e969ef8953445548b452323a5d5eb4b56c72
   languageName: node
   linkType: hard
 

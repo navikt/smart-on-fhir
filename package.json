@@ -55,7 +55,7 @@
         "@opentelemetry/core": "^2.12.0",
         "jose": "^6.2.18",
         "openid-client": "^6.9.1",
-        "quick-lru": "^7.3.0"
+        "quick-lru": "^8.0.0"
     },
     "peerDependencies": {
         "pino": "9 || 10",
