@@ -22,7 +22,7 @@ export async function fhirResponseToFormattedError(response: Response): Promise<
     } else if (contentType.includes('application/json')) {
         try {
             const json = JSON.parse(body)
-            return [new Error(JSON.stringify(json, null, 2)), null]
+            return [new Error(`Non-operation outcome JSON error: ${JSON.stringify(json)}`), null]
         } catch {
             // Just return the text
             return [new Error(body), null]

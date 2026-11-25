@@ -5,7 +5,7 @@ import {
     FhirDocumentReferenceSchema,
     type FhirQuestionnaireResponse,
     FhirQuestionnaireResponseSchema,
-} from '../../zod'
+} from '#zod'
 
 /** A map of FHIR paths in a FHIR server and their known corresponding resource types. */
 type CreateMap = {
